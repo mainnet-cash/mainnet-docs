@@ -7,7 +7,7 @@ RUN yarn -D
 RUN npm install -g vuepress
 WORKDIR /app
 COPY . .
-RUN vuepress build docs
+RUN vuepress build .
 RUN npm install -g static-server
 WORKDIR /app/docs/.vuepress/dist
 EXPOSE 5000
