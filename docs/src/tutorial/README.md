@@ -138,16 +138,6 @@ To document...
 
 To document...
 
-## Docker server
-
-To document...
-
-```sh
-docker run mainnet/mainnet-rest
-```
-
-[Here](https://hub.docker.com/r/mainnet/mainnet-rest/)
-
 ## Packages
 
 - NPM package `mainnet-js`
@@ -178,13 +168,11 @@ npm run api:build:client lang
 
 Where `lang` is the language you want to build, see [here](https://openapi-generator.tech/docs/generators/) for the list
 
-## REST server docs
+## REST API server
 
 <img src="/rest.svg" style="margin-top: 20px">
 
-These are done, but we need to document it.
-
-[Docs](https://rest-unstable.mainnet.cash/api-docs/)
+[REST API Docs](https://rest-unstable.mainnet.cash/api-docs/)
 
 ### Installation
 
