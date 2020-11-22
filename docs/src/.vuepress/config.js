@@ -34,8 +34,8 @@ module.exports = {
         lastUpdated: false,
         nav: [
             {
-                text: 'Guide',
-                link: '/guide/',
+                text: 'Tutorial',
+                link: '/tutorial/',
             },
             // {
             //   text: 'Config',
@@ -47,7 +47,7 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/guide/',
+            '/tutorial/',
             '/original.html',
         ]
     },

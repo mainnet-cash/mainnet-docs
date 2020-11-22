@@ -26,21 +26,38 @@ Now, you can create a test wallet:
 
 ```js
 const wallet = await TestNetWallet.newRandom();
-const wallet = await TestNetWallet.named('buyer'); // named wallet
 ```
 
-`buyer` is an optional name for the wallet, it saves data in user's browser for future re-use. See further for explanation.
+This wallet will not be persisted, if a user closes his browser, it's gone forever. We'll explain below how to make 
+persistent wallets.
+
+To create a persistent wallet:
+
+```js
+const wallet = await TestNetWallet.named('buyer');
+```
+
+`buyer` is an optional name for the wallet, it saves data in user's browser for future re-use.
+
+::: tip What is TestNet and RegTest?
 
 `TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
 which is what people usually mean when they talk about Bitcoin Cash network. 
-You might also hear about RegTest mode, which is when you run your Bitcoin Cash node 
+You might also hear about `RegTest` mode, which is when you run your Bitcoin Cash node 
 locally and you can get as many test coins as you need, but they exist on your machine only. 
 RegTest wallets are supported by mainnet library.
 
-To create a MainNet wallet (Bitcoin Cash production network) or a RegTest (local development) wallets, use this:
+:::
+
+To create a MainNet wallet (Bitcoin Cash production network): 
 
 ```js
-const wallet = await Wallet.newRandom(); // MainNet
+const wallet = await Wallet.newRandom();
+```
+
+RegTest (local development) wallets, use this:
+
+```js
 const wallet = await RegTestWallet.newRandom();
 ```
 
@@ -52,13 +69,6 @@ but it's better to run ```await Wallet.named(`user:${id}`)``` and add the `ID` o
 so that if the same browser multiple users use the same browser, they'll all get their own wallet.
 
 :::
-
-Running `await Wallet.newRandom()` will create a new wallet each time it is called, 
-which is not useful for your user, since they'll lose their private keys.
-
-For server-side languages named wallets are stored on the REST server (your own), so that you 
-can run something similar to await Wallet.named(`hot-wallet`) and get the same hot wallet every time 
-without the need to store the private key somewhere else.
 
 If you want to create a wallet from WIF (private key), use this call:
 
