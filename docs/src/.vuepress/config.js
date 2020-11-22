@@ -48,6 +48,8 @@ module.exports = {
         ],
         sidebar: [
             '/tutorial/',
+            '/tutorial/other_langs.html',
+            '/developing_mainnet.html',
             '/original.html',
         ]
     },

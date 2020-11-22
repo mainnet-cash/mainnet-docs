@@ -1,4 +1,4 @@
-# Overview
+# Tutorial (JavaScript)
 
 ::: danger
 
@@ -11,16 +11,23 @@ even though we try not to break things too often. Use at your own risk. To see t
 
 <!-- Your stack: Browser + IndexedDB PHP Other -->
 
-## Let's get programming Bitcoin Cash!
+## Let's get programming
 
 Note that this tutorial describes `Browser + IndexedDB` approach, which means that the wallets will be created 
 and persisted inside of a user browser.
 
-To get started using Bitcoin Cash on your site, include this tag in your section:
+To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://mainnet.cash/dist/mainnet-0.0.1-rc.js"></script>
+<script src="https://cdn.mainnet.cash/mainnet-0.0.1-rc.3.js"
+    integrity="sha384-C8lwo1llqjqJUHz/M0eTiQzqGqBhKKme3Cz4baMSvpX7vTBpM0ZmwSEzqr11mQsk"
+    crossorigin="anonymous"></script>
 ```
+
+<!-- 
+sha matching:
+curl https://cdn.mainnet.cash/mainnet-0.0.1-rc.3.js | openssl dgst -sha384 -binary | openssl base64 -A 
+-->
 
 Now, you can create a test wallet:
 
@@ -39,13 +46,10 @@ const wallet = await TestNetWallet.named('buyer');
 
 `buyer` is an optional name for the wallet, it saves data in user's browser for future re-use.
 
-::: tip What is TestNet and RegTest?
+::: tip What is TestNet?
 
 `TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
 which is what people usually mean when they talk about Bitcoin Cash network. 
-You might also hear about `RegTest` mode, which is when you run your Bitcoin Cash node 
-locally and you can get as many test coins as you need, but they exist on your machine only. 
-RegTest wallets are supported by mainnet library.
 
 :::
 
@@ -53,12 +57,6 @@ To create a MainNet wallet (Bitcoin Cash production network):
 
 ```js
 const wallet = await Wallet.newRandom();
-```
-
-RegTest (local development) wallets, use this:
-
-```js
-const wallet = await RegTestWallet.newRandom();
 ```
 
 ::: tip Why named wallets?
@@ -128,134 +126,44 @@ alert('Transaction has arrived!');
 
 ## QR codes
 
-To document...
+You can also display deposit QR codes. Create a placeholder first:
+
+```html
+<p style="text-align: center;">
+    <img src="https://cdn.mainnet.cash/wait.svg" style="width: 15em;" id="deposit">
+</p>
+```
+
+Then you can replace it with an actual QR code of the deposit address:
+
+```js
+document.querySelector('#deposit').src = wallet.getDepositQr().src;
+```
 
 ## Escrow contracts
 
-To document...
+Done, but not yet documented...
 
 ## CashScript
 
-To document...
+Done, but not yet documented...
 
-## Packages
+## RegTest wallets
 
-- NPM package `mainnet-js`
-- Python PyPI package `mainnet`
-- PHP Composer package `mainnet/mainnet`
-- Go [package](https://github.com/mainnet-cash/mainnet-go-generated) `https://github.com/mainnet-cash/mainnet-go-generated`
+TODO: How to run the local development environment
 
-### Other programming languages
+RegTest (local development) wallets, use this:
 
-We're using OpenAPI generators, so it allows you to build clients for dozens of programming languages or you can use the REST API directly.
+::: tip What is RegTest?
 
-You can see the docs for the REST API [here](https://rest-unstable.mainnet.cash/api-docs/)
+You might also hear about `RegTest` mode, which is when you run your Bitcoin Cash node 
+locally and you can get as many test coins as you need, but they exist on your machine only. 
+RegTest wallets are supported by mainnet library.
 
-We are automatically generating some clients, namely:
+:::
 
-- [PHP](https://github.com/mainnet-cash/mainnet-php-generated)
-- [Python](https://github.com/mainnet-cash/mainnet-python-generated)
-- [Go](https://github.com/mainnet-cash/mainnet-go-generated)
-
-...and we'll be adding to this list soon.
-
-To build the client for another language, run the following commands:
-
-```sh
-git clone https://github.com/mainnet-cash/mainnet-js.git
-npm run api:build:client lang
+```js
+const wallet = await RegTestWallet.newRandom();
 ```
-
-Where `lang` is the language you want to build, see [here](https://openapi-generator.tech/docs/generators/) for the list
-
-## REST API server
-
-All these clients (PHP, Go, Python, etc...) can't sign transactions or generate private keys, they are thin
-REST wrappers and dere all important tasks to the REST server. Here's how this works:
-
-<img src="/rest.svg" style="margin-top: 20px">
-
-[REST API Docs](https://rest-unstable.mainnet.cash/api-docs/)
-
-### Installation
-
-TODO: Postgres, DATABASE_URL ?
-
-#### Docker (exposed on localhost) <Badge text="recommended" type="tip"/>
-
-```shell
-docker run -d --env WORKERS=5 -p 127.0.0.1:3000:80 mainnet/mainnet-rest
-```
-
-Your REST server will now be available on http://127.0.0.1:3000/
-
-Try the REST API:
-
-```sh
-curl -X POST -H 'Content-type: application/json' -d'{}' \
-    http://127.0.0.1:3000/wallet/create
-```
-
-This is the most secure way to run the server, since it's the server that does the signing, so the private keys
-will be sent to it (and if you use named wallet - the private keys will be stored on server too, you don't want to
-keep them on a public server like `rest-unstable.mainnet.cash` - you want your own server)
-
-#### Docker (exposed for everyone) <Badge text="not recommended" type="warning"/>
-
-Alternatively, exposed for the whole world, unencrypted:  
-
-```shell
-docker run -d --env WORKERS=5 -p 80:80 mainnet/mainnet-rest
-```
-
-(This is not recommended since if you use named wallets - other users will be able to read your private keys)
-
-Or run with LetsEncrypt SSL (you need to provide a domain name and a "valid" email for notifications). 
-
-```shell
-mkdir -p letsencrypt
-sudo docker run --rm -p 80:80 -p 443:443 \
-    -v $(pwd)/letsencrypt:/etc/letsencrypt \
-    --env WORKERS=5 \
-    -e LETSENCRYPT_EMAIL=admin@example.com \
-    -e DOMAIN=example.com mainnet/mainnet-rest
-```
-
-Many more details about our Docker image can be found [here](https://github.com/mainnet-cash/mainnet-js/blob/master/generated/serve/docker/README.md)
-
-#### Without Docker
-
-```shell
-git clone https://github.com/mainnet-cash/mainnet-js.git
-cd mainnet-js
-npm i
-npm run api:build:server
-npm run build
-(cd generated/serve && npm i)
-PORT=3000 WORKERS=5 npm run api:serve:cluster
-```
-
-Open http://127.0.0.1:3000/api-docs/
-
-Try the REST API:
-
-```sh
-curl -X POST -H 'Content-type: application/json' -d'{}' \
-    http://127.0.0.1:3000/wallet/create
-```
-
-Response:
-
-```
-{"name":"","cashaddr":"bitcoincash:qzl6jf....
-```
-
-TODO: Add host:port to console output
-
-
-On MacOS if you get `gyp: No Xcode or CLT version detected!` you might want to follow 
-[this article](https://medium.com/flawless-app-stories/gyp-no-xcode-or-clt-version-detected-macos-catalina-anansewaa-38b536389e8d).
-
----
 
 To be continued...
