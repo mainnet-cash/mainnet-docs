@@ -182,6 +182,8 @@ but only act as an arbiter in case something goes wrong. It's possible in Bitcoi
 
 You'll need three addresses for this: `buyer`, `seller` and `arbiter`. 
 
+Note: The source for the contract is [here](https://github.com/mainnet-cash/mainnet-js/blob/a35c3ff9590eb04e03b122d7bb2d4bbb12150d66/src/contract/escrow/EscrowContract.ts#L98-L118). 
+
 1) Buyer sends the money to the contract and could then release the money to the seller 
 2) The seller could refund the buyer
 3) Arbiter can either complete the transaction to the seller or refund to the buyer, but cannot steal the money 
