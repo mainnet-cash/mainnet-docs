@@ -9,6 +9,12 @@ even though we try not to break things too often. Use at your own risk. To see t
 
 :::
 
+::: tip A working demo
+
+You can see a fully working demo [here](https://jsfiddle.net/ghn19jmu/2/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
+
+:::
+
 <!-- Your stack: Browser + IndexedDB PHP Other -->
 
 ## Let's get programming
