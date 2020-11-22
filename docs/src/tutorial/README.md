@@ -96,7 +96,7 @@ Let's create another wallet and send some of our money there:
 ```js
 const seller = new TestNetHdWallet('seller');
 
-await wallet.send([
+const txData = await wallet.send([
     [seller.depositAddress(), 0.01, 'USD'],
 ]);
 ```
@@ -112,9 +112,31 @@ console.log(await seller.getBalance('USD'));
 
 Great! You've just made your first transaction!
 
-## Waiting for a transaction
+Now you can send all of your money somewhere else:
+
+```js
+const txData = await seller.sendMax(wallet.depositAddress());
+```
+
+## QR codes
 
 Let's say you want to display a QR code for you user to pay you money and show an alert when money arrives?
+
+Let's display a QR code first. Create a placeholder first:
+
+```html
+<p style="text-align: center;">
+    <img src="https://cdn.mainnet.cash/wait.svg" style="width: 15em;" id="deposit">
+</p>
+```
+
+Then you can replace it with an actual QR code of the deposit address:
+
+```js
+document.querySelector('#deposit').src = wallet.getDepositQr().src;
+```
+
+## Waiting for a transaction
 
 Currently, the only way to wait for a tx is to poll the balance (this will improve later):
 
@@ -130,21 +152,6 @@ while((await wallet.getBalance('usd')) < 1.0) {
 alert('Transaction has arrived!');
 ````
 
-## QR codes
-
-You can also display deposit QR codes. Create a placeholder first:
-
-```html
-<p style="text-align: center;">
-    <img src="https://cdn.mainnet.cash/wait.svg" style="width: 15em;" id="deposit">
-</p>
-```
-
-Then you can replace it with an actual QR code of the deposit address:
-
-```js
-document.querySelector('#deposit').src = wallet.getDepositQr().src;
-```
 
 ## Escrow contracts
 
