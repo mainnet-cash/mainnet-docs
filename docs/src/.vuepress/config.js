@@ -49,10 +49,24 @@ module.exports = {
         sidebar: [
             '/tutorial/',
             '/tutorial/other_langs.html',
-            '/developing_mainnet.html',
-            '/original.html',
-            '/people.html',
-            '/projects.html',
+            {
+                title: 'Bitcoin Cash',
+                path: '',
+                collapsable: false,
+                children: [
+                    '/people.html',
+                    '/projects.html',
+                ]
+            },
+            {
+                title: 'Additional',
+                path: '',
+                collapsable: false,
+                children: [
+                    '/developing_mainnet.html',
+                    '/original.html',
+                ]
+            },
         ]
     },
 

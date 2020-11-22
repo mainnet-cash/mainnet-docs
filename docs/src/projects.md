@@ -1,4 +1,8 @@
-# Bitcoin Cash: sites and applications
+---
+sidebarDepth: 0
+---
+
+# Sites and applications
 
 Originally published on [read.cash](https://read.cash/@Read.Cash/bitcoin-cash-specific-sites-and-applications-7f03d537)
 
