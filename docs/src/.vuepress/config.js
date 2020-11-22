@@ -51,6 +51,8 @@ module.exports = {
             '/tutorial/other_langs.html',
             '/developing_mainnet.html',
             '/original.html',
+            '/people.html',
+            '/projects.html',
         ]
     },
 
