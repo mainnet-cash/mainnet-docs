@@ -89,6 +89,26 @@ run it using `electron-cash --testnet` flag. For example, on MacOS that would be
 `/Applications/Electron-Cash.app/Contents/MacOS/Electron-Cash --testnet`
 :::
 
+## Getting the balance
+
+To get the balance of the wallet you can do this:
+
+```js
+console.log(await seller.getBalance('usd'));
+// 0.00
+console.log(await seller.getBalance('bch'));
+// 0.00
+console.log(await seller.getBalance('sat'));
+// 0
+```
+
+You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in case you forget the exact name).
+
+- 1 satoshi = 0.000 000 01 Bitcoin Cash
+- 1 Bitcoin Cash = 100,000,000 satoshis
+
+`USD` returns the amount at the current exchange rate. 
+
 ## Sending money
 
 Let's create another wallet and send some of our money there:
@@ -154,14 +174,79 @@ while((await wallet.getBalance('usd')) < 1.0) {
 alert('Transaction has arrived!');
 ````
 
-
 ## Escrow contracts
 
-Done, but not yet documented...
+Ok, let's now assume that you are building a service where you want to connect a buyer and a seller (a freelance marketplace 
+or a non-custodial exchange), but at the same time you don't want to hold anyone's money, 
+but only act as an arbiter in case something goes wrong. It's possible in Bitcoin Cash and it's called "an escrow contract".
+
+You'll need three addresses for this: `buyer`, `seller` and `arbiter`. 
+
+1) Buyer sends the money to the contract and could then release the money to the seller 
+2) The seller could refund the buyer
+3) Arbiter can either complete the transaction to the seller or refund to the buyer, but cannot steal the money 
+
+```js
+let escrow = new EscrowContract({
+  arbiterAddr: arbiter.getDepositAddress(),
+  buyerAddr: buyer.getDepositAddress(),
+  sellerAddr: seller.getDepositAddress(),
+});
+```
+
+You can now send money to the contract:
+
+```js
+await buyer.send([ [ escrow.getAddress(), 450000, "satoshis" ], ]);
+``` 
+
+Check the balance of the contract (in satoshis):
+
+```js
+await escrow.getBalance()
+// 450000
+```
+
+TODO: a function to convert satoshis to USD and vice versa - that's coming
+
+Now, we can execute the necessary functions:
+
+1) Buyer releases the funds
+```js
+await escrow.run(buyer.privateKeyWif, "spend");
+```
+
+2) Seller refunds
+```js
+await escrow.run(seller.privateKeyWif, "refund");
+```
+
+3) Arbiter releases the funds or refunds
+```js
+await escrow.run(arbiter.privateKeyWif, "spend");
+await escrow.run(arbiter.privateKeyWif, "refund");
+```
+
+### Saving the contract to the database
+
+The arbiter needs to save the contract somewhere (in a database or some other storage), so that when the time comes,
+he could execure the necessary functions:
+
+Save:
+
+```js
+const contractId = escrow.toString();
+```
+
+Restore it later:
+
+```js
+const restoredEscrow = EscrowContract.fromId(contractId);
+```
 
 ## CashScript
 
-Done, but not yet documented...
+Somewhat done, but not yet documented...
 
 ## RegTest wallets
 

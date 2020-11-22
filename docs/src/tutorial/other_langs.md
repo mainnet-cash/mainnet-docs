@@ -1,10 +1,16 @@
 # Other programming languages
 
-We're using OpenAPI generators, so it allows you to build clients for dozens of programming languages 
+With a limited budget, we are mainly concentrated on developing mainnet library for JavaScript, 
+but as an added bonus we decided to build a REST server that will allow other languages 
+to access the Bitcoin Cash network too using the same code.
+
+We're using OpenAPI generators, which allows you to build clients for dozens of programming languages,
 or you can use the REST API directly.
 
 All these clients (PHP, Go, Python, etc...) can't sign transactions or generate private keys, they are thin
-REST wrappers and defer all important tasks to the REST server. Here's how this works:
+REST wrappers and defer all important tasks to the REST server. 
+
+Here's how this works:
 
 <img src="/rest.svg" style="margin-top: 20px">
 
