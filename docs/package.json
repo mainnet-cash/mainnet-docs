@@ -1,0 +1,20 @@
+{
+  "name": "mainnet.cash",
+  "version": "0.0.1",
+  "description": "Bitcoin Cash programming",
+  "main": "index.js",
+  "authors": {
+    "name": "Mainnet",
+    "email": "hello@mainnet.cash"
+  },
+  "repository": "/mainnet.cash",
+  "scripts": {
+    "dev": "vuepress dev src",
+    "build": "vuepress build src",
+    "deploy": "caprover deploy -n cpr1 -a mainnet-docs -b master"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.5.3"
+  }
+}
