@@ -8,5 +8,8 @@ RUN npm install -g vuepress
 WORKDIR /app
 COPY . .
 WORKDIR /app/docs
+RUN vuepress build src
 
-ENTRYPOINT vuepress dev src
+WORKDIR /app/docs/src/.vuepress/dist/
+RUN npm install -g static-server
+ENTRYPOINT static-server -p 8080
