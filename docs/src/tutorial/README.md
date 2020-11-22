@@ -118,7 +118,9 @@ Now you can send all of your money somewhere else:
 const txData = await seller.sendMax(wallet.depositAddress());
 ```
 
-## QR codes
+## Waiting for a transaction
+
+### QR codes
 
 Let's say you want to display a QR code for you user to pay you money and show an alert when money arrives?
 
@@ -136,7 +138,7 @@ Then you can replace it with an actual QR code of the deposit address:
 document.querySelector('#deposit').src = wallet.getDepositQr().src;
 ```
 
-## Waiting for a transaction
+### Waiting
 
 Currently, the only way to wait for a tx is to poll the balance (this will improve later):
 
