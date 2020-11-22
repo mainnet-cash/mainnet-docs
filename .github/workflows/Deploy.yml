@@ -27,5 +27,5 @@ jobs:
         run: |
           git branch
           git remote add dokku dokku@mainnet.cash:mainnet.cash
-          git push -f dokku deploy:master
+          git push -f dokku master
         shell: bash
