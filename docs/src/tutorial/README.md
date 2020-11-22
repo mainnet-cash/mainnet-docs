@@ -25,14 +25,14 @@ and persisted inside of a user browser.
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.0.1-rc.3.js"
- integrity="sha384-C8lwo1llqjqJUHz/M0eTiQzqGqBhKKme3Cz4baMSvpX7vTBpM0ZmwSEzqr11mQsk"
+<script src="https://cdn.mainnet.cash/mainnet-0.0.2.js"
+ integrity="sha384-tEB+lsMkD2DHlGwMMtrzEpFiBxK2anPv3Cx8qNXiz5vPIBAoIvk4/O5sZyL3WsDs"
  crossorigin="anonymous"></script>
 ```
 
 <!-- 
 sha matching:
-curl https://cdn.mainnet.cash/mainnet-0.0.1-rc.3.js | openssl dgst -sha384 -binary | openssl base64 -A 
+curl https://cdn.mainnet.cash/mainnet-0.0.2.js | openssl dgst -sha384 -binary | openssl base64 -A 
 -->
 
 Now, you can create a test wallet:
