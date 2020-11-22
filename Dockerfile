@@ -12,4 +12,4 @@ RUN vuepress build src
 
 WORKDIR /app/docs/src/.vuepress/dist/
 RUN npm install -g static-server
-ENTRYPOINT static-server -p 8080
+ENTRYPOINT static-server -p 5000
