@@ -1,11 +1,11 @@
-name: Deploy Unstable (from master)
+name: Deploy docs (from master)
 
 on:
   push:
     branches:
-      - deploy
+      - master
 jobs:
-  deploy_unstable:
+  deploy_docs:
     runs-on: ubuntu-latest
     steps:
       - name: Save SSH key
