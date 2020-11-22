@@ -11,8 +11,7 @@
   "scripts": {
     "dev": "vuepress dev src",
     "build": "vuepress build src",
-    "deploy": "cd .. && pwd && caprover deploy -n cpr1 -a mainnet-docs -b master",
-    "push": "cd .. && git push -f dokku master"
+    "push": "git push origin master"
   },
   "license": "MIT",
   "devDependencies": {
