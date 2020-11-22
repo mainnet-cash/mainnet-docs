@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "vuepress dev src",
     "build": "vuepress build src",
-    "deploy": "caprover deploy -n cpr1 -a mainnet-docs -b master"
+    "deploy": "cd .. && pwd && caprover deploy -n cpr1 -a mainnet-docs -b master"
   },
   "license": "MIT",
   "devDependencies": {

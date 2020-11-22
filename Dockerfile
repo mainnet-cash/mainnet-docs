@@ -11,4 +11,4 @@ RUN vuepress build docs
 RUN npm install -g static-server
 WORKDIR /app/docs/.vuepress/dist
 EXPOSE 5000
-RUN static-server -p 5000
+ENTRYPOINT static-server -p 5000
