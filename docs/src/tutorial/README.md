@@ -170,6 +170,9 @@ Where `lang` is the language you want to build, see [here](https://openapi-gener
 
 ## REST API server
 
+All these clients (PHP, Go, Python, etc...) can't sign transactions or generate private keys, they are thin
+REST wrappers and dere all important tasks to the REST server. Here's how this works:
+
 <img src="/rest.svg" style="margin-top: 20px">
 
 [REST API Docs](https://rest-unstable.mainnet.cash/api-docs/)
