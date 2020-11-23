@@ -172,6 +172,10 @@ alert('Transaction has arrived!');
 
 ## Escrow contracts
 
+::: warning 
+Not fully tested yet
+:::
+
 Ok, let's now assume that you are building a service where you want to connect a buyer and a seller (a freelance marketplace 
 or a non-custodial exchange), but at the same time you don't want to hold anyone's money, 
 but only act as an arbiter in case something goes wrong. It's possible in Bitcoin Cash and it's called "an escrow contract".
