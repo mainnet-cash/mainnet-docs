@@ -56,6 +56,7 @@ module.exports = {
                 children: [
                     '/people.html',
                     '/projects.html',
+                    '/node.html',
                 ]
             },
             {
