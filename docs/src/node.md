@@ -69,7 +69,8 @@ cd Fulcrum-1.3.1-x86_64-linux
 
 ./Fulcrum --datadir=/mnt/bchn \
   --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
-  --rpcpassword=uizovojahooc --ssl=0.0.0.0:50002 \
+  --rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM \
+  --ssl=0.0.0.0:50002 \
   --cert=/var/www/tls/fulcrum-certificate.pem --key=/var/www/tls/fulcrum-key.pem
 ```
 
