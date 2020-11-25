@@ -49,7 +49,7 @@ bitcoind -datadir=/mnt/bchn -rpcallowip=0.0.0.0/0 \
 
 ## Running Fulcrum (Electron Cash compatible server)
 
-Generate some SSL certificates:
+Generate an SSL certificate (needed for the protocol, self-signed is sufficient, enter any values you'd like):
 
 ```shell script
 openssl req -newkey rsa:4096 \
@@ -58,9 +58,7 @@ openssl req -newkey rsa:4096 \
     -keyout /var/www/tls/fulcrum-key.pem
 ```
 
-Enter any values you want.
-
-Install Fulcrum:
+Install Fulcrum (replace `1.3.1` with the [latest](https://github.com/cculianu/Fulcrum/releases/latest) version)
 
 ```shell script
 wget https://github.com/cculianu/Fulcrum/releases/download/v1.3.1/Fulcrum-1.3.1-x86_64-linux.tar.gz
@@ -72,4 +70,13 @@ cd Fulcrum-1.3.1-x86_64-linux
   --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
   --rpcpassword=uizovojahooc --ssl=0.0.0.0:50002 \
   --cert=/var/www/tls/fulcrum-certificate.pem --key=/var/www/tls/fulcrum-key.pem
+```
+
+## Running Insomnia (REST server to serve Fulcrum results)
+
+```shell script
+git clone https://github.com/fountainhead-cash/insomnia.git
+cd insomnia
+npm i
+npm start
 ```
