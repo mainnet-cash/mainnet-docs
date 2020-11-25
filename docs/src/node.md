@@ -30,7 +30,8 @@ sudo apt-get update
 sudo apt-get install bitcoind
 ```
 
-# Start Bitcoin Cash Node
+### Start Bitcoin Cash Node
+
 ```shell script
 bitcoind -datadir=/mnt/bchn -rpcallowip=127.0.0.1 \
     -rpcbind=127.0.0.1:8332 -rpcuser=rpc \
