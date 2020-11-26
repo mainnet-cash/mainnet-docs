@@ -35,7 +35,8 @@ sudo apt-get install bitcoind
 ```shell script
 bitcoind -datadir=/mnt/bchn -rpcallowip=127.0.0.1 \
     -rpcbind=127.0.0.1:8332 -rpcuser=rpc \
-    -rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM
+    -rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM \
+    -txindex=1
 ```
 
 Replace the password with something random (try `head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo ''` on Linux)
