@@ -45,7 +45,8 @@ To open your RPC for other computers on the Internet (not recommended, even if p
 ```shell script
 bitcoind -datadir=/mnt/bchn -rpcallowip=0.0.0.0/0 \
     -rpcbind=0.0.0.0:8332 -rpcuser=rpc \
-    -rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM
+    -rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM \
+    -txindex=1
 ```
 
 ## Running Fulcrum (Electron Cash compatible server)
@@ -82,3 +83,4 @@ cd insomnia
 npm i
 npm start
 ```
+
