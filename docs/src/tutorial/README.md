@@ -199,15 +199,17 @@ let escrow = new EscrowContract({
 You can now send money to the contract:
 
 ```js
-await buyer.send([ [ escrow.getAddress(), 450000, "satoshis" ], ]);
+await buyer.send([ [ escrow.getAddress(), 3700, "satoshis" ], ]);
 ``` 
 
 Check the balance of the contract (in satoshis):
 
 ```js
 await escrow.getBalance()
-// 450000
+// 3700
 ```
+
+Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum what you can send to it is about 3700 satoshis. 
 
 TODO: a function to convert satoshis to USD and vice versa - that's coming
 
