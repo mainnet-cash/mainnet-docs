@@ -25,14 +25,14 @@ and persisted inside of a user browser. See [Other programming languages](/tutor
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.0.3.js"
- integrity="sha384-bCVluIAKprqcivRz5kGyvVUGaVem8wry6BKlVIfM6DPauSFS/z9wKhiomXGuybK0"
+<script src="https://cdn.mainnet.cash/mainnet-0.0.4.js"
+ integrity="sha384-nlxjiwe7AGYxvOvRp1MrMgdszuvFPeJ7+Gr6AfLTnFP75MAnuw+unIui3hkyAb2M"
  crossorigin="anonymous"></script>
 ```
 
 <!-- 
 sha matching:
-curl https://cdn.mainnet.cash/mainnet-0.0.3.js | openssl dgst -sha384 -binary | openssl base64 -A 
+curl https://cdn.mainnet.cash/mainnet-0.0.4.js | openssl dgst -sha384 -binary | openssl base64 -A 
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
