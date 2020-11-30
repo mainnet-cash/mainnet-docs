@@ -14,6 +14,8 @@ This is a list of finished products that are "Bitcoin Cash first"
 
 **[purse.io](https://purse.io/)** - buy things from Amazon with significant discounts using Bitcoin Cash
 
+**[cryptotopaypal.com](https://www.cryptotopaypal.com/)** - BCH to PayPal (and vice versa)
+
 **[read.cash](https://read.cash/)** - publish your articles, get upvotes in Bitcoin Cash
 
 **[tewtew.com](http://tewtew.com/)** - earn BCH each time someone watches your video
