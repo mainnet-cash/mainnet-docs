@@ -1,4 +1,4 @@
-# The people
+# Bitcoin Cash: The people
 
 Originally published on [read.cash](https://read.cash/@Read.Cash/bitcoin-cash-the-people-66e43350)
 
