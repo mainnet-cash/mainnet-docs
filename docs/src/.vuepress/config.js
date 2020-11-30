@@ -54,6 +54,7 @@ module.exports = {
                 path: '',
                 collapsable: false,
                 children: [
+                    '/for-developers.html',
                     '/people.html',
                     '/projects.html',
                     '/node.html',
