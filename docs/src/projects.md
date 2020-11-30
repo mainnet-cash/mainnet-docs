@@ -20,15 +20,13 @@ This is a list of finished products that are "Bitcoin Cash first"
 
 **[bitcoincash.network/voting](https://bitcoincash.network/voting/)** - IFP (infrastructure funding proposal) vote monitoring
 
-**[lazyfox.io](https://lazyfox.io/)** - do things, get paid in Bitcoin Cash (currently in development of version 2, so new registrations are not allowed)
+**[lazyfox.io](https://lazyfox.io/)** - do things, get paid in Bitcoin Cash
 
 **[bitcartcc.com](https://bitcartcc.com/)** - create your Bitcoin Cash store (hosted or self-hosted, [read more](https://read.cash/@BitcartCC/btcpay-didnt-want-to-support-bitcoin-cash-weve-got-bitcartcc-1fcb3687))
 
 **[tipbitcoin.cash](https://tipbitcoin.cash/)** - tipping Bitcoin Cash for Twitch users
 
 **[bitbirdy.com](https://bitbirdy.com/pages/about)** - Bath & Beauty, Beard & Skincare, BitBirdy Swag, Home Goods, Jewelry & Watches, Kitchen, Novelty, Sports & Outdoor, Tech Gadgets, Travel Gear
-
-**[satoshiwall.cash](https://satoshiwall.cash/)** - paywalls using Bitcoin Cash (publish content, users need to pay to reveal the contents)
 
 **[chaintip on Reddit](https://www.chaintip.org/reddit) and [on Twitter](https://www.chaintip.org/twitter)** - give nice people tips on Reddit and Twitter
 
@@ -126,9 +124,6 @@ Know of any other apps? Let us know in the comments.
 
 ## Suspended
 
-**[c4.cash](https://c4.cash/)** - (not BCH specific, but worth a mention) purchase Steam, Amazon, Google Play, AppStore gift cards anonymously
-
-
 **[honest.cash](https://honest.cash/)** - similar to read.cash - upvotes with Bitcoin Cash
 
 ## Possibly defunct
@@ -139,3 +134,6 @@ BitcoinCashForum.online - Bitcoin Cash forum
 
 **[CASHBOX](https://coinster.pro/cashbox)** - paywalls using Bitcoin Cash
 
+**[satoshiwall.cash](https://satoshiwall.cash/)** - paywalls using Bitcoin Cash (publish content, users need to pay to reveal the contents)
+
+**[c4.cash](https://c4.cash/)** - (not BCH specific, but worth a mention) purchase Steam, Amazon, Google Play, AppStore gift cards anonymously
