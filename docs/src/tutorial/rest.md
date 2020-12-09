@@ -336,7 +336,6 @@ transaction will be broadcast immediately. You can also specify the exact UTXO I
 
 2) Seller refunds
 ```bash
-```bash
 curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
   -d '{
@@ -344,7 +343,6 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
     "walletId": "wif:testnet:....",
     "action": "refund"
   }`
-```
 ```
 
 3) Arbiter releases the funds or refunds 
