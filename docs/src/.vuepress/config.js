@@ -47,8 +47,17 @@ module.exports = {
             }
         ],
         sidebar: [
-            '/tutorial/',
-            '/tutorial/other_langs.html',
+            {
+                title: 'Programming Bitcoin Cash',
+                path: '',
+                collapsable: false,
+                children: [
+                    '/tutorial/',
+                    '/tutorial/rest.html',
+                    '/tutorial/other-languages.html',
+                    '/tutorial/running-rest.html',
+                ]
+            },
             {
                 title: 'Bitcoin Cash',
                 path: '',

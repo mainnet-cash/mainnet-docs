@@ -1,4 +1,4 @@
-# JavaScript (in browser)
+# Via the REST API
 
 ::: danger
 
@@ -9,39 +9,16 @@ even though we try not to break things too often. Use at your own risk. To see t
 
 :::
 
-::: tip A working demo
-
-You can see a fully working demo [here](https://jsfiddle.net/ghn19jmu/2/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
-
-:::
-
-<!-- Your stack: Browser + IndexedDB PHP Other -->
-
 ## Let's get programming
 
-Note that this tutorial describes `Browser + IndexedDB` approach, which means that the wallets will be created 
-and persisted inside of a user browser. See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other_langs.html) for other approaches.
+Note that this tutorial describes calling the REST API approach. See [JavaScript](/tutorial/) or [Other programming languages](/tutorial/other_langs.html) for other approaches.
 
-To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
-
-```html
-<script src="https://cdn.mainnet.cash/mainnet-0.0.4.js"
- integrity="sha384-nlxjiwe7AGYxvOvRp1MrMgdszuvFPeJ7+Gr6AfLTnFP75MAnuw+unIui3hkyAb2M"
- crossorigin="anonymous"></script>
-```
-
-<!-- 
-sha matching:
-curl https://cdn.mainnet.cash/mainnet-0.0.4.js | openssl dgst -sha384 -binary | openssl base64 -A 
--->
-
-Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
-the user's browser will not run the script. Or you can download the library and serve it locally.
+TODO: rest-unstable warning
 
 Now, you can create a test wallet:
 
-```js
-const wallet = await TestNetWallet.newRandom();
+```bash
+TODO
 ```
 
 This wallet will not be persisted, if a user closes his browser, it's gone forever. See below for persistent wallets.
@@ -62,14 +39,14 @@ run it using `electron-cash --testnet` flag. For example, on MacOS that would be
 
 To create a MainNet wallet (Bitcoin Cash production network): 
 
-```js
-const wallet = await Wallet.newRandom();
+```bash
+TODO
 ```
 
 If you want to create a wallet from a WIF (private key), use this call:
 
-```js
-const wallet = Wallet.fromWIF('.....');
+```bash
+TODO
 ```
 
 ## Named wallets (persistent)
@@ -82,8 +59,8 @@ so that if the same browser has multiple users, they'll all get their own wallet
 
 To create a persistent wallet (saved to the IndexedDB of user's browser):
 
-```js
-const wallet = await TestNetWallet.named('user:1234');
+```bash
+TODO
 ```
 
 `user:1234` is an optional name for the wallet. The wallet is saved in user's browser for future re-use.
@@ -92,10 +69,8 @@ const wallet = await TestNetWallet.named('user:1234');
 
 To get the balance of the wallet you can do this:
 
-```js
-await seller.getBalance('usd') // 0.00
-await seller.getBalance('bch') // 0.00
-await seller.getBalance('sat') // 0
+```bash
+TODO
 ```
 
 You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in case you forget the exact name).
@@ -109,29 +84,24 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 
 Let's create another wallet and send some of our money there:
 
-```js
-const seller = new TestNetHdWallet('seller');
-
-const txData = await wallet.send([
-    [seller.depositAddress(), 0.01, 'USD'],
-]);
+```bash
+TODO
 ```
 
 Note that you can send to many addresses at once.
 
 Let's print the balance of the seller's wallet:
 
-```js
-console.log(await seller.getBalance('USD'));
-// 0.01
+```bash
+TODO
 ```
 
 Great! You've just made your first transaction!
 
 Now you can send all of your money somewhere else:
 
-```js
-const txData = await seller.sendMax(wallet.depositAddress());
+```bash
+TODO
 ```
 
 ## Waiting for a transaction
@@ -150,24 +120,16 @@ Let's display a QR code first. Create a placeholder first:
 
 Then you can replace it with an actual QR code of the deposit address:
 
-```js
-document.querySelector('#deposit').src = wallet.getDepositQr().src;
+```bash
+TODO
 ```
 
 ### Waiting
 
 Currently, the only way to wait for a tx is to poll the balance (this will improve later):
 
-```js
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-while((await wallet.getBalance('usd')) < 1.0) {
-  await sleep(0.1);
-}
-
-alert('Transaction has arrived!');
+```bash
+TODO
 ````
 
 ## Escrow contracts
@@ -188,25 +150,20 @@ Note: The source for the contract is [here](https://github.com/mainnet-cash/main
 2) The seller could refund the buyer
 3) Arbiter can either complete the transaction to the seller or refund to the buyer, but cannot steal the money 
 
-```js
-let escrow = new EscrowContract({
-  arbiterAddr: arbiter.getDepositAddress(),
-  buyerAddr: buyer.getDepositAddress(),
-  sellerAddr: seller.getDepositAddress(),
-});
+```bash
+TODO
 ```
 
 You can now send money to the contract:
 
-```js
-await buyer.send([ [ escrow.getAddress(), 3700, "satoshis" ], ]);
+```bash
+TODO
 ``` 
 
 Check the balance of the contract (in satoshis):
 
-```js
-await escrow.getBalance()
-// 3700
+```bash
+TODO
 ```
 
 Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum what you can send to it is about 3700 satoshis. 
@@ -216,19 +173,18 @@ TODO: a function to convert satoshis to USD and vice versa - that's coming
 Now, we can execute the necessary functions:
 
 1) Buyer releases the funds
-```js
-await escrow.run(buyer.privateKeyWif, "spend");
+```bash
+TODO
 ```
 
 2) Seller refunds
-```js
-await escrow.run(seller.privateKeyWif, "refund");
+```bash
+TODO
 ```
 
 3) Arbiter releases the funds or refunds
-```js
-await escrow.run(arbiter.privateKeyWif, "spend");
-await escrow.run(arbiter.privateKeyWif, "refund");
+```bash
+TODO
 ```
 
 ### Saving the contract to the database
@@ -238,14 +194,14 @@ he could execure the necessary functions:
 
 Save:
 
-```js
-const contractId = escrow.toString();
+```bash
+TODO
 ```
 
 Restore it later:
 
-```js
-const restoredEscrow = EscrowContract.fromId(contractId);
+```bash
+TODO
 ```
 
 ## CashScript
@@ -266,8 +222,8 @@ RegTest wallets are supported by mainnet library.
 
 :::
 
-```js
-const wallet = await RegTestWallet.newRandom();
+```bash
+TODO
 ```
 
 To be continued...
