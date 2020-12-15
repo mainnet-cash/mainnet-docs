@@ -15,7 +15,7 @@ Note that this tutorial describes calling the REST API approach (for server-side
 Alternatively, see [JavaScript (browser)](/tutorial/). 
 
 We generate bindings and packages for some programming languages, so that you don't have
-to do the REST calls manually, see [here](/tutorial/other_langs.html). You can generate bindings for nearly 
+to do the REST calls manually, see [here](/tutorial/other-languages.html). You can generate bindings for nearly 
 every other programming language easily.
 
 **You can find the full latest REST API reference at [https://rest-unstable.mainnet.cash/api-docs/](https://rest-unstable.mainnet.cash/api-docs/).**
@@ -31,7 +31,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
 ::: tip rest-unstable
 
 This tutorial shows calls to `https://rest-unstable.mainnet.cash`, which as the name implies is **unstable** by design.
-You can use it to learn, but for production you are expected to [run your own service](/tutorial/rest.md), because 
+You can use it to learn, but for production you are expected to [run your own service](/tutorial/running-rest.md), because 
 otherwise you actually send us your _private keys_, which is absolutely insecure.
 
 :::

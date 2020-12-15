@@ -110,7 +110,7 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 Let's create another wallet and send some of our money there:
 
 ```js
-const seller = new TestNetHdWallet('seller');
+const seller = await TestNetWallet.named('seller');
 
 const txData = await wallet.send([
     [seller.depositAddress(), 0.01, 'USD'],
