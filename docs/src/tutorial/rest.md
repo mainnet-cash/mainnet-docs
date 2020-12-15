@@ -297,7 +297,7 @@ Should be:
 }
 ```
 
-TODO: Yes, this doesn't work yet.
+TODO: These are probably regtest wallets, so that should be the reason for the error.
 
 The `contractId` has all the data needed about the contract (but it's pretty big). Store it in your database, so
 that you can execute all the necessary functions later.
