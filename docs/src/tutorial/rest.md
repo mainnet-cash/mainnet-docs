@@ -153,6 +153,17 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 
 `USD` returns the amount at the current exchange rate. 
 
+
+### Watch-only wallets
+
+You can find out a balance of any cashaddr (say `bchtest:qq1234567`) by building a `walletId` like this:
+
+```
+watch:testnet:bchtest:qq1234567
+```
+
+...and then doing the regular `wallet/balance` query.
+
 ## Sending money
 
 Let's create another wallet and send some of our money there. 
