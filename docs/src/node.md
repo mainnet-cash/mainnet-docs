@@ -81,6 +81,6 @@ cd Fulcrum-1.3.1-x86_64-linux
 ```shell script
 git clone https://github.com/fountainhead-cash/insomnia.git
 cd insomnia
-npm i
-npm start
+yarn install
+yarn start
 ```

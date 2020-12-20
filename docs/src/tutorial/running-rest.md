@@ -1,8 +1,27 @@
 # Running your own REST API server
 
-## Installation
+The REST service is an express javascript app run from nodejs. The project is largely generated from the swagger definition. It uses the bundled library of the root project to complete requests and also serves documentation.
 
-TODO: Postgres, DATABASE_URL ?
+## Requirements
+
+The REST server requires a postgres database to store named wallets. This setting is loaded via the `DATABASE_URL` environment variable.
+
+In development and testing, the url: `postgres://postgres:trusted@localhost:15432/wallet` is loaded automatically from `/.env.regtest`.
+
+## Configuration
+
+The following variables are available to configure the REST server:
+
+| Variable | Description | Default|
+| ----------- | ----------- | ------ |
+| `ALLOW_MAINNET_USER_WALLETS` | Allow saving mainnet wallets to sql  | `true` |
+| `URL_PORT`  | Service port | `3000` |
+| `URL_PATH` | Url to serve requests | `http://localhost` |
+| `TIMEOUT` | Request timeout (seconds)  | `60` |
+| `WORKERS` | Number of threads  | `10` |
+| `DATABASE_URL` | Postgres URL  | `undefined` |
+
+
 
 ### Docker (exposed on localhost) <Badge text="recommended" type="tip"/>
 
@@ -53,11 +72,11 @@ Many more details about our Docker image can be found [here](https://github.com/
 ```shell
 git clone https://github.com/mainnet-cash/mainnet-js.git
 cd mainnet-js
-npm i
-npm run api:build:server
-npm run build
-(cd generated/serve && npm i)
-PORT=3000 WORKERS=5 npm run api:serve:cluster
+npm i -g yarn
+yarn install
+yarn build
+yarn api:server:install
+PORT=3000 WORKERS=5 yarn api:serve:cluster
 ```
 
 On MacOS if you get `gyp: No Xcode or CLT version detected!` you might want to follow 

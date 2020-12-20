@@ -304,7 +304,7 @@ that you can execute all the necessary functions later.
 
 You can now send money to the contract (just use the `cashaddr` from the response) and check the balance of the contract.
 
-Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum what you can send to it is about 3700 satoshis. 
+Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum that you can send to it is about 3700 satoshis. 
 
 TODO: a function to convert satoshis to USD and vice versa - that's coming
 

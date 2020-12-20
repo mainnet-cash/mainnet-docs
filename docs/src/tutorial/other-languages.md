@@ -33,7 +33,7 @@ To build the client for another language, run the following commands:
 
 ```sh
 git clone https://github.com/mainnet-cash/mainnet-js.git
-npm run api:build:client $lang
+yarn api:build:client $lang
 ```
 
 Where `$lang` is the language you want to build, see [here](https://openapi-generator.tech/docs/generators/) for the list
