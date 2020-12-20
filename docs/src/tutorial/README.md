@@ -105,12 +105,21 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 
 `USD` returns the amount at the current exchange rate. 
 
+### Watch-only wallets
+
+You can find out a balance of any cashaddr (say `bchtest:qq1234567`) like this:
+
+```js
+const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567');
+await wallet.getBalance('usd');
+```
+
 ## Sending money
 
 Let's create another wallet and send some of our money there:
 
 ```js
-const seller = new TestNetHdWallet('seller');
+const seller = await TestNetWallet.named('seller');
 
 const txData = await wallet.send([
     [seller.depositAddress(), 0.01, 'USD'],

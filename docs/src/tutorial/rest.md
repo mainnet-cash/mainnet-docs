@@ -15,7 +15,7 @@ Note that this tutorial describes calling the REST API approach (for server-side
 Alternatively, see [JavaScript (browser)](/tutorial/). 
 
 We generate bindings and packages for some programming languages, so that you don't have
-to do the REST calls manually, see [here](/tutorial/other_langs.html). You can generate bindings for nearly 
+to do the REST calls manually, see [here](/tutorial/other-languages.html). You can generate bindings for nearly 
 every other programming language easily.
 
 **You can find the full latest REST API reference at [https://rest-unstable.mainnet.cash/api-docs/](https://rest-unstable.mainnet.cash/api-docs/).**
@@ -31,7 +31,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
 ::: tip rest-unstable
 
 This tutorial shows calls to `https://rest-unstable.mainnet.cash`, which as the name implies is **unstable** by design.
-You can use it to learn, but for production you are expected to [run your own service](/tutorial/rest.md), because 
+You can use it to learn, but for production you are expected to [run your own service](/tutorial/running-rest.md), because 
 otherwise you actually send us your _private keys_, which is absolutely insecure.
 
 :::
@@ -152,6 +152,17 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
 `USD` returns the amount at the current exchange rate. 
+
+
+### Watch-only wallets
+
+You can find out a balance of any cashaddr (say `bchtest:qq1234567`) by building a `walletId` like this:
+
+```
+watch:testnet:bchtest:qq1234567
+```
+
+...and then doing the regular `wallet/balance` query.
 
 ## Sending money
 
@@ -297,7 +308,7 @@ Should be:
 }
 ```
 
-TODO: Yes, this doesn't work yet.
+TODO: These are probably regtest wallets, so that should be the reason for the error.
 
 The `contractId` has all the data needed about the contract (but it's pretty big). Store it in your database, so
 that you can execute all the necessary functions later.
