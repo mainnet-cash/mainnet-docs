@@ -91,7 +91,7 @@ To create a persistent wallet:
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
     -H "Content-Type: application/json" \
-    -d '{"type":"wif","network":"testnet","name":"wallet_1"}'
+    -d '{"type":"seed","network":"testnet","name":"wallet_1"}'
 ```
 
 Response:
@@ -99,12 +99,16 @@ Response:
 ```json
 {
   "name":"wallet_1",
-  "cashaddr":"bchtest:qrj8ryftxwjhtv43v7an0svv3tqrqa48t5z2ynkfqw",
-  "walletId":"wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB", 
-  "network":"testnet"
+  "cashaddr": "bchtest:qp3wsgxkeezy3rumwzja0yxlmgra2jt74ymtrmayyl",
+  "walletId": "named:testnet:wallet_1",
+  "seed": {
+    "seed": "parade vocal foil key orchard pact mansion arena bounce caught perfect true",
+    "derivationPath": "m/44'/1'/0'/0/0"
+  },
+  "network": "testnet"
 }
 ```
-BUG TOFIX: `walletId` should be something like `named:testnet:wallet_1` in this case. 
+
 
 The wallet's private key will be stored in the PostgreSQL database of the REST API server. 
 
@@ -119,7 +123,7 @@ To get the balance of your wallet you can do this (use the `walletId` that you g
 curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
   -H "Content-Type: application/json" \
   -d '{
-    "walletId":"wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"
+    "walletId":"named:testnet:wallet_1"
   }'
 ```
 
@@ -135,7 +139,7 @@ Or you can use `unit` in the call to get just the number:
 curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
   -H "Content-Type: application/json" \
   -d '{
-    "walletId":"wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB", 
+    "walletId":"named:testnet:wallet_1", 
     "unit": "sat"
   }'
 ```
@@ -290,25 +294,22 @@ Note: The source for the contract is [here](https://github.com/mainnet-cash/main
 curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/create \
   -H "Content-Type: application/json" \
   -d '{
-    "buyerAddr": "bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0",
-    "arbiterAddr": "bchtest:qpsm4nm7talhxhl05mlhms3ys43u76rn0ttdv3qg2u",
-    "sellerAddr": "bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0"
-  }'
+  "buyerAddr": "bchtest:qrnluuge56ahxsy6pplq43rva7k6s9dknu4p5278ah",
+  "arbiterAddr": "bchtest:qzspcywxmm4fqhf9kjrknrc3grsv2vukeqyjqla0nt",
+  "sellerAddr": "bchtest:qz00pk9lfs0k9f5vf3j8h66qfmqagk8nc56elq4dv2",
+  "amount": 10000,
+  "nonce": 808
+}'
 ```
 
 Response:
 
-```
-CashAddress decoding error: please review the address for errors.
-
-Should be:
+```json
 {
-  "contractId": "....",
-  "cashaddr": "bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0"
+  "contractId": "testnet␝MTU4LDI0MCwyMTYsMTkxLDc2LDMxLDk4LDE2NiwxNDAsNzYsMTAwLDEyMywyMzUsNjQsNzgsMTkzLDIxMiw4OCwyNDMsMTk3␞MjMxLDI1NCwxMTMsMjUsMTY2LDE4NywxMTUsNjQsMTU0LDgsMTI2LDEwLDE5NiwxMDgsMjM5LDE3MywxNjgsMjEsMTgyLDE1OQ==␞MTYwLDI4LDE3LDE5OCwyMjIsMjM0LDE0NCw5MywzNywxODAsMTM1LDEwNSwxNDMsMTcsNjQsMjI0LDE5Nyw1MSwxNTAsMjAw␞MTAwMDA=␞ODA4␝cHJhZ21hIGNhc2hzY3JpcHQgXjAuNS4zOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg",
+  "cashaddr": "bchtest:pz77d0jkycc6kfrv5cdvxg5afd8qnlj495tfqt60hs"
 }
 ```
-
-TODO: These are probably regtest wallets, so that should be the reason for the error.
 
 The `contractId` has all the data needed about the contract (but it's pretty big). Store it in your database, so
 that you can execute all the necessary functions later.
@@ -316,8 +317,6 @@ that you can execute all the necessary functions later.
 You can now send money to the contract (just use the `cashaddr` from the response) and check the balance of the contract.
 
 Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum that you can send to it is about 3700 satoshis. 
-
-TODO: a function to convert satoshis to USD and vice versa - that's coming
 
 Now, we can execute the necessary functions:
 
@@ -327,7 +326,7 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
   -d '{
     "contractId": "....",
-    "walletId": "wif:testnet:....",
+    "walletId": "seed:testnet:....",
     "action": "spend"
   }`
 ```
@@ -351,22 +350,46 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
   -d '{
     "contractId": "....",
-    "walletId": "wif:testnet:....",
+    "walletId": "seed:testnet:....",
     "action": "refund"
   }`
 ```
 
 3) Arbiter releases the funds or refunds 
 
-(the same: spend or refund, just relace the walletId with the arbiter's one)
+(the same: spend or refund, just replace the walletId with the arbiter's one)
+
+## Utilities
+
+Certain tools common in bitcoin-like currencies may not be in a standard library.
+
+### Currency conversions
+
+Handles rate conversions between supported currencies.
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/util/convert \
+  -H "Content-Type: application/json" \
+  -d '{
+  "value": 100,
+  "from": "usd",
+  "to": "sat"
+}`
+
+```
+returns something like:
+
+```
+...
+28067024
+...
+```
 
 ## CashScript
 
 Somewhat done, but not yet documented...
 
 ## RegTest wallets
-
-TODO: How to run the local development environment
 
 RegTest (local development) wallets, use this:
 
@@ -376,10 +399,17 @@ You might also hear about `RegTest` mode, which is when you run your Bitcoin Cas
 locally and you can get as many test coins as you need, but they exist on your machine only. 
 RegTest wallets are supported by mainnet library.
 
+The library testing harness uses a bchn full node, an electrum server (fulcrum) that automatically mines some blocks with reward going to the address in `.env.regtest` (and an open postgres server). This configuration is available in a docker compose file at `jest/regtest-docker-compose.yml` and automatically starts and stops for testing.
+
+To start or stop it manually, 
+
 :::
 
 ```bash
-TODO
+./jest/docker/start.sh 
+# whatever you want to try on regtest,
+# before removing all the data with:
+./jest/docker/stop.sh
 ```
 
 To be continued...

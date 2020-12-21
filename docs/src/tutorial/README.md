@@ -66,6 +66,21 @@ To create a MainNet wallet (Bitcoin Cash production network):
 const wallet = await Wallet.newRandom();
 ```
 
+If you want to create a wallet from a mnemonic seed phrase, use this call:
+
+```js
+const wallet = Wallet.fromSeed('.....');
+```
+
+::: tip seed phrase wallets use the derivation path `m/44'/1'/0'/0/0` by default, 
+
+Optionally, a BIP44 derivation path may be added as a second argument.
+
+```js
+const wallet = Wallet.fromSeed("horse duck stapler...", "m/44'/1'/145'/0/0");
+```
+
+
 If you want to create a wallet from a WIF (private key), use this call:
 
 ```js
@@ -220,8 +235,6 @@ await escrow.getBalance()
 
 Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum what you can send to it is about 3700 satoshis. 
 
-TODO: a function to convert satoshis to USD and vice versa - that's coming
-
 Now, we can execute the necessary functions:
 
 1) Buyer releases the funds
@@ -261,9 +274,20 @@ const restoredEscrow = EscrowContract.fromId(contractId);
 
 Somewhat done, but not yet documented...
 
-## RegTest wallets
+## Utilities
 
-TODO: How to run the local development environment
+
+### Currency conversions
+
+Handles rate conversions between supported currencies.
+
+```js
+await convert(100,"usd","sat")
+// 28067024
+
+```
+
+## RegTest wallets
 
 RegTest (local development) wallets, use this:
 
@@ -272,6 +296,19 @@ RegTest (local development) wallets, use this:
 You might also hear about `RegTest` mode, which is when you run your Bitcoin Cash node 
 locally and you can get as many test coins as you need, but they exist on your machine only. 
 RegTest wallets are supported by mainnet library.
+
+
+A full bitcoin node, an electrum server and open postgres server configuration is available for testing in a docker compose file at `jest/regtest-docker-compose.yml`
+
+Which can be brought up or reset with:
+
+```bash
+./jest/docker/start.sh 
+# whatever you want to try on regtest,
+# before removing all the data with:
+./jest/docker/stop.sh
+```
+The electrum server (fulcrum) is available at `ws://127.0.0.1:60003` on your local machine.  The regtest bchn node is on port `18443` available with rpc using credentials in `.env.regtest`. An open postgres server is also available on port `15432`
 
 :::
 
