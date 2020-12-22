@@ -281,12 +281,11 @@ Somewhat done, but not yet documented...
 
 ### Currency conversions
 
-Handles rate conversions between supported currencies.
+Need to find out how many BCH are there currently in 1 USD, or find out how many satoshis are there in 100 USD? Easy!
 
 ```js
-await convert(100,"usd","sat")
+await convert(100, "usd", "sat")
 // 28067024
-
 ```
 
 ## RegTest wallets

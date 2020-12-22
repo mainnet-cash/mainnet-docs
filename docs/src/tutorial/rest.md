@@ -365,7 +365,7 @@ Certain tools common in bitcoin-like currencies may not be in a standard library
 
 ### Currency conversions
 
-Handles rate conversions between supported currencies.
+Need to find out how many BCH are there currently in 1 USD, or find out how many satoshis are there in 100 USD? Easy!
 
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/util/convert \
