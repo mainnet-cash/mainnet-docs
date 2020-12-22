@@ -25,23 +25,16 @@ Let's first create a test wallet:
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
     -H "Content-Type: application/json" \
-    -d '{"type":"wif","network":"testnet"}'
+    -d '{"type": "seed", "network": "testnet"}'
 ```
-
-::: tip rest-unstable
-
-This tutorial shows calls to `https://rest-unstable.mainnet.cash`, which as the name implies is **unstable** by design.
-You can use it to learn, but for production you are expected to [run your own service](/tutorial/running-rest.md), because 
-otherwise you actually send us your _private keys_, which is absolutely insecure.
-
-:::
 
 Response:
 
 ```json
 {
-  "cashaddr": "bchtest:qzlvqad8gappn6r3sceq65n9r9x8fq7phccsdtn8gm",
-  "walletId": "wif:testnet:cPbT8t2hDS2ZianEQJ3tdeHzH7ebphmv4kYMxNVLAgJSCGSRnqYa",
+  "name": "",
+  "cashaddr": "bchtest:qrau3n8tzcv2a4yqsr603unhxx4vp9ph0yg2g9449d",
+  "walletId": "seed:testnet:table later ... stove kitten pluck:m/44'/0'/0'/0/0",
   "network": "testnet"
 }
 ```
@@ -49,16 +42,29 @@ Response:
 This creates a **TestNet** wallet.  This has the cashaddress of the wallet, where you can send money, and the `walletId`. 
 Note the `walletId` - we're going to need it later. This wallet will not be persisted. See below for persistent wallets. 
 
+::: tip rest-unstable
+
+This tutorial shows calls to `https://rest-unstable.mainnet.cash`, which as the name implies is **unstable** by design.
+You can use it to learn, but for production you are expected to [run your own service](/tutorial/running-rest.md), because
+otherwise you actually send us your _private keys_, which is absolutely insecure.
+
+:::
+
 ::: danger walletId contains the private key
 
-Keep `walletId` a secret as it contains the private key that allows spending from this wallet.
+Keep `walletId` a secret as it contains the private key that allows spending from this wallet. Seed phrase, WIF - all
+these contain the private key. 
 
 :::
 
 ::: tip What is TestNet? Where to get TestNet money and a wallet?
 
 `TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
-which is what people usually mean when they talk about Bitcoin Cash network.  You can get free TestNet money [here](https://faucet.fullstack.cash/).
+which is what people usually mean when they talk about Bitcoin Cash network.  
+
+You can get free TestNet money [here](https://faucet.fullstack.cash/).
+
+
 If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and 
 run it using `electron-cash --testnet` flag. For example, on MacOS that would be:
 
@@ -72,14 +78,35 @@ To create a MainNet wallet (Bitcoin Cash production network):
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
     -H "Content-Type: application/json" \
-    -d '{"type":"wif","network":"mainnet"}'
+    -d '{"type": "seed", "network": "mainnet"}'
 ```
 
-If you want to create a wallet (walletId) from a WIF (a private key), just build a string like this:
+Response:
 
-```bash
-wif:mainnet:PrivateKeyWifHere
+```json
+{
+  "name": "",
+  "cashaddr": "bitcoincash:qr70hzy3sfmrcknd7apksmxhhf48cwkuavckm7lt8f",
+  "walletId": "seed:mainnet:cave blue ... skill shoot faculty:m/44'/0'/0'/0/0",
+  "network": "mainnet"
+}
 ```
+
+Seed phrase wallets use the derivation path `m/44'/0'/0'/0/0` by default (Bitcoin.com wallet compatibility)
+
+If you want to manually construct a walletId from a WIF (a private key), just build a string like this:
+
+```
+wif:mainnet:WIFHERE
+```
+
+Similarly, from a seed and a derivation path:
+
+```
+seed:mainnet:SEED WORDS HERE:m/DERIVATION/PATH
+```
+
+Networks: `mainnet`, `testnet`, `regtest` ([see below](#regtest-wallets))
 
 ## Named wallets (persistent)
 
@@ -91,14 +118,14 @@ To create a persistent wallet:
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
     -H "Content-Type: application/json" \
-    -d '{"type":"seed","network":"testnet","name":"wallet_1"}'
+    -d '{"type": "seed", "network": "testnet", "name": "wallet_1"}'
 ```
 
 Response:
 
 ```json
 {
-  "name":"wallet_1",
+  "name": "wallet_1",
   "cashaddr": "bchtest:qp3wsgxkeezy3rumwzja0yxlmgra2jt74ymtrmayyl",
   "walletId": "named:testnet:wallet_1",
   "seed": {
@@ -108,7 +135,6 @@ Response:
   "network": "testnet"
 }
 ```
-
 
 The wallet's private key will be stored in the PostgreSQL database of the REST API server. 
 
@@ -123,14 +149,14 @@ To get the balance of your wallet you can do this (use the `walletId` that you g
 curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
   -H "Content-Type: application/json" \
   -d '{
-    "walletId":"named:testnet:wallet_1"
+    "walletId": "named:testnet:wallet_1"
   }'
 ```
 
 Response:
 
 ```json
-{"bch":0,"sat":0,"usd":0}
+{"bch": 0, "sat": 0, "usd": 0}
 ```
 
 Or you can use `unit` in the call to get just the number:
@@ -139,7 +165,7 @@ Or you can use `unit` in the call to get just the number:
 curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
   -H "Content-Type: application/json" \
   -d '{
-    "walletId":"named:testnet:wallet_1", 
+    "walletId": "named:testnet:wallet_1", 
     "unit": "sat"
   }'
 ```
@@ -152,7 +178,7 @@ Response:
 
 You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in case you forget the exact name).
 
-- 1 satoshi = 0.000 000 01 Bitcoin Cash
+- 1 satoshi = 0.00000001 Bitcoin Cash (1/100,000,000th)
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
 `USD` returns the amount at the current exchange rate. 
@@ -179,14 +205,14 @@ Check that the balance is there in the original wallet:
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
 -H "Content-Type: application/json" \
--d '{"walletId":"wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"}'
+-d '{"walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"}'
 ```
 
 ```json
-{"bch":0.0001,"sat":10000,"usd":0.026558}
+{"bch": 0.000100000, "sat": 10000, "usd": 0.02}
 ```
 
-Now we can send 100 satoshis it to `...z2pu` address
+Now, we can send 100 satoshis to the `...z2pu` address
 
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
@@ -209,8 +235,8 @@ Response:
 
 ```json
 {
-  "txId":"316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69",
-  "balance":{"bch":0.0000968,"sat":9680,"usd":0.025755576}
+  "txId": "316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69",
+  "balance": {"bch": 0.00009680, "sat": 9680, "usd": 0.02}
 }
 ```
 
@@ -220,7 +246,7 @@ and the balance left in the original wallet.
 Let's print the balance of `...z2pu` wallet:
 
 ```bash
-{"bch":0.000001,"sat":100,"usd":0.00026607}
+{"bch": 0.00000100, "sat": 100, "usd": 0.00}
 ```
 
 Great! You've just made your first transaction!
@@ -236,7 +262,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
   }'
 ```
 
-This will send the maximum amount (minus the transaction fees of 1 satoshi per byte).
+This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction).
 
 ## Waiting for a transaction
 

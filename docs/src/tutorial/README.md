@@ -73,21 +73,26 @@ const wallet = Wallet.fromSeed('.....');
 ```
 
 ::: tip 
-Seed phrase wallets use the derivation path `m/44'/1'/0'/0/0` by default (taken from the Bitcoin.com wallet)
+Seed phrase wallets use the derivation path `m/44'/0'/0'/0/0` by default (Bitcoin.com wallet compatibility)
 :::
 
-Optionally, a BIP44 derivation path may be added as a second argument.
+Optionally, a [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) derivation path may be added as a second argument.
 
 ```js
 const wallet = Wallet.fromSeed("horse duck stapler...", "m/44'/1'/145'/0/0");
 ```
-
 
 If you want to create a wallet from a WIF (private key), use this call:
 
 ```js
 const wallet = Wallet.fromWIF('.....');
 ```
+
+Networks: 
+
+- mainnet: `Wallet`
+- Testnet: `TestNetWallet`
+- RegTest: `RegTestWallet` ([see below](#regtest-wallets))
 
 ## Named wallets (persistent)
 
