@@ -72,7 +72,9 @@ If you want to create a wallet from a mnemonic seed phrase, use this call:
 const wallet = Wallet.fromSeed('.....');
 ```
 
-::: tip seed phrase wallets use the derivation path `m/44'/1'/0'/0/0` by default, 
+::: tip 
+Seed phrase wallets use the derivation path `m/44'/1'/0'/0/0` by default (taken from the Bitcoin.com wallet)
+:::
 
 Optionally, a BIP44 derivation path may be added as a second argument.
 
