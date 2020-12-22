@@ -391,25 +391,32 @@ Somewhat done, but not yet documented...
 
 ## RegTest wallets
 
-RegTest (local development) wallets, use this:
+During the local development and testing, you might not want to use TestNet coins, so you can use so-called "RegTest wallets".
 
 ::: tip What is RegTest?
 
-You might also hear about `RegTest` mode, which is when you run your Bitcoin Cash node 
-locally and you can get as many test coins as you need, but they exist on your machine only. 
-RegTest wallets are supported by mainnet library.
-
-The library testing harness uses a bchn full node, an electrum server (fulcrum) that automatically mines some blocks with reward going to the address in `.env.regtest` (and an open postgres server). This configuration is available in a docker compose file at `jest/regtest-docker-compose.yml` and automatically starts and stops for testing.
-
-To start or stop it manually, 
+`RegTest` is a mode, in which you can run your Bitcoin Cash node locally, and you can get as many test coins as you need,
+but they exist on your machine only. RegTest wallets are supported by the mainnet library.
 
 :::
 
+A full Bitcoin node, an Electrum server and open Postgres server configuration is available for testing in a
+Docker Compose file at `jest/regtest-docker-compose.yml`
+
+It can be brought up with:
+
 ```bash
 ./jest/docker/start.sh 
-# whatever you want to try on regtest,
-# before removing all the data with:
+```
+
+To stop it:
+
+```bash
 ./jest/docker/stop.sh
 ```
 
-To be continued...
+The Electrum server (Fulcrum) is available at `ws://127.0.0.1:60003` on your local machine.  
+The regtest BCHN node is on port `18443` available with RPC using credentials in `.env.regtest`.
+An open Postgres server is also available on port `15432`
+
+To use this wallet from your code, just use `network`: `RegTest` in your calls.
