@@ -354,7 +354,7 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
     "contractId": "....",
     "walletId": "seed:testnet:....",
     "action": "spend"
-  }`
+  }'
 ```
 
 You can optionally provide `"getHexOnly": true` flag if you want to get the raw transaction to broadcast later, otherwise the
@@ -378,7 +378,7 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
     "contractId": "....",
     "walletId": "seed:testnet:....",
     "action": "refund"
-  }`
+  }'
 ```
 
 3) Arbiter releases the funds or refunds 
@@ -400,7 +400,7 @@ curl -X POST https://rest-unstable.mainnet.cash/util/convert \
   "value": 100,
   "from": "usd",
   "to": "sat"
-}`
+}'
 
 ```
 returns something like:
@@ -446,3 +446,28 @@ The regtest BCHN node is on port `18443` available with RPC using credentials in
 An open Postgres server is also available on port `15432`
 
 To use this wallet from your code, just use `network`: `RegTest` in your calls.
+
+## Webhooks
+
+Webhooks are custom callbacks which notify user upon certain actions. Mainnet provides the webhook functionality to monitor addresses and transactions.
+
+You can register a webhook with the following `curl` call:
+
+```bash
+curl -X POST "https://rest-unstable.mainnet.cash/webhook/watch_address" \
+  -H  "accept: application/json"
+  -H  "Content-Type: application/json"
+  -d '{
+    "address":"bchtest:qzd0tv75gx6y0zspzwqpgkwkq0n72g8fsq2zch26s2",
+    "url":"http://example.com/webhook",
+    "type":"transaction:in,out",
+    "recurrence":"recurrent",
+    "duration_sec":86400
+  }'
+```
+
+The endpoint you specify in the `url` parameter will be called with HTTP POST method and data with the webhook response. After the `duration_sec` seconds the registered webhook will expire and you stop receiving notifications.
+
+Webhooks can be set up to fire once and expire if the `recurrence` parameter is set to `once` or continuously until they expire by the timeout.
+
+See full webhook rest documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress)
