@@ -330,26 +330,20 @@ const wallet = await RegTestWallet.newRandom();
 We provide some functionality over websockets where traditional REST servers would timeout. Examples are waiting for transactions and watching balances .
 Websockets allow to subscribe to server events, sending responses and notifications asynchronously.
 
-Check out the jsfiddle [demo](https://jsfiddle.net/Lm87yzuj/6/)
+Check out the jsfiddle [demo](https://jsfiddle.net/ahq6eyd3/1/)
 
 Websockets are supported by all major browsers and using them is easy, no external libraries are needed:
 
 ```js
-// create websocket and connect it to mainnet
 let socket = new WebSocket("wss://rest-unstable.mainnet.cash/api/v1/wallet");
-
-// make a request to subscribe to bakance changes of a wallet
 socket.onopen = (event) => {
-  // request body
-  const balanceRequest = {method: "watchBalance", data: {address: "qzxzl07tth5qx4shphrpzz38wnstwac5ksqnc6yyr3"}};
-  // send request
-  socket.send(JSON.stringify(balanceRequest));
+  const request = {method: "watchBalance", data: {cashaddr: address}};
+  socket.send(JSON.stringify(request));
 };
 
-// receive server replies and log them
 socket.onmessage = (event) => {
-  let response = JSON.parse(event.data);
-  console.log(response);
+  const transaction = JSON.parse(event.data);
+  // do something
 };
 ```
 
@@ -363,5 +357,4 @@ The output of this code snippet will look like this:
 }
 ```
 
-See [websocket API reference](/additional/websockets.html)
-
+See [websocket API reference](/tutorial/rest.html#websocket-api-reference)
