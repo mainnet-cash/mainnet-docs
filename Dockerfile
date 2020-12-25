@@ -6,10 +6,12 @@ COPY docs/yarn.lock .
 RUN yarn -D
 RUN npm install -g vuepress
 WORKDIR /app
-COPY . .
+COPY docs /app/docs
 WORKDIR /app/docs
 RUN vuepress build src
 
 WORKDIR /app/docs/src/.vuepress/dist/
-RUN npm install -g static-server
-ENTRYPOINT static-server -p 5000
+RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+COPY nginx.conf /etc/nginx/sites-enabled/default
+EXPOSE 80
+ENTRYPOINT /usr/sbin/nginx -g 'daemon off;'
