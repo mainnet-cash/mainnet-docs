@@ -11,7 +11,7 @@ even though we try not to break things too often. Use at your own risk. To see t
 
 ::: tip A working demo
 
-You can see a fully working demo [here](https://jsfiddle.net/7emLk4na/1/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
+You can see a fully working demo [here](https://jsfiddle.net/5oc2uw9a/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
 
 :::
 
@@ -25,14 +25,14 @@ and persisted inside of a user browser. See [calling the REST API](/tutorial/res
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.1.5.js"
- integrity="sha384-CPKigz4DprdLsGjkL7KdJHs0BBziT4VG62BZdqauo/Aujq9ygLMI2zcGdGLKfW3E"
+<script src="https://cdn.mainnet.cash/mainnet-0.1.7.js"
+ integrity="sha384-d0YYKdhw7q960LkTW9ka2Y0KzHeY+Ixr0YLD4iq7VPqnjX3l50WqaxWIg3fB8BJO"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.1.5.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.1.7.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,

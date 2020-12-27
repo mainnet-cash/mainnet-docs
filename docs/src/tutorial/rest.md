@@ -477,7 +477,7 @@ See full webhook rest documentation in the [Swagger UI](https://rest-unstable.ma
 We provide some functionality over websockets where traditional REST servers would timeout. Examples are waiting for transactions and watching balances.
 Websockets allow to subscribe to server events, sending responses and notifications asynchronously.
 
-Check out the jsfiddle [demo](https://jsfiddle.net/Lm87yzuj/6/)
+Check out the jsfiddle [demo](/tutorial/)
 
 The client-server communication is in JSON format.
 
