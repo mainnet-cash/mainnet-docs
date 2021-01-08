@@ -365,3 +365,10 @@ The output of this code snippet will look like this:
 
 See [websocket API reference](/additional/websockets.html)
 
+## Changing Networks Providers
+
+By default, creating a new wallet will create a connection 
+to a server communicating over the [electrum cash protocol](https://bitcoincash.network/electrum/).
+
+However, if there are issues it may be necessary to set it manually.
+
