@@ -76,7 +76,6 @@ module.exports = {
                 children: [
                     '/developing_mainnet.html',
                     '/original.html',
-                    'additional/websockets.html'
                 ]
             },
         ]

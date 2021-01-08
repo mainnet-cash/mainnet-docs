@@ -11,7 +11,7 @@ even though we try not to break things too often. Use at your own risk. To see t
 
 ::: tip A working demo
 
-You can see a fully working demo [here](https://jsfiddle.net/7emLk4na/1/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
+You can see a fully working demo [here](https://jsfiddle.net/5oc2uw9a/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
 
 :::
 
@@ -25,14 +25,14 @@ and persisted inside of a user browser. See [calling the REST API](/tutorial/res
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.1.5.js"
- integrity="sha384-CPKigz4DprdLsGjkL7KdJHs0BBziT4VG62BZdqauo/Aujq9ygLMI2zcGdGLKfW3E"
+<script src="https://cdn.mainnet.cash/mainnet-0.2.6.js"
+ integrity="sha384-UKCPFDAy33Qltt0Q9vkkrmo7U5J8tK5IJ9dDB3GnkeC74VTKkXbjAbt9f6gwB0pm"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.1.5.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.6.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -330,26 +330,20 @@ const wallet = await RegTestWallet.newRandom();
 We provide some functionality over websockets where traditional REST servers would timeout. Examples are waiting for transactions and watching balances .
 Websockets allow to subscribe to server events, sending responses and notifications asynchronously.
 
-Check out the jsfiddle [demo](https://jsfiddle.net/Lm87yzuj/6/)
+Check out the jsfiddle [demo](https://jsfiddle.net/ahq6eyd3/1/)
 
 Websockets are supported by all major browsers and using them is easy, no external libraries are needed:
 
 ```js
-// create websocket and connect it to mainnet
 let socket = new WebSocket("wss://rest-unstable.mainnet.cash/api/v1/wallet");
-
-// make a request to subscribe to bakance changes of a wallet
 socket.onopen = (event) => {
-  // request body
-  const balanceRequest = {method: "watchBalance", data: {address: "qzxzl07tth5qx4shphrpzz38wnstwac5ksqnc6yyr3"}};
-  // send request
-  socket.send(JSON.stringify(balanceRequest));
+  const request = {method: "watchBalance", data: {cashaddr: address}};
+  socket.send(JSON.stringify(request));
 };
 
-// receive server replies and log them
 socket.onmessage = (event) => {
-  let response = JSON.parse(event.data);
-  console.log(response);
+  const transaction = JSON.parse(event.data);
+  // do something
 };
 ```
 
@@ -363,12 +357,26 @@ The output of this code snippet will look like this:
 }
 ```
 
-See [websocket API reference](/additional/websockets.html)
+See [websocket API reference](/tutorial/rest.html#websocket-api-reference)
 
-## Changing Networks Providers
+## Changing Electrum Servers
 
-By default, creating a new wallet will create a connection 
-to a server communicating over the [electrum cash protocol](https://bitcoincash.network/electrum/).
+By default, creating a new wallet will use a common connection
+to a single server communicating with the [electrum cash protocol](https://bitcoincash.network/electrum/). 
 
-However, if there are issues it may be necessary to set it manually.
+These connections are stored on `globalThis` under the ticker for the network (`BCH`, `BCHt`, `BCHr`).
 
+If you need to create a new connection manually, it can be done by 
+passing the network and servers, where servers is either a single
+url or an array of urls.
+
+```js
+let conn = new Connection(
+  "mainnet",
+  "wss://bch.imaginary.cash:50004" 
+  )
+await conn.networkProvider.getBlockHeight()
+// 669347
+```
+
+This connection can be used to replace the common provider on `glboalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet.
