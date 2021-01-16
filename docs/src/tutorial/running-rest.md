@@ -21,6 +21,22 @@ The following variables are available to configure the REST server:
 | `WORKERS` | Number of threads  | `10` |
 | `DATABASE_URL` | Postgres URL  | `undefined` |
 
+The node package also has the following variables to control which electrum cash servers it connects to and how:
+
+| Variable | Description | Default|
+| ----------- | ----------- | ------ |
+| `ELECTRUM` | electrum server url, or multiple as a comma separated list without spaces  | `wss://fulcrum.fountainhead.cash` |
+| `ELECTRUM_TESTNET` | Same for testnet | `wss://blackie.c3-soft.com:60004` |
+| `ELECTRUM_REGTEST` | Same for regtest  | `ws://127.0.0.1:60003` |
+| `ELECTRUM_CONFIDENCE` | How many servers must agree for an response to resolve  | `1` |
+
+It is possible to use multiple servers and compare the results from each:
+
+```
+ELECTRUM="wss://fulcrum.fountainhead.cash,wss://bch.imaginary.cash:50004"
+```
+
+Where the number of servers that must agree is controlled with `ELECTRUM_CONFIDENCE`
 
 
 ### Docker (exposed on localhost) <Badge text="recommended" type="tip"/>

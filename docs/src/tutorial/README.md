@@ -358,3 +358,25 @@ The output of this code snippet will look like this:
 ```
 
 See [websocket API reference](/tutorial/rest.html#websocket-api-reference)
+
+## Changing Electrum Servers
+
+By default, creating a new wallet will use a common connection
+to a single server communicating with the [electrum cash protocol](https://bitcoincash.network/electrum/). 
+
+These connections are stored on `globalThis` under a variable matching ticker for the network (`BCH`, `tBCH`, `rBCH`).
+
+If you need to create a new connection manually, it can be done by 
+passing the network and servers, where servers is either a single
+url or an array of urls.
+
+```js
+let conn = new Connection(
+  "mainnet",
+  "wss://bch.imaginary.cash:50004" 
+  )
+await conn.networkProvider.getBlockHeight()
+// 669347
+```
+
+This connection can be used to replace the common provider on `glboalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet.
