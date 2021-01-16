@@ -364,7 +364,7 @@ See [websocket API reference](/tutorial/rest.html#websocket-api-reference)
 By default, creating a new wallet will use a common connection
 to a single server communicating with the [electrum cash protocol](https://bitcoincash.network/electrum/). 
 
-These connections are stored on `globalThis` under a variable matching ticker for the network (`BCH`, `BCHt`, `BCHr`).
+These connections are stored on `globalThis` under a variable matching ticker for the network (`BCH`, `tBCH`, `rBCH`).
 
 If you need to create a new connection manually, it can be done by 
 passing the network and servers, where servers is either a single
