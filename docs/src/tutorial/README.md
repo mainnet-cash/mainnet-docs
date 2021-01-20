@@ -198,7 +198,7 @@ The `balance` variable contains the actual balance of the wallet.
 ## Escrow contracts
 
 ::: warning
-Not fully tested yet
+Alpha
 :::
 
 Ok, let's now assume that you are building a service where you want to connect a buyer and a seller (a freelance marketplace 
@@ -273,7 +273,109 @@ const restoredEscrow = EscrowContract.fromId(contractId);
 
 ## CashScript
 
-Somewhat done, but not yet documented...
+If a contract from a template doesn't suit your needs, it is also possible to use any contract written in [cashscript](https://cashscript.org/).  Taking a simple timout example from the [cashscript playground](https://playground.cashscript.org/):
+
+```js
+var script = `pragma cashscript ^0.5.0;
+
+contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
+    // Require recipient's signature to match
+    function transfer(sig recipientSig) {
+        require(checkSig(recipientSig, recipient));
+    }
+
+    // Require timeout time to be reached and sender's signature to match
+    function timeout(sig senderSig) {
+        require(checkSig(senderSig, sender));
+        require(tx.time >= timeout);
+    }
+}`
+```
+
+This can be loaded up by passing the script, constructor arguments and network to a new Contract. 
+
+::: tip Before you dive in, it might be a good time to consider using RegTest?
+
+The below code is for TestNet, but it's highly recommended to develop and test your contracts on `RegTest`. Besides the ability to give yourself free coins, it's also possible to mine blocks to test your contract functioning over different time conditions.
+
+:::
+
+```js
+const alice = await TestNetWallet.newRandom();
+
+// In the case that you only have Charlie's cashaddr, 
+// it won't be possible to get the full public key,
+// but a public key hash may be used in the contract instead
+const charlie = await TestNetWallet.newRandom();
+
+// In javascript, the contract can take a binary argument as a Uint8Array or 
+// hexidecimal strings just like cashscript, but passing passing `true`
+// here causes getPublicKey() returns hex, 
+// the default is an Array
+const alicePk = alice.getPublicKey(true);
+const charliePk = charlie.getPublicKey(true);
+
+// Some block height very far in the past.
+const after = 215;
+
+let contract = new Contract(
+  script,
+  [alicePk, charliePk, after],
+  Network.TESTNET
+);
+
+```
+
+This will give you a contract object that can be serialized and deserialized just like a wallet:
+
+```js
+// serialized to a string
+let contractStr = contract.toString()
+//testnet:TURSa05EV...nPT06TWpFMQ==:cHJhZ...gfQp9:61149027"
+
+// recreate the Contract object from a string
+let contractCopy = Contract.fromId(contractStr)
+```
+
+The deposit address is available with the same interface as a wallet.
+
+```js
+contract.getDepositAddress()
+//"bchtest:pzpt6y6ganwagvr6far4pe82yvtflx60zstdyhlzld"
+```
+
+The interface to list utxos is identical to wallets as well...
+
+```js
+await contract.getUtxos()
+// [
+//  {
+//   txid: "8806ef4f1185f268a5083fbd651d974b939d2c68afa2be28652c4ccce06703c4", 
+//   vout: 0, 
+//   satoshis: 1000, 
+//   height: 0
+//  }
+// ]
+```
+
+Once the contract is funded, contract functions may be called just like in cashscript:
+
+```js
+let transferFn = contract.getContractFunction("transfer");
+
+// the signature template for charlie is available on the wallet
+const sig = charlie.getSignatureTemplate();
+const charlieAddr = charlie.getDepositAddress()
+
+// The function may be called by passing the arguments to the function
+// specifying a `to` destination and a cashscript function method, i.e. send
+let txn = await transferFn(sig).to(charlieAddr, 7000)
+                                   .send();  // builds and transmits the tx,
+// or get hex without sending:     .build();
+// or generate meep debug command  .meep();
+```
+
+If you may be making a lot of contracts, which sometimes may be identical in construction, it may be useful to make them unique to keep deposited funds separate.  
 
 ## Utilities
 

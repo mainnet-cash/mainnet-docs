@@ -301,7 +301,7 @@ Currently, the only way to wait for a tx is to poll the balance (this will impro
 ## Escrow contracts
 
 ::: warning 
-Not fully tested yet
+Alpha release
 :::
 
 Ok, let's now assume that you are building a service where you want to connect a buyer and a seller (a freelance marketplace 
@@ -385,6 +385,70 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
 
 (the same: spend or refund, just replace the walletId with the arbiter's one)
 
+## Generic CashScript
+
+Like the javascript library, generic CashScript functions are supported via rest.
+
+::: tip 
+All byte arguments to the constructor or function should be passed as hexidecimal. Byte arguments can only be passed as Uint8Arrays with the native library.
+:::
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/contract/create \
+  -H  "Content-Type: application/json" \
+  -d '{
+  "network": "testnet",
+  "script": "contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {\n    function transfer(sig recipientSig) {\n        require(checkSig(recipientSig, recipient));\n    }\n\n    function timeout(sig senderSig) {\n        require(checkSig(senderSig, sender));\n        require(tx.time >= timeout);\n    }\n}\n",
+  "parameters": [
+    "03410ef048b3da351793f6ed14cc2fde460becc5b658d9138443b9a3000707a6a7",
+    "034978ac464f358b235f11212eb6e017af90215b90b1ff7471d9ae2abb5e09263b",
+    215
+  ]
+}'
+
+```
+Response:
+
+The response is a serialized contract, (storing the network, raw script, and constructor parameters), as well as the deposit cashaddr for the contract.
+
+```json
+{
+  "contractId": "testnet:TURNME1UQmxaakEwT0dJelpHRXpOVEUzT1RObU5tVmtNVFJqWXpKbVpHVTBOakJpWldOak5XSTJOVGhrT1RFek9EUTBNMkk1WVRNd01EQTNNRGRoTm1FMzpNRE0wT1RjNFlXTTBOalJtTXpVNFlqSXpOV1l4TVRJeE1tVmlObVV3TVRkaFpqa3dNakUxWWprd1lqRm1aamMwTnpGa09XRmxNbUZpWWpWbE1Ea3lOak5pOk1qRTE=:Y29udHJhY3QgVHJhbnNmZXJXaXRoVGltZW91dChwdWJrZXkgc2VuZGVyLCBwdWJrZXkgcmVjaXBpZW50LCBpbnQgdGltZW91dCkgewogICAgZnVuY3Rpb24gdHJhbnNmZXIoc2lnIHJlY2lwaWVudFNpZykgewogICAgICAgIHJlcXVpcmUoY2hlY2tTaWcocmVjaXBpZW50U2lnLCByZWNpcGllbnQpKTsKICAgIH0KCiAgICBmdW5jdGlvbiB0aW1lb3V0KHNpZyBzZW5kZXJTaWcpIHsKICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHNlbmRlclNpZywgc2VuZGVyKSk7CiAgICAgICAgcmVxdWlyZSh0eC50aW1lID49IHRpbWVvdXQpOwogICAgfQp9Cg==:310978053",
+  "cashaddr": "bchtest:pz29r0fy4q50ctszguqlze9e9cxh3etdqqnpdn4eg5"
+}
+```
+
+Now with the contract id, it is fairly straight-forward to call the function in cashscript:
+
+```bash
+curl -X POST "https://rest-unstable.mainnet.cash/contract/create" \
+  -H  "accept: application/json"  \
+  -H  "Content-Type: application/json" \
+'{
+  "contractId": "testnet:TU ... qRTE=:Y29udHJhY3... Qp9Cg==:310978053",
+  "action": "build",
+  "function": "transfer",
+  "arguments": [
+    "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"
+  ],
+  "to": {
+    "cashaddr":"bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0", 
+    "value":100,
+    "unit":"sat"
+    }
+}'
+```
+The above call is a simple example with the required arguments:
+
+- The `action` is the cashscript method to perform (`build`, `send`, or `meep`)
+- The `function` is the method on the contract to call. 
+- In this case, the argument is a keypair signature (`sig`), so the **walletId** is passed to generate the CashScript SignatureTemplate server-side.
+- Finally, a transaction output is required, and the argument was passed in mainnet-js send format, but cashscript (`to`/`amount`) format is also accepted, as well as lists of either format.
+
+In the case of the example above, where the transaction is signed, a walletId with private keys (wif/seed) should be fine.  If a contract calls for public key hashs as input, this may be derived by creating a watch only wallet and using the `wallet/info` endpoint to obtain any available data about a wallet as hex.
+
+Full access to the cashscript SDK (opReturn, fees, change, age, time) is documented further in [the full specification](https://rest-unstable.mainnet.cash/api-docs/#/contract/call).
+
 ## Utilities
 
 Certain tools common in bitcoin-like currencies may not be in a standard library.
@@ -410,10 +474,6 @@ returns something like:
 28067024
 ...
 ```
-
-## CashScript
-
-Somewhat done, but not yet documented...
 
 ## RegTest wallets
 
