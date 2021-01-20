@@ -298,6 +298,361 @@ You can use this `src` directly in the image tag:
 
 Currently, the only way to wait for a tx is to poll the balance (this will improve later)
 
+## Simple Ledger Protocol (SLP)
+
+We currently fully support the SLP type 1 tokens [specification](https://slp.dev/specs/slp-token-type-1/)
+
+The interfaces were designed to be largely similar to those of BCH wallets.
+
+Slp methods can use the `walletId` created in `wallet/create` calls.
+
+Rest server uses strings for the slp amounts in order not to lose precision or have floating point issues
+
+### Token creation - Genesis
+
+To create your own token you should prepare and broadcast a special genesis transaction containing all the information about the token being created: token name, ticker, decimals - number of significant digits after comma, initial token amount, url you want to associate with token. Some of these properties are optional.
+
+With the `endBaton` parameter you can decide to keep the possibility of additional token creation, which is governed by so called minting baton or immediately discard this baton to make the token circulation amount to be fixed.
+
+The transaction id in which the token is created will become its permanent and unique identifier.
+
+Note, that there might be many tokens with the same name. Remember, that only 64 character long string-ids do identify your token uniquely und unambiguously.
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/genesis \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "name": "Mainnet coin",
+  "ticker": "MNC",
+  "initialAmount": "10000",
+  "decimals": 0,
+  "documentUrl": "https://mainnet.cash",
+  "documentHash": "db4451f11eda33950670aaf59e704da90117ff7057283b032cfaec7779313916",
+  "endBaton": false
+}'
+```
+
+Response:
+
+```json
+{
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
+  "balances": {
+    "value": "10000",
+    "ticker": "MNC",
+    "name": "Mainnet coin",
+    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+}
+```
+
+### Looking up token information
+
+If you want to get the genesis information of some token, you can simply call getTokenInfo:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/token_info \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}'
+```
+
+Response:
+
+```json
+{
+  "name": "Mainnet coin",
+  "ticker": "MNC",
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
+  "initialAmount": "10000",
+  "decimals": 2,
+  "documentUrl": "https://mainnet.cash",
+  "documentHash": "db4451f11eda33950670aaf59e704da90117ff7057283b032cfaec7779313916"
+}
+```
+
+
+### Additional token creation - Minting
+
+If you decide to increase the token circulation supply, you would need to `mint` more tokens. You are required to have the ownership of the minting baton to do so. Similarly to genesis, you can keep the baton or discard it.
+
+In the following example we issue 50 more tokens we just created in genesis:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/mint \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "value": "10000",
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
+  "endBaton": false
+}'
+```
+
+Response:
+
+```json
+{
+  "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
+  "balances": {
+    "value": "20000",
+    "ticker": "MNC",
+    "name": "Mainnet coin",
+    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+}
+```
+
+### Sending tokens
+
+Sending tokens around is easy and is very similar to sending BCH.You can include many send requests one call too!
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/send \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "to": [
+    {
+      "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+      "value": 100,
+      "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+    }
+  ]
+}'
+```
+
+Response:
+
+```json
+{
+  "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
+  "balance": {
+    "value": "19900",
+    "ticker": "MNC",
+    "name": "Mainnet coin",
+    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+}
+```
+
+Or you can send all tokens available with a simple sendMax method
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/send_max \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}'
+```
+
+Response:
+
+```json
+{
+  "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
+  "balance": {
+    "value": "0",
+    "ticker": "MNC",
+    "name": "Mainnet coin",
+    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+}
+```
+
+Note, you can not send several different tokens in one go.
+
+
+### Token balances
+
+You can get all token balances of your wallet or a balance of a specific token with the following methods:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/balance \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}'
+```
+
+Response:
+
+```json
+{
+  "value": "1000",
+  "ticker": "MNC",
+  "name": "Mainnet coin",
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}
+```
+
+All balances:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/all_balances \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
+}'
+```
+
+Response:
+
+```json
+[
+  {
+    "value": "1000",
+    "ticker": "MNC",
+    "name": "Mainnet coin",
+    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+]
+```
+
+### Slp address utxos
+
+If you want to get the information about Slp utxos of an address, look up the locked satoshi values, etc., you can do the following call:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/utxo \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
+}'
+```
+
+Response:
+
+```json
+[
+  {
+    "index": 0,
+    "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
+    "satoshis": 546,
+    "utxoId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0",
+    "value": "10000",
+    "decimals": 2,
+    "ticker": "MNC",
+    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+]
+```
+
+### Slp deposit address
+
+You can get the deposit address in cashscript format: `simpleledger:qq...`, `slptest:qq...` or `slpreg:qq...` for mainnet, testnet and regtest networks, respectively
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_address \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
+}'
+```
+
+Response:
+
+```json
+{
+  "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+}
+```
+
+### Slp deposit qr code
+
+You can get the deposit address in cashscript format: `simpleledger:qq...`, `slptest:qq...` or `slpreg:qq...` for mainnet, testnet and regtest networks, respectively
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_qr \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
+}'
+```
+
+Response:
+
+```json
+{
+  "src": "data:image/svg+xml;base64,PD94bWwgdm... ==**",
+  "title": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "alt": "A Bitcoin Cash Simple Ledger Protocol Qr Code"
+}
+```
+
+## Testnet faucet
+
+You can have some testnet satoshi or slp tokens for your convenience. Visit our ~~faucet~~ refilling station at https://rest-unstable.mainnet.cash/faucet.html
+
+Your address will be refilled up to 10000 testnet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+
+Please always return the rest satoshi/tokens bach to the faucet.
+
+We've integrated the faucet into the library so that you can do an easy calls like the following.
+
+
+### Get testnet satoshis
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_bch \
+  -H "Content-Type: application/json" \
+  -d '{
+  "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8"
+}'
+```
+
+Response:
+
+```json
+{
+  "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}
+```
+
+### Get testnet slp tokens
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_slp \
+  -H "Content-Type: application/json" \
+  -d '{
+  "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}'
+```
+
+Response:
+
+```json
+{
+  "txId": "dc38ee5d4233163e69144e4ec6e49257d41f5605e297d05c0af8f1d81ae1a387"
+}
+```
+
+### Get faucet return addresses
+
+Always return the lended satoshis and tokens. Consider donating your excess funds and fancy tokens too!
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/faucet/get_addresses \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+Response:
+
+```json
+{
+  "bchtest": "bchtest:qzxkd5achtj6v46m9vdqv6gj2pvrac5q0qd2qqa2ga",
+  "slptest": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+}
+```
+
 ## Escrow contracts
 
 ::: warning 
