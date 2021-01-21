@@ -223,10 +223,12 @@ The transaction id in which the token is created will become its permanent and u
 
 Note, that there might be many tokens with the same name. Remember, that only 64 character long string-ids do identify your token uniquely und unambiguously.
 
+In the following example 10000.00 MNC tokens will be created.
+
 ```js
-const genesisOptions: SlpGenesisOptions = {
+const genesisOptions = {
   name: "Mainnet coin",
-  ticker: ticker,
+  ticker: "MNC",
   decimals: 2,
   initialAmount: 10000,
   documentUrl: "https://mainnet.cash",
@@ -255,7 +257,7 @@ const {txId, balance} = await wallet.slp.mint(50, tokenId)
 
 ### Sending tokens
 
-Sending tokens around is easy and is very similar to sending BCH.You can include many send requests one call too!
+Sending tokens around is easy and is very similar to sending BCH. You can include many send requests in one call too!
 
 ```js
 const {txId, balance} = await wallet.slp.send([
@@ -285,9 +287,9 @@ const tokenBalance = wallet.slp.getBalance(tokenId);
 const allBalances = wallet.slp.getAllBalances();
 ```
 
-### Slp address utxos
+### SLP address UTXOs
 
-If you want to get the information about Slp utxos of an address, look up the locked satoshi values, etc., you can do the following call:
+If you want to get the information about SLP UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
 
 ```js
 const utxos = wallet.slp.getFormattedSlpUtxos();
@@ -295,7 +297,7 @@ const utxos = wallet.slp.getFormattedSlpUtxos();
 
 ### Watching/waiting for transactions
 
-You can set up a hook to monitor Slp transactions with the following:
+You can set up a hook to monitor SLP transactions with the following:
 
 ```js
 const cancelFn = wallet.slp.watchTransactions((tx) => {
@@ -333,15 +335,13 @@ const actualBalance = await wallet.slp.waitForBalance(10, tokenId);
 
 This will halt the program execution until the balance reaches the target value.
 
-## Testnet faucet
+## TestNet faucet
 
-You can have some testnet satoshi or slp tokens for your convenience. Visit our ~~faucet~~ refilling station at https://rest-unstable.mainnet.cash/faucet.html
+You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
 
-Your address will be refilled up to 10000 testnet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+Your address will be refilled up to 10000 TestNet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
 
-Please always return the rest satoshi/tokens bach to the faucet.
-
-We've integrated the faucet into the library so that you can do an easy calls like the following:
+We've integrated the faucet into the library so that you can do easy calls like the following:
 
 ```js
 const txid = await wallet.getTestnetSatoshis();

@@ -304,9 +304,9 @@ We currently fully support the SLP type 1 tokens [specification](https://slp.dev
 
 The interfaces were designed to be largely similar to those of BCH wallets.
 
-Slp methods can use the `walletId` created in `wallet/create` calls.
+SLP methods can use the `walletId` created in `wallet/create` calls.
 
-Rest server uses strings for the slp amounts in order not to lose precision or have floating point issues
+Rest server uses strings for the SLP amounts in order not to lose precision or have floating point issues
 
 ### Token creation - Genesis
 
@@ -318,6 +318,8 @@ The transaction id in which the token is created will become its permanent and u
 
 Note, that there might be many tokens with the same name. Remember, that only 64 character long string-ids do identify your token uniquely und unambiguously.
 
+In the following example 10000.00 MNC tokens will be created.
+
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/genesis \
   -H "Content-Type: application/json" \
@@ -326,7 +328,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/genesis \
   "name": "Mainnet coin",
   "ticker": "MNC",
   "initialAmount": "10000",
-  "decimals": 0,
+  "decimals": 2,
   "documentUrl": "https://mainnet.cash",
   "documentHash": "db4451f11eda33950670aaf59e704da90117ff7057283b032cfaec7779313916",
   "endBaton": false
@@ -408,7 +410,7 @@ Response:
 
 ### Sending tokens
 
-Sending tokens around is easy and is very similar to sending BCH.You can include many send requests one call too!
+Sending tokens around is easy and is very similar to sending BCH. You can include many send requests in one call too!
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/send \
@@ -515,9 +517,9 @@ Response:
 ]
 ```
 
-### Slp address utxos
+### SLP address UTXOs
 
-If you want to get the information about Slp utxos of an address, look up the locked satoshi values, etc., you can do the following call:
+If you want to get the information about SLP UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/utxo \
@@ -544,9 +546,9 @@ Response:
 ]
 ```
 
-### Slp deposit address
+### SLP deposit address
 
-You can get the deposit address in cashscript format: `simpleledger:qq...`, `slptest:qq...` or `slpreg:qq...` for mainnet, testnet and regtest networks, respectively
+You can get the token deposit address in cashaddress format: `simpleledger:qq...`, `slptest:qq...` or `slpreg:qq...` for MainNet, TestNet and RegTest networks, respectively
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_address \
@@ -564,9 +566,9 @@ Response:
 }
 ```
 
-### Slp deposit qr code
+### SLP deposit QR code
 
-You can get the deposit address in cashscript format: `simpleledger:qq...`, `slptest:qq...` or `slpreg:qq...` for mainnet, testnet and regtest networks, respectively
+You can get the deposit address embedded in a QR code image. The response is ready to be used in HTML `src`, `title` and `alt` attributes of an `img` node.
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_qr \
@@ -582,22 +584,19 @@ Response:
 {
   "src": "data:image/svg+xml;base64,PD94bWwgdm... ==**",
   "title": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "alt": "A Bitcoin Cash Simple Ledger Protocol Qr Code"
+  "alt": "A Bitcoin Cash Simple Ledger Protocol QR Code"
 }
 ```
 
-## Testnet faucet
+## TestNet faucet
 
-You can have some testnet satoshi or slp tokens for your convenience. Visit our ~~faucet~~ refilling station at https://rest-unstable.mainnet.cash/faucet.html
+You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
 
-Your address will be refilled up to 10000 testnet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+Your address will be refilled up to 10000 TestNet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
 
-Please always return the rest satoshi/tokens bach to the faucet.
+We've integrated the faucet into the library so that you can do easy calls like the following.
 
-We've integrated the faucet into the library so that you can do an easy calls like the following.
-
-
-### Get testnet satoshis
+### Get TestNet satoshis
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_bch \
@@ -615,7 +614,7 @@ Response:
 }
 ```
 
-### Get testnet slp tokens
+### Get TestNet SLP tokens
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_slp \
@@ -631,25 +630,6 @@ Response:
 ```json
 {
   "txId": "dc38ee5d4233163e69144e4ec6e49257d41f5605e297d05c0af8f1d81ae1a387"
-}
-```
-
-### Get faucet return addresses
-
-Always return the lended satoshis and tokens. Consider donating your excess funds and fancy tokens too!
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/faucet/get_addresses \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-Response:
-
-```json
-{
-  "bchtest": "bchtest:qzxkd5achtj6v46m9vdqv6gj2pvrac5q0qd2qqa2ga",
-  "slptest": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
 }
 ```
 
