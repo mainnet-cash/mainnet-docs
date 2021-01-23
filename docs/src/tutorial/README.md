@@ -25,14 +25,14 @@ and persisted inside of a user browser. See [calling the REST API](/tutorial/res
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.2.12.js"
- integrity="sha384-CmrJoR+dx6a4cw3opshz5ssWp587n6VUyYD005vlGq2+UKgtfNhOil/wLgydN5E3"
+<script src="https://cdn.mainnet.cash/mainnet-0.2.14.js"
+ integrity="sha384-xCZt+GMgW7fyHrTbXqA76f1SlPs3RTwxgqHjasjjVIU1Un1MCTAEsLtNS4qUjmsW"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.12.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.14.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -185,15 +185,46 @@ Then you can replace it with an actual QR code of the deposit address:
 document.querySelector('#deposit').src = wallet.getDepositQr().src;
 ```
 
-### Waiting
+### Waiting for balance
 
 You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
 
 ```js
-let balance = await wallet.waitForBalance(1.0, 'usd');
+const balance = await wallet.waitForBalance(1.0, 'usd');
 ````
 
 The `balance` variable contains the actual balance of the wallet.
+
+### Waiting for transaction
+
+You can wait for a wallet transaction and halt the program execution until it arrives.
+
+```js
+const rawTransaction = await wallet.waitForTransaction();
+```
+
+The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+
+If you are willing to ~~spy on~~ monitor transactions of an address you do not own, you can create a [watchOnly wallet](#watch-only-wallets).
+
+### Waiting for block
+
+If you want to wait for the next block or wait for blockhain to reach certain block height you can use the following method of the wallet's network provider:
+
+```js
+const nextBlockInfo = await wallet.provider.waitForBlock();
+
+const futureBlockInfo = await wallet.provider.waitForBlock(770000);
+```
+
+The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-headers-subscribe) is simple:
+
+```json
+{
+  height: number;
+  hex: string;
+}
+```
 
 ## Simple Ledger Protocol (SLP)
 

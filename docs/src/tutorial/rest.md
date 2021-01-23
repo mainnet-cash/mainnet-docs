@@ -856,6 +856,28 @@ Response:
 }
 ```
 
+#### waitForBalance
+
+Waits for the address balance to reach the minimum target value.
+
+```json
+{
+  method: "waitForBalance",
+  data: {
+    cashaddr: "bitcoincash:qzxzl07tth5qx4shphrpzz38wnstwac5ksqnc6yyr3",
+    value: 1000,
+    unit: "satoshi"
+  }
+}
+```
+
+Response: actual balance of the address in the units you specified.
+```json
+{
+  balance: 1200
+}
+```
+
 #### waitForTransaction
 
 Waits for the next transaction of the address. Responds once.
@@ -892,3 +914,29 @@ Response: Raw transaction in verbose format as per [specification](https://elect
 }
 ```
 
+#### waitForBlock
+
+Waits for the next next block or for the blockchain to reach a certain height.
+```json
+{
+  method: "waitForBlock",
+  data: {}
+}
+```
+
+```json
+{
+  method: "waitForBlock",
+  data: {
+    height: 770000
+  }
+}
+```
+
+Response: Block header as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-headers-subscribe)
+```json
+{
+  height: 770000,
+  hex: "000000209107e04f2eee18fa36c70f00cdb8a9e35c669a7d5ada13c945a130db2389bc116cc61e2d285d78c5a8b62e6df23037c9fbfea2b58df6e649c0a1e7d7a8f94393fe760c60ffff7f2000000000"
+}
+```
