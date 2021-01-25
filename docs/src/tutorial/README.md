@@ -2,7 +2,7 @@
 
 ::: danger
 
-Note: This site is work-in-progress and the mainnet library is currently in a prototype stage.
+Note: This site is a work-in-progress and the mainnet library is currently in a prototype stage.
 Things may and will change randomly. There is no backward compatibility guarantee yet,
 even though we try not to break things too often. Use at your own risk. To see the old site with the full plan
 (yet to be implemented), go [here](https://web.archive.org/web/20200810182937/https://mainnet.cash/).
@@ -197,8 +197,8 @@ The `balance` variable contains the actual balance of the wallet.
 
 ## Escrow contracts
 
-::: warning
-Alpha
+::: warning 
+Alpha release
 :::
 
 Ok, let's now assume that you are building a service where you want to connect a buyer and a seller (a freelance marketplace 
@@ -271,12 +271,57 @@ Restore it later:
 const restoredEscrow = EscrowContract.fromId(contractId);
 ```
 
-## CashScript
+The escrow object implements a CashScript contract from a stock template, but if the template doesn't suit your needs, it is also possible to use any contract written in [CashScript](https://cashscript.org/).  
 
-If a contract from a template doesn't suit your needs, it is also possible to use any contract written in [cashscript](https://cashscript.org/).  Taking a simple timout example from the [cashscript playground](https://playground.cashscript.org/):
+```solidity
+pragma cashscript ^0.5.3;
 
-```js
-var script = `pragma cashscript ^0.5.0;
+contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int contractAmount, int contractNonce) {
+
+    function spend(pubkey signingPk, sig s, int amount, int nonce) {
+        require(hash160(signingPk) == arbiterPkh || hash160(signingPk) == buyerPkh);
+        require(checkSig(s, signingPk));
+        require(amount >= contractAmount);
+        require(nonce == contractNonce);
+        bytes34 output = new OutputP2PKH(bytes8(amount), sellerPkh);
+        require(hash256(output) == tx.hashOutputs);
+    }
+
+    function refund(pubkey signingPk, sig s, int amount, int nonce) {
+        require(hash160(signingPk) == arbiterPkh||hash160(signingPk) == sellerPkh);
+        require(checkSig(s, signingPk));
+        require(amount >= contractAmount);
+        require(nonce == contractNonce);
+        bytes34 output = new OutputP2PKH(bytes8(amount), buyerPkh);
+        require(hash256(output) == tx.hashOutputs);
+    }
+}
+```
+
+## Generic CashScript
+
+::: warning 
+Alpha release
+:::
+
+::: tip What is CashScript?
+
+*From CashScript.org:*
+
+[CashScript](https://cashscript.org/) is a high-level programming language for smart contracts on Bitcoin Cash. It offers a strong abstraction layer over Bitcoin Cash' native virtual machine, Bitcoin Script. Its syntax is based on Ethereum's smart contract language Solidity, but its functionality is very different since smart contracts on Bitcoin Cash differ greatly from smart contracts on Ethereum. For a detailed comparison of them, refer to the blog post [Smart Contracts on Ethereum, Bitcoin and Bitcoin Cash](https://kalis.me/smart-contracts-eth-btc-bch/). 
+
+
+:::
+
+In the `EscrowContract` example in the previous section, the contract source is hardcoded. But with a generic `Contract`, the full script is defined by the user. 
+
+`Contracts` are objects that simply wrap a CashScript Contract, with utilities to serialize and deserialize them. In addition, there are some functions on wallets to facilitate sending arguments to the contract. 
+
+For example, taking a simple pay with timeout example from the [CashScript playground](https://playground.cashscript.org/):
+
+
+```solidity
+pragma cashscript ^0.5.0;
 
 contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
     // Require recipient's signature to match
@@ -289,7 +334,7 @@ contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
         require(checkSig(senderSig, sender));
         require(tx.time >= timeout);
     }
-}`
+}
 ```
 
 This can be loaded up by passing the script, constructor arguments and network to a new Contract. 
@@ -301,6 +346,20 @@ The below code is for TestNet, but it's highly recommended to develop and test y
 :::
 
 ```js
+
+const script = `contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
+    // Require recipient's signature to match
+    function transfer(sig recipientSig) {
+        require(checkSig(recipientSig, recipient));
+    }
+
+    // Require timeout time to be reached and sender's signature to match
+    function timeout(sig senderSig) {
+        require(checkSig(senderSig, sender));
+        require(tx.time >= timeout);
+    }
+}`
+
 const alice = await TestNetWallet.newRandom();
 
 // In the case that you only have Charlie's cashaddr, 
@@ -309,9 +368,10 @@ const alice = await TestNetWallet.newRandom();
 const charlie = await TestNetWallet.newRandom();
 
 // In javascript, the contract can take a binary argument as a Uint8Array or 
-// hexidecimal strings just like cashscript, but passing passing `true`
-// here causes getPublicKey() returns hex, 
-// the default is an Array
+// hexadecimal strings just like CashScript, but passing passing `true`
+// here causes getPublicKey() to return hex, 
+// (in case you wanted to paste into the data into CashScript playground.)
+// the default is a Uint8Array
 const alicePk = alice.getPublicKey(true);
 const charliePk = charlie.getPublicKey(true);
 
@@ -358,7 +418,7 @@ await contract.getUtxos()
 // ]
 ```
 
-Once the contract is funded, contract functions may be called just like in cashscript:
+Once the contract is funded, contract functions may be called just like in CashScript:
 
 ```js
 let transferFn = contract.getContractFunction("transfer");
@@ -368,14 +428,19 @@ const sig = charlie.getSignatureTemplate();
 const charlieAddr = charlie.getDepositAddress()
 
 // The function may be called by passing the arguments to the function
-// specifying a `to` destination and a cashscript function method, i.e. send
-let txn = await transferFn(sig).to(charlieAddr, 7000)
-                                   .send();  // builds and transmits the tx,
-// or get hex without sending:     .build();
-// or generate meep debug command  .meep();
+// specifying a `to` destination and a CashScript function method, i.e. send
+let txn = await transferFn(sig).to(charlieAddr, 7000).send();  
 ```
 
-If you may be making a lot of contracts, which sometimes may be identical in construction, it may be useful to make them unique to keep deposited funds separate.  
+Wallets have the following convenience methods for passing data to CashScript:
+
+| Wallet Method | Returns | CashScript Type | 
+| ----------- | ----------- | ----------- |  
+| `getSignatureTemplate()` | SignatureTemplate | `sig` |
+| `getPublicKeyCompressed()` | Hex String or Uint8Array | `pubkey` |
+| `getPublicKeyHash()` | Hex String or Uint8Array |`bytes20` |
+
+In Javascript, passing either hex or a Uint8Array to CashScript will work.
 
 ## Utilities
 

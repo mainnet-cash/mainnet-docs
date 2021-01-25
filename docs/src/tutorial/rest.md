@@ -323,8 +323,7 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/create \
   "buyerAddr": "bchtest:qrnluuge56ahxsy6pplq43rva7k6s9dknu4p5278ah",
   "arbiterAddr": "bchtest:qzspcywxmm4fqhf9kjrknrc3grsv2vukeqyjqla0nt",
   "sellerAddr": "bchtest:qz00pk9lfs0k9f5vf3j8h66qfmqagk8nc56elq4dv2",
-  "amount": 10000,
-  "nonce": 808
+  "amount": 10000
 }'
 ```
 
@@ -353,12 +352,13 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -d '{
     "contractId": "....",
     "walletId": "seed:testnet:....",
-    "action": "spend"
+    "function": "spend"
   }'
 ```
 
-You can optionally provide `"getHexOnly": true` flag if you want to get the raw transaction to broadcast later, otherwise the
-transaction will be broadcast immediately. You can also specify the exact UTXO IDs to spend 
+By *default* the above command will build and transmit the transaction.  To **only** build the transaction hex, (without transmitting) and inspect the hex or transmit the hex manually, simply pass `"action": "build"` and the hex will be returned on the `"hex"` field.  In addition, to inspect the contract in the Bitcoin Script debugger, as a `meep` action may be passed, `"action": "meep"`.
+
+You can also specify the exact UTXO IDs to spend 
 (you can use [utxos call](https://rest-unstable.mainnet.cash/api-docs/#/contract/escrowUtxos) to list them):
 
 ```
@@ -370,15 +370,15 @@ transaction will be broadcast immediately. You can also specify the exact UTXO I
 ```
 
 
-2) Seller refunds
+1) Seller refunds
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
   -d '{
-    "contractId": "....",
-    "walletId": "seed:testnet:....",
-    "action": "refund"
-  }'
+      "contractId": "....",
+      "walletId": "seed:testnet:....",
+      "function": "refund"
+    }'
 ```
 
 3) Arbiter releases the funds or refunds 
@@ -387,10 +387,47 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
 
 ## Generic CashScript
 
-Like the javascript library, generic CashScript functions are supported via rest.
+::: warning 
+Alpha release
+:::
+
+::: tip What is CashScript?
+
+*From CashScript.org:*
+
+[CashScript](https://cashscript.org/) is a high-level programming language for smart contracts on Bitcoin Cash. It offers a strong abstraction layer over Bitcoin Cash' native virtual machine, Bitcoin Script. Its syntax is based on Ethereum's smart contract language Solidity, but its functionality is very different since smart contracts on Bitcoin Cash differ greatly from smart contracts on Ethereum. For a detailed comparison of them, refer to the blog post [Smart Contracts on Ethereum, Bitcoin and Bitcoin Cash](https://kalis.me/smart-contracts-eth-btc-bch/). 
+
+
+:::
+
+In the `EscrowContract` example in the previous section, the contract source is hardcoded. But with a generic `Contract`, the full script is defined by the user.
+
+`Contracts` are objects that simply wrap a CashScript Contract, with utilities to serialize and deserialize them. In addition, there are some functions on wallets to facilitate sending arguments to the contract.
+
+For example, taking a simple pay with timeout example from the [CashScript playground](https://playground.cashscript.org/):
+
+
+```solidity
+pragma cashscript ^0.5.0;
+
+contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
+    // Require recipient's signature to match
+    function transfer(sig recipientSig) {
+        require(checkSig(recipientSig, recipient));
+    }
+
+    // Require timeout time to be reached and sender's signature to match
+    function timeout(sig senderSig) {
+        require(checkSig(senderSig, sender));
+        require(tx.time >= timeout);
+    }
+}
+```
+
+This contract may be used over the REST interface by passing the contract script, parameters and network to the `contract/create` endpoint.
 
 ::: tip 
-All byte arguments to the constructor or function should be passed as hexidecimal. Byte arguments can only be passed as Uint8Arrays with the native library.
+All byte arguments to the constructor or function should be passed as hexidecimal. Byte arguments can only be passed as Uint8Arrays with the native javascript.
 :::
 
 ```bash
@@ -418,15 +455,13 @@ The response is a serialized contract, (storing the network, raw script, and con
 }
 ```
 
-Now with the contract id, it is fairly straight-forward to call the function in cashscript:
+Now with the `contractId`, it is fairly straight-forward to call the function in CashScript:
 
 ```bash
-curl -X POST "https://rest-unstable.mainnet.cash/contract/create" \
-  -H  "accept: application/json"  \
+curl -X POST "https://rest-unstable.mainnet.cash/contract/call" \
   -H  "Content-Type: application/json" \
 '{
   "contractId": "testnet:TU ... qRTE=:Y29udHJhY3... Qp9Cg==:310978053",
-  "action": "build",
   "function": "transfer",
   "arguments": [
     "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"
@@ -438,16 +473,16 @@ curl -X POST "https://rest-unstable.mainnet.cash/contract/create" \
     }
 }'
 ```
-The above call is a simple example with the required arguments:
+The above call is a simple example with minimum required arguments:
 
-- The `action` is the cashscript method to perform (`build`, `send`, or `meep`)
 - The `function` is the method on the contract to call. 
 - In this case, the argument is a keypair signature (`sig`), so the **walletId** is passed to generate the CashScript SignatureTemplate server-side.
-- Finally, a transaction output is required, and the argument was passed in mainnet-js send format, but cashscript (`to`/`amount`) format is also accepted, as well as lists of either format.
+- Finally, a transaction output is required, and the argument was passed in mainnet-js send format, but CashScript (`to`/`amount`) format is also accepted, as well as lists of either format.
+- The `action` is the CashScript method to perform (`build`, `meep`, or the default `send`)
 
-In the case of the example above, where the transaction is signed, a walletId with private keys (wif/seed) should be fine.  If a contract calls for public key hashs as input, this may be derived by creating a watch only wallet and using the `wallet/info` endpoint to obtain any available data about a wallet as hex.
+If a contract calls for public key hashes as input, this may be derived by creating a watch only wallet and using the `wallet/info` endpoint to obtain any available data about a wallet as hex.
 
-Full access to the cashscript SDK (opReturn, fees, change, age, time) is documented further in [the full specification](https://rest-unstable.mainnet.cash/api-docs/#/contract/call).
+Full access to the CashScript SDK (opReturn, fees, change, age, time) is documented further in [the full specification](https://rest-unstable.mainnet.cash/api-docs/#/contract/call).
 
 ## Utilities
 
@@ -530,7 +565,7 @@ The endpoint you specify in the `url` parameter will be called with HTTP POST me
 
 Webhooks can be set up to fire once and expire if the `recurrence` parameter is set to `once` or continuously until they expire by the timeout.
 
-See full webhook rest documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress)
+See full webhook REST documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress)
 
 ## WebSocket API reference
 
