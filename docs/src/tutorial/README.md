@@ -25,14 +25,14 @@ and persisted inside of a user browser. See [calling the REST API](/tutorial/res
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.2.7.js"
- integrity="sha384-sIxBivUvvuaznMyTewr6U4Pjlh0F5rwkREqSDg8oz/ZA8Sqxp5iPwXzpBqraONB6"
+<script src="https://cdn.mainnet.cash/mainnet-0.2.14.js"
+ integrity="sha384-xCZt+GMgW7fyHrTbXqA76f1SlPs3RTwxgqHjasjjVIU1Un1MCTAEsLtNS4qUjmsW"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.7.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.14.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -185,15 +185,208 @@ Then you can replace it with an actual QR code of the deposit address:
 document.querySelector('#deposit').src = wallet.getDepositQr().src;
 ```
 
-### Waiting
+### Waiting for balance
 
 You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
 
 ```js
-let balance = await wallet.waitForBalance(1.0, 'usd');
+const balance = await wallet.waitForBalance(1.0, 'usd');
 ````
 
 The `balance` variable contains the actual balance of the wallet.
+
+### Waiting for transaction
+
+You can wait for a wallet transaction and halt the program execution until it arrives.
+
+```js
+const rawTransaction = await wallet.waitForTransaction();
+```
+
+The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+
+If you are willing to ~~spy on~~ monitor transactions of an address you do not own, you can create a [watchOnly wallet](#watch-only-wallets).
+
+### Waiting for block
+
+If you want to wait for the next block or wait for blockhain to reach certain block height you can use the following method of the wallet's network provider:
+
+```js
+const nextBlockInfo = await wallet.provider.waitForBlock();
+
+const futureBlockInfo = await wallet.provider.waitForBlock(770000);
+```
+
+The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-headers-subscribe) is simple:
+
+```json
+{
+  height: number;
+  hex: string;
+}
+```
+
+## Simple Ledger Protocol (SLP)
+
+We currently fully support the SLP type 1 tokens [specification](https://slp.dev/specs/slp-token-type-1/)
+
+The interfaces were designed to be largely similar to those of BCH wallets.
+
+The slp functionality is available via Wallet.slp accessor:
+
+```js
+const wallet = await TestNetWallet.fromId("testnet:wif:qq...")
+
+const slpAddress = wallet.slp.getDepositAddress()
+
+const qrCode = wallet.slp.getDepositQr()
+```
+
+Note, that working with slp tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the slp transactions.
+
+### Token creation - Genesis
+
+To create your own token you should prepare and broadcast a special genesis transaction containing all the information about the token being created: token name, ticker, decimals - number of significant digits after comma, initial token amount, url you want to associate with token. Some of these properties are optional.
+
+With the `endBaton` parameter you can decide to keep the possibility of additional token creation, which is governed by so called minting baton or immediately discard this baton to make the token circulation amount to be fixed.
+
+The transaction id in which the token is created will become its permanent and unique identifier.
+
+Note, that there might be many tokens with the same name. Remember, that only 64 character long string-ids do identify your token uniquely und unambiguously.
+
+In the following example 10000.00 MNC tokens will be created.
+
+```js
+const genesisOptions = {
+  name: "Mainnet coin",
+  ticker: "MNC",
+  decimals: 2,
+  initialAmount: 10000,
+  documentUrl: "https://mainnet.cash",
+  endBaton: false
+};
+const {tokenId} =  await wallet.slp.genesis(genesisOptions)
+```
+
+### Looking up token information
+
+If you want to get the genesis information of some token, you can simply call getTokenInfo:
+
+```js
+const info = await wallet.slp.getTokenInfo(tokenId);
+```
+
+### Additional token creation - Minting
+
+If you decide to increase the token circulation supply, you would need to `mint` more tokens. You are required to have the ownership of the minting baton to do so. Similarly to genesis, you can keep the baton or discard it.
+
+In the following example we issue 50 more tokens we just created in genesis:
+
+```js
+const {txId, balance} = await wallet.slp.mint(50, tokenId)
+```
+
+### Sending tokens
+
+Sending tokens around is easy and is very similar to sending BCH. You can include many send requests in one call too!
+
+```js
+const {txId, balance} = await wallet.slp.send([
+  {
+    slpaddr: bobWallet.slp.slpaddr,
+    value: 5,
+    tokenId: tokenId
+  }
+]);
+```
+
+Or you can send all tokens available with a simple sendMax method
+
+```js
+const result = await wallet.slp.sendMax(otherWallet.slp.slpaddr, tokenId);
+```
+
+Note, you can not send several different tokens in one go.
+
+
+### Token balances
+
+You can get all token balances of your wallet or a balance of a specific token with the following methods:
+
+```js
+const tokenBalance = wallet.slp.getBalance(tokenId);
+const allBalances = wallet.slp.getAllBalances();
+```
+
+### SLP address UTXOs
+
+If you want to get the information about SLP UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
+
+```js
+const utxos = wallet.slp.getFormattedSlpUtxos();
+```
+
+### Watching/waiting for transactions
+
+You can set up a hook to monitor SLP transactions with the following:
+
+```js
+const cancelFn = wallet.slp.watchTransactions((tx) => {
+  ...
+}, tokenId);
+```
+
+Leave out the tokenId to monitor all token transactions.
+
+Call the `cancelFn()` to unsubscribe from receiving callback calls.
+
+If you want just to wait for the next transaction you can use the following call:
+
+```js
+const tx = await wallet.slp.waitForTransaction(tokenId);
+```
+
+This will halt the program execution until the transaction arrives.
+
+### Watching/waiting for balance
+
+Similarly a to transaction watching/waiting we provide the convenient methods to watch/wait for balance.
+
+```js
+const cancelFn = wallet.slp.watchBalance((balance) => {
+  ...
+}, tokenId);
+```
+
+You can wait for the slp wallet to reach a certain minimal token balance:
+
+```js
+const actualBalance = await wallet.slp.waitForBalance(10, tokenId);
+```
+
+This will halt the program execution until the balance reaches the target value.
+
+## TestNet faucet
+
+You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
+
+Your address will be refilled up to 10000 TestNet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+
+We've integrated the faucet into the library so that you can do easy calls like the following:
+
+```js
+const txid = await wallet.getTestnetSatoshis();
+...
+const sendResponse = await wallet.returnTestnetSatoshis();
+```
+
+Same for SLP:
+
+```js
+const txid = await wallet.getTestnetSlp(tokenId);
+...
+const slpSendResponse = await wallet.returnTestnetSlp(tokenId);
+```
 
 ## Escrow contracts
 
