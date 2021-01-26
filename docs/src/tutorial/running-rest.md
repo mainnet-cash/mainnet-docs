@@ -8,6 +8,7 @@ The REST server requires a postgres database to store named wallets. This settin
 
 In development and testing, the url: `postgres://postgres:trusted@localhost:15432/wallet` is loaded automatically from `/.env.regtest`.
 
+
 ### Docker (exposed on localhost) <Badge text="recommended" type="tip"/>
 
 ```shell
@@ -83,6 +84,7 @@ Response:
 ```
 
 TODO: Add host:port to console output
+
 
 ## Configuration
 
