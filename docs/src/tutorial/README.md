@@ -20,7 +20,7 @@ You can see a fully working demo [here](https://jsfiddle.net/5oc2uw9a/) and a vi
 ## Let's get programming
 
 Note that this tutorial describes `Browser + IndexedDB` approach, which means that the wallets will be created
-and persisted inside of a user browser. See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other_langs.html) for other approaches.
+and persisted inside of a user browser. See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other-languages.html) for other approaches.
 
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 

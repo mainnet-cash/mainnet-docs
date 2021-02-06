@@ -1,5 +1,11 @@
 # Other languages
 
+**Android**:  Mainnet library is not available for Android. Use [bitcoincashj](https://github.com/pokkst/bitcoincashj)
+
+**iOS**:  Mainnet library is not available for iOS. No idea what to use here.
+
+**Other Languages:**
+
 With a limited budget, we are mainly concentrated on developing mainnet library for JavaScript, 
 but as an added bonus we decided to build a REST server that will allow other languages 
 to access the Bitcoin Cash network too using the same code.
