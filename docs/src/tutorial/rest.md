@@ -229,7 +229,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
   }'
 ```
 
-Note that you can send to many addresses at once. It is also possible to specify which addresses are used to spend funds from by specifying a list of `utxoIds` in `options`.
+Note that you can send to many addresses at once. It is also possible to specify which unspent outputs are used to send funds from by specifying a list of `utxoIds` in `options`.
 
 Response:
 

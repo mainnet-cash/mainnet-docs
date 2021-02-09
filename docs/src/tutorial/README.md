@@ -148,7 +148,7 @@ const txData = await wallet.send([
 ]);
 ```
 
-Note that you can send to many addresses at once. There are also some options about how money is spent in development.
+Note that you can send to many addresses at once. There are also some options about how money is spent, such as specifying which unspent outputs are used as inputs.
 
 Let's print the balance of the seller's wallet:
 
