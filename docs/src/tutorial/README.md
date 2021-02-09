@@ -20,19 +20,19 @@ You can see a fully working demo [here](https://jsfiddle.net/5oc2uw9a/) and a vi
 ## Let's get programming
 
 Note that this tutorial describes `Browser + IndexedDB` approach, which means that the wallets will be created
-and persisted inside of a user browser. See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other_langs.html) for other approaches.
+and persisted inside of a user browser. See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other-languages.html) for other approaches.
 
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.2.14.js"
- integrity="sha384-xCZt+GMgW7fyHrTbXqA76f1SlPs3RTwxgqHjasjjVIU1Un1MCTAEsLtNS4qUjmsW"
+<script src="https://cdn.mainnet.cash/mainnet-0.2.28.js"
+ integrity="sha384-yNARexmnMZlxKP+/hVma4GE3pLz61GvdbS0JD5uvIRDTSfigiwpLghUG3aRlYcL2"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.14.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.28.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -232,7 +232,7 @@ We currently fully support the SLP type 1 tokens [specification](https://slp.dev
 
 The interfaces were designed to be largely similar to those of BCH wallets.
 
-The slp functionality is available via Wallet.slp accessor:
+The SLP functionality is available via Wallet.slp accessor:
 
 ```js
 const wallet = await TestNetWallet.fromId("testnet:wif:qq...")
@@ -242,7 +242,7 @@ const slpAddress = wallet.slp.getDepositAddress()
 const qrCode = wallet.slp.getDepositQr()
 ```
 
-Note, that working with slp tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the slp transactions.
+Note, that working with SLP tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the SLP transactions.
 
 ### Token creation - Genesis
 
@@ -358,7 +358,7 @@ const cancelFn = wallet.slp.watchBalance((balance) => {
 }, tokenId);
 ```
 
-You can wait for the slp wallet to reach a certain minimal token balance:
+You can wait for the SLP wallet to reach a certain minimal token balance:
 
 ```js
 const actualBalance = await wallet.slp.waitForBalance(10, tokenId);
@@ -713,7 +713,7 @@ socket.onopen = (event) => {
 };
 
 socket.onmessage = (event) => {
-  const transaction = JSON.parse(event.data);
+  const balance = JSON.parse(event.data);
   // do something
 };
 ```

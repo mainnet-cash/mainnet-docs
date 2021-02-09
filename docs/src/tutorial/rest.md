@@ -907,7 +907,7 @@ See full webhook REST documentation in the [Swagger UI](https://rest-unstable.ma
 We provide some functionality over websockets where traditional REST servers would timeout. Examples are waiting for transactions and watching balances.
 Websockets allow to subscribe to server events, sending responses and notifications asynchronously.
 
-Check out the jsfiddle [demo](/tutorial/)
+Check out the jsfiddle [demo](https://jsfiddle.net/ahq6eyd3/1/)
 
 The client-server communication is in JSON format.
 
@@ -1035,3 +1035,74 @@ Response: Block header as per [specification](https://electrum-cash-protocol.rea
   hex: "000000209107e04f2eee18fa36c70f00cdb8a9e35c669a7d5ada13c945a130db2389bc116cc61e2d285d78c5a8b62e6df23037c9fbfea2b58df6e649c0a1e7d7a8f94393fe760c60ffff7f2000000000"
 }
 ```
+
+#### slpWatchBalance
+
+Receive notification upon the address' SLP balance change. Responds recurrently.
+
+If `tokenId` is supplied, the response will be narrowed down to only this token.
+
+Request:
+```json
+{
+  method: "slpWatchBalance",
+  data: {
+    cashaddr: "simpleledger:qzxzl07tth5qx4shphrpzz38wnstwac5ksvgnp3ya0",
+    tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+}
+```
+
+Response:
+```json
+{
+  value: "10000",
+  ticker: "MNC",
+  name: "Mainnet coin"
+  tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}
+```
+
+#### slpWaitForBalance
+
+Wait for the SLP wallet to reach a certain minimal token balance. Returns actual wallet balance. Responds once.
+
+Request:
+```json
+{
+  method: "slpWaitForBalance",
+  data: {
+    cashaddr: "simpleledger:qzxzl07tth5qx4shphrpzz38wnstwac5ksvgnp3ya0",
+    value: "1000",
+    tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+}
+```
+
+Response:
+```json
+{
+  value: "10000",
+  ticker: "MNC",
+  name: "Mainnet coin"
+  tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+}
+```
+
+#### slpWaitForTransaction
+
+Wait for the next SLP transaction to happen. Responds once.
+
+If `tokenId` is supplied, the response will arrive only for the transactions with this tokenId.
+
+```json
+{
+  method: "slpWaitForTransaction",
+  data: {
+    cashaddr: "simpleledger:qzxzl07tth5qx4shphrpzz38wnstwac5ksvgnp3ya0",
+    tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  }
+}
+```
+
+Response follows this [schema](https://slp.dev/tooling/slpdb/#mongodb-collections-data-schema)
