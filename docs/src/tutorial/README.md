@@ -148,7 +148,7 @@ const txData = await wallet.send([
 ]);
 ```
 
-Note that you can send to many addresses at once.
+Note that you can send to many addresses at once. There are also some options about how money is spent, such as specifying which unspent outputs are used as inputs.
 
 Let's print the balance of the seller's wallet:
 
@@ -552,22 +552,33 @@ const script = `contract TransferWithTimeout(pubkey sender, pubkey recipient, in
         require(tx.time >= timeout);
     }
 }`
+```
 
+```js
 const alice = await TestNetWallet.newRandom();
 
-// In the case that you only have Charlie's cashaddr, 
-// it won't be possible to get the full public key,
-// but a public key hash may be used in the contract instead
-const charlie = await TestNetWallet.newRandom();
+```
 
-// In javascript, the contract can take a binary argument as a Uint8Array or 
-// hexadecimal strings just like CashScript, but passing passing `true`
-// here causes getPublicKey() to return hex, 
-// (in case you wanted to paste into the data into CashScript playground.)
-// the default is a Uint8Array
+
+In the case that you only have Charlie's cashaddr, 
+it won't be possible to get the full public key,
+but a public key hash may be used in the contract instead
+```js
+const charlie = await TestNetWallet.newRandom();
+```
+In javascript, the contract can take a binary argument as a Uint8Array or 
+hexadecimal strings just like CashScript, but passing passing `true`
+here causes getPublicKey() to return hex, 
+(in case you wanted to paste into the data into CashScript playground.)
+the default is a Uint8Array.
+
+```js
 const alicePk = alice.getPublicKey(true);
 const charliePk = charlie.getPublicKey(true);
+```
 
+Next pass the script, arguments and network to create a new Contract.
+```js
 // Some block height very far in the past.
 const after = 215;
 
