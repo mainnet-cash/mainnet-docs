@@ -264,6 +264,10 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
 
 This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction).
 
+::: danger
+If your address holds SLP tokens, you have to add `slpAware(): true` to your request to prevent accidental token burning.
+:::
+
 ## Waiting for a transaction
 
 ### QR codes

@@ -165,6 +165,10 @@ Now you can send all of your money somewhere else:
 const txData = await seller.sendMax(wallet.depositAddress());
 ```
 
+::: danger
+If your address holds SLP tokens, you have to use `wallet.slpAware().send([...])` method to prevent accidental token burning.
+:::
+
 ## Waiting for a transaction
 
 ### QR codes
