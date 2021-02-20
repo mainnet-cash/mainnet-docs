@@ -287,8 +287,18 @@ If you decide to increase the token circulation supply, you would need to `mint`
 In the following example we issue 50 more tokens we just created in genesis:
 
 ```js
-const {txId, balance} = await wallet.slp.mint(50, tokenId)
+const mintOptions = {
+  value: "10000",
+  tokenId: tokenId,
+  endBaton: false,
+  tokenReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  batonReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+}
+
+const {txId, balance} = await wallet.slp.mint(mintOptions);
 ```
+
+Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the mintin baton to other authority.
 
 ### Sending tokens
 

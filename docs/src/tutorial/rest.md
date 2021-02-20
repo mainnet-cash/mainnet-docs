@@ -394,9 +394,13 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/mint \
   "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
   "value": "10000",
   "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
-  "endBaton": false
+  "endBaton": false,
+  "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
 }'
 ```
+
+Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the mintin baton to other authority.
 
 Response:
 
