@@ -592,6 +592,87 @@ Response:
 }
 ```
 
+### Non-fungible tokens (NFT)
+
+NFT1 is a simple extension to the SLP token type 1 protocol which allows many NFT tokens to be grouped together using a single ID. Having the ability to group NFTs in a provable manner opens the doors for many more token applications, and makes SLP more similar to other NFT protocols (e.g., ERC-721). NFT1 uses the same validation rules as SLP token type 1 with a few additional constraints. [See reference](https://slp.dev/specs/slp-nft-1/#simple-nft-vs-nft1-protocol). Non-fungible tokens can be produced by simply minting a non-divisible token supply of 1 without a minting baton.
+
+All operations apart from genesis and minting, which are used for SLP tokens Type1, support the NFT tokens and are used the same way with same interfaces.
+
+#### NFT Parent Genesis
+
+To create the NFT parent group use the following code snippet
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/nft_parent_genesis \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "name": "Mainnet NFT Parent",
+  "ticker": "MNC_NFTP",
+  "initialAmount": "10000",
+  "decimals": 0,
+  "documentUrl": "https://mainnet.cash",
+  "documentHash": "db4451f11eda33950670aaf59e704da90117ff7057283b032cfaec7779313916",
+  "endBaton": false,
+  "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+}'
+```
+
+Response:
+
+```json
+{
+  "tokenId": "90a0bac9a1e3c0dfb40b8b8cb2ab04db91b57e5f2b43251e55c080d2f7c4a668",
+  "balance": {
+    "value": "10000",
+    "ticker": "MNC_NFTP",
+    "name": "Mainnet NFT Parent",
+    "tokenId": "90a0bac9a1e3c0dfb40b8b8cb2ab04db91b57e5f2b43251e55c080d2f7c4a668",
+    "type": 129
+  }
+}
+```
+Note: these tokens are transferrable and mintable. Decimal places of 0 is adviced.
+
+#### NFT Child Genesis
+
+NFT child tokens are unique and one of a kind. To create an NFT child token use the following code snippet
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/nft_child_genesis \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+  "name": "Mainnet NFT Child",
+  "ticker": "MNC_NFTC",
+  "initialAmount": "10",
+  "decimals": 0,
+  "documentUrl": "https://mainnet.cash",
+  "endBaton": false,
+  "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+}'
+```
+
+Response:
+
+```json
+{
+  "tokenId": "ae332fa2dba4dd943f86d9f2b1ed7a3bcb40a7f30b9b7736e4ee9acabb1f0908",
+  "balance": {
+    "value": "1",
+    "ticker": "MNC_NFTC",
+    "name": "Mainnet NFT Child",
+    "tokenId": "ae332fa2dba4dd943f86d9f2b1ed7a3bcb40a7f30b9b7736e4ee9acabb1f0908",
+    "type": 65
+  }
+}
+```
+In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.
+
+Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 0`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
+
 ## TestNet faucet
 
 You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
