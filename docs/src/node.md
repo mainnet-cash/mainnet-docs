@@ -46,8 +46,7 @@ Replace the password with something random (try `head /dev/urandom | tr -dc A-Za
 To open your RPC for other computers on the Internet (not recommended, even if password protected):
 
 ```shell script
-mkdir -p /mnt/fulcrum
-bitcoind -datadir=/mnt/fulcrum -rpcallowip=0.0.0.0/0 \
+bitcoind -datadir=/mnt/bchn -rpcallowip=0.0.0.0/0 \
     -rpcbind=0.0.0.0:8332 -rpcuser=rpc \
     -rpcpassword=RANDOMPASSWORD \
     -txindex=1
@@ -72,7 +71,8 @@ tar zxvf Fulcrum-1.4.1-x86_64-linux.tar.gz
 rm Fulcrum-1.4.1-x86_64-linux.tar.gz
 cd Fulcrum-1.4.1-x86_64-linux
 
-./Fulcrum --datadir=/mnt/bchn \
+mkdir -p /mnt/fulcrum
+./Fulcrum --datadir=/mnt/fulcrum \
   --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
   --rpcpassword=RANDOMPASSWORD \
   --ssl=0.0.0.0:50002 \
