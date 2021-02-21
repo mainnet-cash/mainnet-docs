@@ -37,19 +37,19 @@ sudo apt-get install bitcoind
 mkdir -p /mnt/bchn
 bitcoind -datadir=/mnt/bchn -rpcallowip=127.0.0.1 \
     -rpcbind=127.0.0.1:8332 -rpcuser=rpc \
-    -rpcpassword=RANDOMPASSWORD \
-    -txindex=1
+    -txindex=1 \
+    -rpcpassword=RANDOMPASSWORD
 ```
 
-Replace the password with something random (try `head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo ''` on Linux)
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">Replace the password</span> with something random (try `head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo ''` on Linux)
 
 To open your RPC for other computers on the Internet (not recommended, even if password protected):
 
 ```shell script
 bitcoind -datadir=/mnt/bchn -rpcallowip=0.0.0.0/0 \
     -rpcbind=0.0.0.0:8332 -rpcuser=rpc \
-    -rpcpassword=RANDOMPASSWORD \
-    -txindex=1
+    -txindex=1 \
+    -rpcpassword=RANDOMPASSWORD
 ```
 
 ## Running Fulcrum (Electron Cash compatible server)
@@ -63,7 +63,7 @@ openssl req -newkey rsa:4096 \
     -keyout /var/www/tls/fulcrum-key.pem
 ```
 
-Install Fulcrum (replace `1.4.1` with the <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">[latest](https://github.com/cculianu/Fulcrum/releases/latest) version</span>)
+Install Fulcrum (replace `1.4.1` with the [latest](https://github.com/cculianu/Fulcrum/releases/latest) version)
 
 ```shell script
 wget https://github.com/cculianu/Fulcrum/releases/download/v1.4.1/Fulcrum-1.4.1-x86_64-linux.tar.gz
@@ -74,9 +74,9 @@ cd Fulcrum-1.4.1-x86_64-linux
 mkdir -p /mnt/fulcrum
 ./Fulcrum --datadir=/mnt/fulcrum \
   --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
-  --rpcpassword=RANDOMPASSWORD \
   --ssl=0.0.0.0:50002 \
-  --cert=/var/www/tls/fulcrum-certificate.pem --key=/var/www/tls/fulcrum-key.pem
+  --cert=/var/www/tls/fulcrum-certificate.pem --key=/var/www/tls/fulcrum-key.pem \
+  --rpcpassword=RANDOMPASSWORD
 ```
 
 ## Running Insomnia (REST server to serve Fulcrum results)
@@ -87,14 +87,3 @@ cd insomnia
 yarn install
 yarn start
 ```
-
-<script defer>
-window.addEventListener("load", function(event) {
-    const password = Math.random().toString(36).substr(2, 8) + Math.random().toString(36).substr(2, 8) + Math.random().toString(36).substr(2, 8);
-    document.querySelectorAll('.language-shell').forEach(n => {
-        if(n.textContent.match(/RANDOMPASSWORD/)) {
-            n.innerHTML = n.innerHTML.replace(/RANDOMPASSWORD/, password);
-        }
-    });
-});
-</script>
