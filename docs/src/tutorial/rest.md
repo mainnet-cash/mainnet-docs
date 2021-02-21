@@ -1,13 +1,8 @@
 # Via the REST API
 
-::: danger
-
-Note: This site is work-in-progress and the mainnet library is currently in a prototype stage. 
-Things may and will change randomly. There is no backward compatibility guarantee yet, 
-even though we try not to break things too often. Use at your own risk. To see the old site with the full plan 
-(yet to be implemented), go [here](https://web.archive.org/web/20200810182937/https://mainnet.cash/).
-
-:::
+The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>. 
+Things may change randomly. There is no backward compatibility guarantee yet, 
+even though we try not to break things too often.
 
 ## Let's get programming
 
@@ -46,14 +41,14 @@ Note the `walletId` - we're going to need it later. This wallet will not be pers
 
 This tutorial shows calls to `https://rest-unstable.mainnet.cash`, which as the name implies is **unstable** by design.
 You can use it to learn, but for production you are expected to [run your own service](/tutorial/running-rest.md), because
-otherwise you actually send us your _private keys_, which is absolutely insecure.
+otherwise you actually send us your _private keys_, which is absolutely insecure. Run your own service, you'll be ok.
 
 :::
 
 ::: danger walletId contains the private key
 
-Keep `walletId` a secret as it contains the private key that allows spending from this wallet. Seed phrase, WIF - all
-these contain the private key. 
+Keep `walletId` a secret as it contains the private key that allows spending from this wallet. WalletId, Seed phrase, WIF - all
+these are a form of a private key. 
 
 :::
 
@@ -62,8 +57,7 @@ these contain the private key.
 `TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
 which is what people usually mean when they talk about Bitcoin Cash network.  
 
-You can get free TestNet money [here](https://faucet.fullstack.cash/).
-
+You can get free TestNet money using our TestNet faucet (see below) or [here](https://faucet.fullstack.cash/).
 
 If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and 
 run it using `electron-cash --testnet` flag. For example, on MacOS that would be:

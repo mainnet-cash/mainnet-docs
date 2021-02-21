@@ -1,19 +1,8 @@
 # JavaScript (in browser)
 
-::: danger
-
-Note: This site is a work-in-progress and the mainnet library is currently in a prototype stage.
-Things may and will change randomly. There is no backward compatibility guarantee yet,
-even though we try not to break things too often. Use at your own risk. To see the old site with the full plan
-(yet to be implemented), go [here](https://web.archive.org/web/20200810182937/https://mainnet.cash/).
-
-:::
-
-::: tip A working demo
-
-You can see a fully working demo [here](https://jsfiddle.net/5oc2uw9a/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
-
-:::
+The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>.
+Things may change randomly. There is no backward compatibility guarantee yet,
+even though we try not to break things too often.
 
 <!-- Your stack: Browser + IndexedDB PHP Other -->
 
@@ -51,12 +40,13 @@ This creates a **TestNet** wallet.
 ::: tip What is TestNet? Where to get TestNet money and a wallet?
 
 `TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
-which is what people usually mean when they talk about Bitcoin Cash network.  You can get free TestNet money [here](https://faucet.fullstack.cash/).
+which is what people usually mean when they talk about Bitcoin Cash network.  You can get free TestNet money using 
+the `getTestnetSatoshis()` call (see below) or [here](https://faucet.fullstack.cash/).
+
 If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and
 run it using `electron-cash --testnet` flag. For example, on MacOS that would be:
 
 `/Applications/Electron-Cash.app/Contents/MacOS/Electron-Cash --testnet`
-
 
 :::
 
@@ -93,6 +83,12 @@ Networks:
 - mainnet: `Wallet`
 - Testnet: `TestNetWallet`
 - RegTest: `RegTestWallet` ([see below](#regtest-wallets))
+
+::: tip
+
+You can see a working demo [here](https://jsfiddle.net/5oc2uw9a/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
+
+:::
 
 ## Named wallets (persistent)
 
