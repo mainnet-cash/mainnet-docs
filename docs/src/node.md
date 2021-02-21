@@ -34,8 +34,8 @@ sudo apt-get install bitcoind
 ### Start Bitcoin Cash Node
 
 ```shell script
-mkdir -p /mnt/bchn/bitcoind
-bitcoind -datadir=/mnt/bchn/bitcoind -rpcallowip=127.0.0.1 \
+mkdir -p /mnt/bchn
+bitcoind -datadir=/mnt/bchn -rpcallowip=127.0.0.1 \
     -rpcbind=127.0.0.1:8332 -rpcuser=rpc \
     -rpcpassword=RANDOMPASSWORD \
     -txindex=1
@@ -46,7 +46,8 @@ Replace the password with something random (try `head /dev/urandom | tr -dc A-Za
 To open your RPC for other computers on the Internet (not recommended, even if password protected):
 
 ```shell script
-bitcoind -datadir=/mnt/bchn/fulcrum -rpcallowip=0.0.0.0/0 \
+mkdir -p /mnt/fulcrum
+bitcoind -datadir=/mnt/fulcrum -rpcallowip=0.0.0.0/0 \
     -rpcbind=0.0.0.0:8332 -rpcuser=rpc \
     -rpcpassword=RANDOMPASSWORD \
     -txindex=1
