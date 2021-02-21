@@ -229,7 +229,15 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
   }'
 ```
 
-Note that you can send to many addresses at once. It is also possible to specify which unspent outputs are used to send funds from by specifying a list of `utxoIds` in `options`.
+Note that you can send to many addresses at once. 
+
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add 
+`"slpAware": true,` to your request to prevent accidental token burning.
+SLP checks are a bit slow, so they are opt-in.
+
+It is also possible to specify which unspent outputs are used to send
+funds from by specifying a list of `utxoIds` in `options`: `"options": {"utxoIds": ["...", "..."]}`,
+see [wallet/utxo](https://rest-unstable.mainnet.cash/api-docs/#/wallet/utxos).
 
 Response:
 
@@ -263,10 +271,6 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
 ```
 
 This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction).
-
-::: danger
-If your address holds SLP tokens, you have to add `slpAware(): true` to your request to prevent accidental token burning.
-:::
 
 ## Waiting for a transaction
 

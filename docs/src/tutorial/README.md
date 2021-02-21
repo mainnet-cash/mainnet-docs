@@ -148,7 +148,14 @@ const txData = await wallet.send([
 ]);
 ```
 
-Note that you can send to many addresses at once. There are also some options about how money is spent, such as specifying which unspent outputs are used as inputs.
+Note that you can send to many addresses at once. 
+
+If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>, 
+you have to use the `wallet.slpAware().send([...])` method to prevent accidental token burning.
+SLP checks are a bit slow, so they are opt-in.
+
+There is also an `options` parameter that specifies how money is spent, for example specifying which 
+unspent outputs are used as inputs: `{utxoIds: ["...", "..."]}`.
 
 Let's print the balance of the seller's wallet:
 
@@ -164,10 +171,6 @@ Now you can send all of your money somewhere else:
 ```js
 const txData = await seller.sendMax(wallet.depositAddress());
 ```
-
-::: danger
-If your address holds SLP tokens, you have to use `wallet.slpAware().send([...])` method to prevent accidental token burning.
-:::
 
 ## Waiting for a transaction
 
@@ -239,7 +242,7 @@ The interfaces were designed to be largely similar to those of BCH wallets.
 The SLP functionality is available via Wallet.slp accessor:
 
 ```js
-const wallet = await TestNetWallet.fromId("testnet:wif:qq...")
+const wallet = await TestNetWallet.fromId("wif:testnet:qq...")
 
 const slpAddress = wallet.slp.getDepositAddress()
 
