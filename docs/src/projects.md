@@ -18,6 +18,8 @@ This is a list of finished products that are "Bitcoin Cash first"
 
 **[read.cash](https://read.cash/)** - publish your articles, get upvotes in Bitcoin Cash
 
+**[noise.cash](https://read.cash/)** - post short messages, get tips in Bitcoin Cash
+
 **[tewtew.com](http://tewtew.com/)** - earn BCH each time someone watches your video
 
 **[bitcoincash.network/voting](https://bitcoincash.network/voting/)** - IFP (infrastructure funding proposal) vote monitoring
