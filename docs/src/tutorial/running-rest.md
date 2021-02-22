@@ -61,7 +61,7 @@ cd mainnet-js
 npm i -g yarn
 yarn install
 yarn build
-yarn api:server:install
+yarn api:serve:install
 PORT=3000 WORKERS=5 yarn api:serve:cluster
 ```
 
