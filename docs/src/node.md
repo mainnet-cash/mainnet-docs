@@ -1,8 +1,15 @@
-# Running Bitcoin Cash node
+# Running Bitcoin Cash servers (BCHN, Fulcrum)
 
 ## BCHN on Ubuntu
 
-Create a directory for the data (it should have ~210G free space as of Nov 2020), let's say: `/mnt/bchn`
+Create a directory for the data, let's say: `/mnt/bchn` (and for example `/mnt/fulcrum` for Fulcrum)
+
+The space requirements as of February 2021:
+
+```shell
+182G    /mnt/bchn
+36G     /mnt/fulcrum
+```
 
 ### Remove Bitcoin ABC if it was running
 
@@ -75,15 +82,66 @@ mkdir -p /mnt/fulcrum
 ./Fulcrum --datadir=/mnt/fulcrum \
   --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
   --ssl=0.0.0.0:50002 \
-  --cert=/var/www/tls/fulcrum-certificate.pem --key=/var/www/tls/fulcrum-key.pem \
+  --cert=/var/www/tls/fulcrum-certificate.pem \
+  --key=/var/www/tls/fulcrum-key.pem \
   --rpcpassword=RANDOMPASSWORD
 ```
+
+### WebSocket port for mainnet library
+
+To be able to connect to this Fulcrum from mainnet library, you need to enable WebSocket port (50004)
+and get a valid certificate. First assign a domain name to your IP address (buy one, usually there's a domain name
+manager, add an A entry). Let's say your domain name is `fulcrum.test.cash`
+
+```shell
+sudo apt-get install -y certbot
+certbot certonly --manual --preferred-challenges dns -d fulcrum.test.cash
+```
+
+Follow the instructions of `certbot`.
+
+Now run:
+
+```shell
+./Fulcrum --datadir=/mnt/fulcrum \
+  --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
+  --ssl=0.0.0.0:50002 \
+  --cert=/var/www/tls/fulcrum-certificate.pem \
+  --key=/var/www/tls/fulcrum-key.pem \
+  --rpcpassword=RANDOMPASSWORD \
+  --wss=0.0.0.0:50004 \
+  --wss-cert=/etc/letsencrypt/live/fulcrum.test.cash/fullchain.pem \ 
+  --wss-key=/etc/letsencrypt/live/fulcrum.test.cash/privkey.pem
+```
+
+Remember to replace `fulcrum.test.cash` with your domain name and `RANDOMPASSWORD` with an actual password.
+
+Now you can setup your REST server:
+
+```shell
+docker run --env ELECTRUM="wss://fulcrum.test.cash:50004" -p 127.0.0.1:3000:80 \
+   mainnet/mainnet-rest:latest
+```
+
+Your REST server will be available at `http://127.0.0.1:3000` connected to your own Fulcrum instance
+
+See [here](/tutorial/running-rest.html) for more options (including LetsEncrypt certificate for your REST server)
 
 ## Running Insomnia (REST server to serve Fulcrum results)
 
 ```shell script
 git clone https://github.com/fountainhead-cash/insomnia.git
 cd insomnia
-yarn install
-yarn start
+npm install
+```
+
+Edit the config file
+
+```shell
+cp src/config.ts.example src/config.ts
+$(EDITOR) src/config.ts
+```
+
+```shell
+npm start
 ```

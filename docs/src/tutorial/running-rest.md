@@ -115,3 +115,5 @@ ELECTRUM="wss://fulcrum.fountainhead.cash,wss://bch.imaginary.cash:50004"
 ```
 
 Where the number of servers that must agree is controlled with `ELECTRUM_CONFIDENCE`
+
+See [here](/node.html) for instructions how to run your own Bitcoin Cash node and Fulcrum.
