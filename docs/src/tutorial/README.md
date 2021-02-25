@@ -78,7 +78,14 @@ If you want to create a wallet from a WIF (private key), use this call:
 const wallet = Wallet.fromWIF('.....');
 ```
 
-Networks: 
+::: danger Keep the private key and the seed phrase secret
+
+Remember to keep the private key (in "WIF" form) and/or the seed phrase (aka "mnemonic") secret as they allow spending money from this wallet.
+You can access them using `wallet.privateKeyWif` and `wallet.mnemonic` (you'll also need the derivation path from `wallet.derivationPath`)
+
+:::
+
+Available networks: 
 
 - mainnet: `Wallet`
 - Testnet: `TestNetWallet`

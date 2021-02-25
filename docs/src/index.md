@@ -1,5 +1,5 @@
 ---
-home: true
+layout: HomeCustom
 heroImage: /bch-logo.svg
 tagline: Develop using Bitcoin Cash
 actionText: Quick Start →
