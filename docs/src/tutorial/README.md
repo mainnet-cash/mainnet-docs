@@ -1,8 +1,16 @@
 # JavaScript (client wallets)
 
-The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>.
+## Introduction
+
+Our Javascript library is designed so you can rapidly and easily provide secure financial services to your users using 
+standard web development knowledge. You no longer have to be a blockchain wizard to give the powers of magic internet 
+money to your customers.
+
+With this library you will be able to create advanced, non-custodial, in-browser wallets.
+
+<p style="font-size: 90%;">The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>.
 Things may change randomly. There is no backward compatibility guarantee yet,
-even though we try not to break things too often.
+even though we try not to break things too often.</p>
 
 <!-- Your stack: Browser + IndexedDB PHP Other -->
 

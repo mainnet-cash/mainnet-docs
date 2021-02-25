@@ -1,13 +1,22 @@
 # REST API (backend wallets)
 
+## Introduction
+
+Our REST API allows you to create advanced, performant, and secure financial applications without the usual complexity 
+of blockchain development.
+
+By deploying our REST API on your server, creating enterprise-level cryptocurrency applications becomes effortless.
+
 <b style="color: #af3e3e;">Important!</b> This tutorial shows calls to `https://rest-unstable.mainnet.cash` to ease the learning process.
-You can use it to learn, but <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">for production you are expected to</span> [run your own service](/tutorial/running-rest.md) (it's very lightweight, just one docker call), 
+You can use it to learn, but <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">for production use you are expected to</span> [run your own service](/tutorial/running-rest.md) (it's very lightweight, just one docker call),
 because
 otherwise you actually send us your _private keys_, which is absolutely insecure. Run your own service, you'll be ok.
 
-This server is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>. 
+This REST API is in production use on noise.cash and creates hundreds of thousands of transactions daily, it's pretty stable, but...
+
+<p style="font-size: 90%;">...this server is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>. 
 Things may change randomly. There is no backward compatibility guarantee yet, 
-even though we try not to break things too often.
+even though we try not to break things too often.</p> 
 
 ## Let's get programming
 
@@ -26,7 +35,6 @@ Response:
 
 ```json
 {
-  "name": "",
   "cashaddr": "bchtest:qrau3n8tzcv2a4yqsr603unhxx4vp9ph0yg2g9449d",
   "walletId": "seed:testnet:table later ... stove kitten pluck:m/44'/0'/0'/0/0",
   "network": "testnet"
