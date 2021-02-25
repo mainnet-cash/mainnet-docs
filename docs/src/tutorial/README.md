@@ -1,4 +1,4 @@
-# JavaScript (in browser)
+# JavaScript (client wallets)
 
 The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>.
 Things may change randomly. There is no backward compatibility guarantee yet,

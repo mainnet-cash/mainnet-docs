@@ -1,19 +1,16 @@
-# Via the REST API
+# REST API (backend wallets)
 
-The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>. 
+<b style="color: #af3e3e;">Important!</b> This tutorial shows calls to `https://rest-unstable.mainnet.cash` to ease the learning process.
+You can use it to learn, but <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">for production you are expected to</span> [run your own service](/tutorial/running-rest.md) (it's very lightweight, just one docker call), 
+because
+otherwise you actually send us your _private keys_, which is absolutely insecure. Run your own service, you'll be ok.
+
+This server is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>. 
 Things may change randomly. There is no backward compatibility guarantee yet, 
 even though we try not to break things too often.
 
 ## Let's get programming
 
-Note that this tutorial describes calling the REST API approach (for server-side programming languages, like PHP, Go, Java). 
-Alternatively, see [JavaScript (browser)](/tutorial/). 
-
-We generate bindings and packages for some programming languages, so that you don't have
-to do the REST calls manually, see [here](/tutorial/other-languages.html). You can generate bindings for nearly 
-every other programming language easily.
-
-**You can find the full latest REST API reference at [https://rest-unstable.mainnet.cash/api-docs/](https://rest-unstable.mainnet.cash/api-docs/).**
 
 Let's first create a test wallet:
 
@@ -22,6 +19,8 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
     -H "Content-Type: application/json" \
     -d '{"type": "seed", "network": "testnet"}'
 ```
+
+See also: Full [REST server API reference](https://rest-unstable.mainnet.cash/api-docs/).
 
 Response:
 
@@ -36,14 +35,6 @@ Response:
 
 This creates a **TestNet** wallet.  This has the cashaddress of the wallet, where you can send money, and the `walletId`. 
 Note the `walletId` - we're going to need it later. This wallet will not be persisted. See below for persistent wallets. 
-
-::: tip rest-unstable
-
-This tutorial shows calls to `https://rest-unstable.mainnet.cash`, which as the name implies is **unstable** by design.
-You can use it to learn, but for production you are expected to [run your own service](/tutorial/running-rest.md), because
-otherwise you actually send us your _private keys_, which is absolutely insecure. Run your own service, you'll be ok.
-
-:::
 
 ::: danger walletId contains the private key
 
@@ -101,6 +92,10 @@ seed:mainnet:SEED WORDS HERE:m/DERIVATION/PATH
 ```
 
 Networks: `mainnet`, `testnet`, `regtest` ([see below](#regtest-wallets))
+
+Note: we generate bindings and packages for some programming languages, so that you don't have
+to do the REST calls manually, see [here](/tutorial/other-languages.html). You can generate bindings for nearly
+every other programming language easily.
 
 ## Named wallets (persistent)
 
