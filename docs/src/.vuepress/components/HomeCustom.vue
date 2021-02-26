@@ -1,6 +1,8 @@
 <template>
   <main class="home" :aria-labelledby="data.heroText !== null ? 'main-title' : null" >
     <header class="hero">
+      <link rel="stylesheet" href="https://cdn.mainnet.cash/icofont.min.css">
+
       <img v-if="data.heroImage" :src="$withBase(data.heroImage)" :alt="data.heroAlt || 'hero'">
 
       <h1 v-if="data.heroText !== null" id="main-title"> {{ data.heroText || $title || 'Hello' }} </h1>
@@ -27,6 +29,11 @@
             Non-custodial enterprise wallet<br>on your own server
           </p>
         </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; width: 10em; margin: 0 auto; font-size: 70%;">
+        <div><a href="https://t.me/mainnetcash"><div class="icofont-telegram" style="font-size: 290%; margin-bottom: 0.2em;"></div>Telegram</a></div>
+        <div><a href="http://github.com/mainnet-cash/"><div class="icofont-github" style="font-size: 290%; margin-bottom: 0.2em;"></div>GitHub</a></div>
       </div>
     </header>
 
