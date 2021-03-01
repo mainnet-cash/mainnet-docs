@@ -438,6 +438,10 @@ In the process of the child genesis, a parent token of quantity 1 will be spent,
 
 Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 0`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
 
+#### List of your NFTs
+
+See [Token Balances](#token-balances)
+
 ## TestNet faucet
 
 You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
