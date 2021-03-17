@@ -734,7 +734,108 @@ await convert(100, "usd", "sat")
 // 28067024
 ```
 
-[filename](_regtest.md ':include')
+## Signed Messages
+
+One of the perks of having a wallet is the ability to sign message text or verify the signatures of other parties using their public key.
+
+Full-nodes and SPV wallets often include this feature as standard. 
+
+### Signing a message with a wallet
+
+Let's try signing with an example from a common test case:
+
+```js
+message = "Chancellor on brink of second bailout for banks"
+francisWallet = await Wallet.fromWIF(
+      `L1TnU2zbNaAqMoVh65Cyvmcjzbrj41Gs9iTLcWbpJCMynXuap6UN`
+    );
+
+francisWallet.cashaddr
+// "bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7eatdkqt05lt3nw"
+
+signature = (await francisWallet.sign(message)).signature;
+// H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y=
+
+// or 
+
+sigResult = await francisWallet.sign(message);
+```
+Where the full `sigResult` result is:
+```json
+
+{
+  "raw": {
+    "ecdsa": "/2Mw6ePgwVsfd3u3jIJD2LsOBlT9VnbvzDf7JK/YXjIix2qOxzmeDeSY3w5kBOGDJ8Jk5DFkJbNr1XlfOVVjRg==",
+    "schnorr": "rSeWfhxN6tI+3hNQpHwU6E+pZC34rk6gR/h8hqxS0YjUd6mxsOd4OCmMkGJXsqNvVZ1F/Fs/Y81dyzSDBhxp9w==",
+    "der": "MEUCIQD/YzDp4+DBWx93e7eMgkPYuw4GVP1Wdu/MN/skr9heMgIgIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
+  },
+  "details": {
+    "recoveryId": 0,
+    "compressed": true,
+    "messageHash": "gE9BDBFAOqW+yoOzABjnM+LQRWHd4dvUVrsTR+sIWsU="
+  },
+  "signature": "H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
+}
+```
+
+::: danger Please be aware
+ The above contains both ECDSA and Schnorr signatures. If they had been created using the same random nonce, an attacker could derive the private key. To avoid this risk, the underlying library ([libauth](https://libauth.org/interfaces/secp256k1.html#signmessagehashschnorr)) uses nonces for Schorr signatures with the additional data field set to `Schnorr+SHA256`. Such measures are an important security requirement for any financial software producing both types of signatures. 
+:::
+
+For most cases, the relevant information here is the `"signature"` field, which can be used in an SPV wallet such as electron cash or with [bitcoin.com's verify tool](https://tools.bitcoin.com/verify-message/). The following signature will validate as belonging to Francis' address:
+
+
+**Bitcoin Address:**  bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7eatdkqt05lt3nw
+
+**Message:**          Chancellor on brink of second bailout for banks
+
+**Signature:**        H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y=
+
+It should also be noted that the signature is "recoverable", meaning the `publicKey` can be derived from it and the message.  This is important when validating against a `cashaddr`, because only a `publicKeyHash` can be derived from a `cashaddr`.
+
+If one of the `"raw"` signatures are used instead, the `publicKey` may have to be passed manually.
+
+### Verifying a message with a wallet
+
+To verify the above signature (without having access to the private key), by using a `watchOnly` wallet to represent the party in the example above.
+
+
+```js
+
+francisPublic = await Wallet.watchOnly("bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7eatdkqt05lt3nw")
+
+message = "Chancellor on brink of second bailout for banks"
+sig = "H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
+
+verifyResult = await francisPublic.verify(message, sig);
+```
+
+where `verifyResult` is
+
+```json
+{
+  "valid": true,
+  "details": {
+    "signatureValid": true,
+    "signatureType": "recoverable",
+    "messageHash": "gE9BDBFAOqW+yoOzABjnM+LQRWHd4dvUVrsTR+sIWsU=",
+    "publicKeyHashMatch": true
+  }
+}
+```
+
+In the default case, with a `"signatureType"` of `"recoverable"`, the cashaddr `publicKeyHash` has been checked against the hashed `publicKey`, which is recovered from the provided message and signature.
+
+Under the hood, all signature types, the message is serialized or formatted in four parts before hashing:
+
+```
+\x18                       // 1) length the prefix
+Bitcoin Signed Message:\n  // 2) A prefix w/newline
+<\x???>                    // 3) length of the message
+<message>                  // 4) the message string as utf8 encoded binary 
+```
+
+The above message formatting is typically handled automatically by the signing software (i.e. wallet.sign(...)), and the `messageHash` is the double sha256 of the above as binary. For verification, only if the signature itself is valid **and** the recovered `publicKey` is valid for the provided `cashaddr` will the response have `"valid":true`, and the additional details given may be safely ignored in most cases.
 
 ## RegTest wallets
 
