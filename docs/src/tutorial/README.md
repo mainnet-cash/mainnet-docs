@@ -413,7 +413,8 @@ const genesisOptions = {
   documentUrl: "https://mainnet.cash",
   endBaton: false
 };
-const {tokenId} =  await wallet.slp.nftParentGenesis(genesisOptions);
+const genesisResult =  await wallet.slp.nftParentGenesis(genesisOptions);
+const parentTokenId = genesisResult.tokenId;
 ```
 
 Note: these tokens are transferrable and mintable. Decimal places of 0 is adviced.
@@ -427,11 +428,12 @@ const genesisOptions = {
   name: "Mainnet NFT Child",
   ticker: "MNC_NFTC",
   decimals: 0,
-  initialAmount: 10,
+  initialAmount: 1,
   documentUrl: "https://mainnet.cash",
-  endBaton: false
+  endBaton: true,
+  parentTokenId: parentTokenId
 };
-const {tokenId} =  await wallet.slp.nftParentGenesis(parentTokenId, genesisOptions);
+const {tokenId} =  await wallet.slp.nftParentGenesis(genesisOptions);
 ```
 
 In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.

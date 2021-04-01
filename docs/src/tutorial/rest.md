@@ -656,7 +656,8 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/nft_child_genesis \
   "documentUrl": "https://mainnet.cash",
   "endBaton": false,
   "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "parentTokenId": "90a0bac9a1e3c0dfb40b8b8cb2ab04db91b57e5f2b43251e55c080d2f7c4a668"
 }'
 ```
 
@@ -1075,14 +1076,14 @@ You can register a webhook with the following `curl` call:
 
 ```bash
 curl -X POST "https://rest-unstable.mainnet.cash/webhook/watch_address" \
-  -H  "accept: application/json"
-  -H  "Content-Type: application/json"
+  -H  "accept: application/json" \
+  -H  "Content-Type: application/json" \
   -d '{
-    "cashaddr":"bchtest:qzd0tv75gx6y0zspzwqpgkwkq0n72g8fsq2zch26s2",
-    "url":"http://example.com/webhook",
-    "type":"transaction:in,out",
-    "recurrence":"recurrent",
-    "duration_sec":86400
+    "cashaddr": "bchtest:qzd0tv75gx6y0zspzwqpgkwkq0n72g8fsq2zch26s2",
+    "url": "http://example.com/webhook",
+    "type": "transaction:in,out",
+    "recurrence": "recurrent",
+    "duration_sec": 86400
   }'
 ```
 
