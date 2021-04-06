@@ -166,7 +166,7 @@ you have to use the `wallet.slpAware().send([...])` method to prevent accidental
 SLP checks are a bit slow, so they are opt-in.
 
 There is also an `options` parameter that specifies how money is spent, for example specifying which 
-unspent outputs are used as inputs: `{utxoIds: ["...", "..."]}`.
+unspent outputs are used as inputs: `{utxoIds: ["...", "..."]}`. SLP awareness can also be passed as a member of `options` parameter: `{slpAware: true}`.
 
 Let's print the balance of the seller's wallet:
 
@@ -250,14 +250,28 @@ We currently fully support the SLP type 1 tokens [specification](https://slp.dev
 
 The interfaces were designed to be largely similar to those of BCH wallets.
 
-The SLP functionality is available via Wallet.slp accessor:
+Creating an SLP enabled wallet is similar to a BCH one, just add an `.slp` static accessor after the wallet class you want to use:
 
 ```js
-const wallet = await TestNetWallet.fromId("wif:testnet:qq...")
+const wallet = await TestNetWallet.slp.newRandom();
+```
 
-const slpAddress = wallet.slp.getDepositAddress()
+The SLP wallets are using the `m/44'/245'/0'/0/0` BIP44 derivation path unlike normal BCH wallets which use `m/44'/0'/0'/0/0`. This is done to lower the chances of accidental token burns.
 
-const qrCode = wallet.slp.getDepositQr()
+If you want to instantiate an SLP wallet which will use a different derivation path (assuming you already have your BIP39 seed phrase):
+
+```js
+const wallet = await Wallet.slp.fromSeed("abandon abandon abandon ...", "m/44'/123'/0'/0/0");
+```
+
+Note, that SLP-enabled wallets are by default SLP aware and token burn checks are ensured when spending UTXOs.
+
+The SLP functions are then available via Wallet.slp accessor:
+
+```js
+const slpAddress = wallet.slp.getDepositAddress();
+
+const qrCode = wallet.slp.getDepositQr();
 ```
 
 Note, that working with SLP tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the SLP transactions.

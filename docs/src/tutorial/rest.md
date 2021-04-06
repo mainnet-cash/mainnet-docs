@@ -222,19 +222,21 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
         "value": 100,
         "unit": "sat"
       }
-    ]
+    ],
+    "options": {
+      "slpAware": true
+    }
   }'
 ```
 
-Note that you can send to many addresses at once. 
-
-<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add 
-`"slpAware": true,` to your request to prevent accidental token burning.
-SLP checks are a bit slow, so they are opt-in.
+Note that you can send to many addresses at once.
 
 It is also possible to specify which unspent outputs are used to send
 funds from by specifying a list of `utxoIds` in `options`: `"options": {"utxoIds": ["...", "..."]}`,
 see [wallet/utxo](https://rest-unstable.mainnet.cash/api-docs/#/wallet/utxos).
+
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
+SLP checks are a bit slow, so they are opt-in.
 
 Response:
 
@@ -267,7 +269,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
   }'
 ```
 
-This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction).
+This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs and SLP awareness.
 
 ## Waiting for a transaction
 
@@ -309,9 +311,23 @@ We currently fully support the SLP type 1 tokens [specification](https://slp.dev
 
 The interfaces were designed to be largely similar to those of BCH wallets.
 
-SLP methods can use the `walletId` created in `wallet/create` calls.
+<!-- SLP methods can use the `walletId` created in `wallet/create` calls. -->
 
-Rest server uses strings for the SLP amounts in order not to lose precision or have floating point issues
+Creating an SLP enabled wallet is similar to a BCH one, just use the `wallet/slp/create` endpoint.
+
+The SLP wallets are using the `m/44'/245'/0'/0/0` BIP44 derivation path unlike normal BCH wallets which use `m/44'/0'/0'/0/0`. This is done to lower the chances of accidental token burns.
+
+If you want to instantiate an SLP wallet which will use a different derivation path (assuming you already have your BIP39 seed phrase) you should construct the `walletId` parameter as follows
+
+```json
+{
+  walletId: "seed:mainnet:abandon abandon abandon ...:m/44'/123'/0'/0/0"
+}
+```
+
+Note, that unless you are using the `walletId` from `wallet/slp/create` (example is a `wif` wallet) the SLP awareness is not guaranteed. This means that you have to provide `"slpAware": true` to your `options` parameter in `wallet/send` and `wallet/send_max` endpoints.
+
+Note, that REST server uses strings for the SLP amounts in order not to lose precision or have floating point issues.
 
 ### Token creation - Genesis
 
