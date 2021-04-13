@@ -1086,7 +1086,7 @@ To use this wallet from your code, just use `network`: `RegTest` in your calls.
 
 ## Webhooks
 
-Webhooks are custom callbacks which notify user upon certain actions. Mainnet provides the webhook functionality to monitor addresses and transactions.
+Webhooks are custom callbacks which notify user upon certain actions. Mainnet.cash provides the webhook functionality to monitor addresses and transactions.
 
 You can register a webhook with the following `curl` call:
 
@@ -1107,7 +1107,11 @@ The endpoint you specify in the `url` parameter will be called with HTTP POST me
 
 Webhooks can be set up to fire once and expire if the `recurrence` parameter is set to `once` or continuously until they expire by the timeout.
 
-See full webhook REST documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress)
+We also support SLP-enabled webhooks to monitor token balance or token transactions. When using SLP webhooks you have to pass `tokenId` parameter. `cashaddr` param can be either cash address or SLP address, the necessary conversions will happen under the hood.
+
+See full webhook REST documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress).
+
+When deploying your own mainnet.cash REST server you cat set webhook specific parameters like postgres `DATABASE_URL` or `WEBHOOK_EXPIRE_TIMEOUT_SECONDS`. See related documentation [here](https://github.com/mainnet-cash/mainnet-js/blob/master/generated/serve/docker/README.md).
 
 ## WebSocket API reference
 
