@@ -16,8 +16,20 @@ even though we try not to break things too often.</p>
 
 ## Let's get programming
 
-Note that this tutorial describes `Browser + IndexedDB` approach, which means that the wallets will be created
-and persisted inside of a user browser. See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other-languages.html) for other approaches.
+Note that this tutorial mostly describes `Browser + IndexedDB` approach, which means that the wallets will be created
+and persisted inside of a user browser. 
+
+See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other-languages.html) for other approaches.
+
+### node.js / webpack
+
+Install using:
+
+```sh
+npm install mainnet-js
+```
+
+### &lt;script> tag in HTML
 
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
@@ -67,7 +79,7 @@ const wallet = await Wallet.newRandom();
 If you want to create a wallet from a mnemonic seed phrase, use this call:
 
 ```js
-const wallet = Wallet.fromSeed('.....');
+const wallet = await Wallet.fromSeed('.....');
 ```
 
 ::: tip
@@ -77,13 +89,13 @@ Seed phrase wallets use the derivation path `m/44'/0'/0'/0/0` by default (Bitcoi
 Optionally, a [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) derivation path may be added as a second argument.
 
 ```js
-const wallet = Wallet.fromSeed("horse duck stapler...", "m/44'/1'/145'/0/0");
+const wallet = await Wallet.fromSeed("horse duck stapler...", "m/44'/1'/145'/0/0");
 ```
 
 If you want to create a wallet from a WIF (private key), use this call:
 
 ```js
-const wallet = Wallet.fromWIF('.....');
+const wallet = await Wallet.fromWIF('.....');
 ```
 
 ::: danger Keep the private key and the seed phrase secret
