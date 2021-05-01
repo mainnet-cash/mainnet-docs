@@ -171,6 +171,16 @@ const txData = await wallet.send([
 ]);
 ```
 
+... which returns an object containing the remaining balance and the transaction ID:
+
+```js
+{
+  txId: "2fc2...af",
+  balance: {bch: 1.0, sat: 100000000, usd: 1000.00}
+}
+```
+
+
 Note that you can send to many addresses at once. 
 
 If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>, 
@@ -193,6 +203,15 @@ Now you can send all of your money somewhere else:
 
 ```js
 const txData = await seller.sendMax(wallet.depositAddress());
+```
+
+... which also returns:
+
+```js
+{
+  txId: "2fc2...af",
+  balance: {bch: 0, sat: 0, usd: 0}
+}
 ```
 
 ## Waiting for a transaction
