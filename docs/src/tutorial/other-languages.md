@@ -25,12 +25,12 @@ The docs for specific REST methods are [here](https://rest-unstable.mainnet.cash
 We are automatically generating some clients, namely:
 
 - [PHP](https://github.com/mainnet-cash/mainnet-php-generated) 
-  - `composer require mainnet/mainnet`
+  - `composer require mainnet-cash/mainnet-php-generated`
 - [Python](https://github.com/mainnet-cash/mainnet-python-generated) 
   - `pip install mainnet`
 - [Go](https://github.com/mainnet-cash/mainnet-go-generated) 
   - `go get https://github.com/mainnet-cash/mainnet-go-generated`
-- NodeJS
+- [NodeJS](https://github.com/mainnet-cash/mainnet-js) (not auto-generated)
   - `yarn add mainnet-js`
 
 ...and we'll be adding to this list soon.

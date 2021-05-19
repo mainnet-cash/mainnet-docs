@@ -303,7 +303,7 @@ You can use this `src` directly in the image tag:
 
 ### Waiting
 
-Currently, the only way to wait for a tx is to poll the balance (this will improve later)
+See [WebSockets](#websocket-api-reference) and [WebHooks](#webhooks).
 
 ## Simple Ledger Protocol (SLP)
 
@@ -801,7 +801,7 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
 By *default* the above command will build and transmit the transaction.  To **only** build the transaction hex, (without transmitting) and inspect the hex or transmit the hex manually, simply pass `"action": "build"` and the hex will be returned on the `"hex"` field.  In addition, to inspect the contract in the Bitcoin Script debugger, as a `meep` action may be passed, `"action": "meep"`.
 
 You can also specify the exact UTXO IDs to spend 
-(you can use [utxos call](https://rest-unstable.mainnet.cash/api-docs/#/contract/escrowUtxos) to list them):
+(you can use [utxos call](https://rest-unstable.mainnet.cash/api-docs/#/contract/escrow/utxos) to list them):
 
 ```
 ...
@@ -811,8 +811,8 @@ You can also specify the exact UTXO IDs to spend
 ...
 ```
 
+2) Seller refunds
 
-1) Seller refunds
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
@@ -1222,7 +1222,7 @@ Response: Raw transaction in verbose format as per [specification](https://elect
 
 #### waitForBlock
 
-Waits for the next next block or for the blockchain to reach a certain height.
+Waits for the next block or for the blockchain to reach a certain height.
 ```json
 {
   method: "waitForBlock",
