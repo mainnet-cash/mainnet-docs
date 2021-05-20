@@ -347,7 +347,7 @@ In the following example we issue 50 more tokens we just created in genesis:
 
 ```js
 const mintOptions = {
-  value: "10000",
+  value: "50",
   tokenId: tokenId,
   endBaton: false,
   tokenReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
@@ -357,7 +357,7 @@ const mintOptions = {
 const {txId, balance} = await wallet.slp.mint(mintOptions);
 ```
 
-Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the mintin baton to other authority.
+Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the minting baton to other authority.
 
 ### Sending tokens
 
@@ -478,12 +478,12 @@ const genesisOptions = {
   endBaton: true,
   parentTokenId: parentTokenId
 };
-const {tokenId} =  await wallet.slp.nftParentGenesis(genesisOptions);
+const {tokenId} =  await wallet.slp.nftChildGenesis(genesisOptions);
 ```
 
 In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.
 
-Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 0`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
+Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 1`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
 
 #### List of your NFTs
 

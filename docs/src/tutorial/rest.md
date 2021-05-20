@@ -372,7 +372,7 @@ Response:
 
 ### Looking up token information
 
-If you want to get the genesis information of some token, you can simply call getTokenInfo:
+If you want to get the genesis information of some token, you can simply call `wallet/slp/token_info`:
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/token_info \
@@ -409,7 +409,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/mint \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "value": "10000",
+  "value": "50",
   "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
   "endBaton": false,
   "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
@@ -417,7 +417,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/mint \
 }'
 ```
 
-Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the mintin baton to other authority.
+Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the minting baton to other authority.
 
 Response:
 
@@ -425,7 +425,7 @@ Response:
 {
   "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
   "balances": {
-    "value": "20000",
+    "value": "10050",
     "ticker": "MNC",
     "name": "Mainnet coin",
     "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
@@ -466,7 +466,7 @@ Response:
 }
 ```
 
-Or you can send all tokens available with a simple sendMax method
+Or you can send all tokens available with a simple `wallet/slp/send_max` method
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/send_max \
@@ -667,7 +667,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/nft_child_genesis \
   "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
   "name": "Mainnet NFT Child",
   "ticker": "MNC_NFTC",
-  "initialAmount": "10",
+  "initialAmount": "1",
   "decimals": 0,
   "documentUrl": "https://mainnet.cash",
   "endBaton": false,
@@ -693,7 +693,7 @@ Response:
 ```
 In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.
 
-Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 0`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
+Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 1`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
 
 ## TestNet faucet
 
