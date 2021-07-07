@@ -34,7 +34,7 @@ npm install mainnet-js
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.3.19.js"
+<script src="https://cdn.mainnet.cash/mainnet-0.3.20.js"
  integrity="sha384-yNARexmnMZlxKP+/hVma4GE3pLz61GvdbS0JD5uvIRDTSfigiwpLghUG3aRlYcL2"
  crossorigin="anonymous"></script>
 ```
