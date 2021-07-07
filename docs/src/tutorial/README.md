@@ -34,7 +34,7 @@ npm install mainnet-js
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0,3,16.js"
+<script src="https://cdn.mainnet.cash/mainnet-0.3.16.js"
  integrity="sha384-yNARexmnMZlxKP+/hVma4GE3pLz61GvdbS0JD5uvIRDTSfigiwpLghUG3aRlYcL2"
  crossorigin="anonymous"></script>
 ```
@@ -132,6 +132,23 @@ const wallet = await TestNetWallet.named('user:1234');
 ```
 
 `user:1234` is an optional name for the wallet. The wallet is saved in user's browser for future re-use.
+
+To check if a named wallet already exists in the storage, you can invoke:
+
+```js
+const walletExists = await TestNetWallet.namedExists('user:1234');
+```
+
+Say a user of your application has wiped the website data and his IndexedDB is now empty. But he still has the seed and derivation path info. A named wallet can be replaced (recovered) with the existing `walletId`:
+
+```js
+const seed = "diary caution almost ...";
+const derivationPath = "m/44'/0'/0'/0/0";
+const walletId = `seed:testnet:${seed}:${derivationPath}`;
+const wallet = await TestNetWallet.replaceNamed('user:1234', walletId);
+```
+
+If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
 
 ## Getting the balance
 
@@ -292,7 +309,7 @@ The SLP wallets are using the `m/44'/245'/0'/0/0` BIP44 derivation path unlike n
 If you want to instantiate an SLP wallet which will use a different derivation path (assuming you already have your BIP39 seed phrase):
 
 ```js
-const wallet = await Wallet.slp.fromSeed("abandon abandon abandon ...", "m/44'/123'/0'/0/0");
+const wallet = await Wallet.slp.fromSeed("diary caution almost ...", "m/44'/123'/0'/0/0");
 ```
 
 Note, that SLP-enabled wallets are by default SLP aware and token burn checks are ensured when spending UTXOs.

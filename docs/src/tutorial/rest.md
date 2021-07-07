@@ -133,10 +133,40 @@ Response:
 }
 ```
 
-The wallet's private key will be stored in the PostgreSQL database of the REST API server. 
+The wallet's private key will be stored in the PostgreSQL database of the REST API server.
 
-Note that `rest-unstable.mainnet.cash` will not allow you to store mainnet private keys, 
-you need to [run your own service](/tutorial/rest.md) for that. We really don't want to store your private keys! 
+Note that `rest-unstable.mainnet.cash` will not allow you to store mainnet private keys,
+you need to [run your own service](/tutorial/rest.md) for that. We really don't want to store your private keys!
+
+To check if a named wallet already exists in the storage, you can invoke:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/named_exists \
+    -H "Content-Type: application/json" \
+    -d '{"type": "seed", "network": "testnet", "name": "wallet_1"}'
+```
+
+Response:
+
+```json
+{"result":true}
+```
+
+Say a user of your application wants to change the wallet info to a new seed. Their wallet on the REST server can be replaced (recovered) with the existing `walletId`:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/replace_named \
+    -H "Content-Type: application/json" \
+    -d '{"name": "wallet_1", "walletId": "seed:testnet:diary caution almost ...:m/44'\''/0'\''/0'\''/0/0", "type": "seed", "network": "testnet"}'
+```
+
+Response:
+
+```json
+{"result":true}
+```
+
+If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
 
 ## Getting the balance
 
@@ -321,7 +351,7 @@ If you want to instantiate an SLP wallet which will use a different derivation p
 
 ```json
 {
-  walletId: "seed:mainnet:abandon abandon abandon ...:m/44'/123'/0'/0/0"
+  walletId: "seed:mainnet:diary caution almost ...:m/44'/123'/0'/0/0"
 }
 ```
 
