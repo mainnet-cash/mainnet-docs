@@ -939,7 +939,7 @@ curl -X POST "https://rest-unstable.mainnet.cash/contract/call" \
     "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"
   ],
   "to": {
-    "cashaddr":"bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0", 
+    "cashaddr":"bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0",
     "value":100,
     "unit":"sat"
     }
@@ -947,7 +947,7 @@ curl -X POST "https://rest-unstable.mainnet.cash/contract/call" \
 ```
 The above call is a simple example with minimum required arguments:
 
-- The `function` is the method on the contract to call. 
+- The `function` is the method on the contract to call.
 - In this case, the argument is a keypair signature (`sig`), so the **walletId** is passed to generate the CashScript SignatureTemplate server-side.
 - Finally, a transaction output is required, and the argument was passed in mainnet-js send format, but CashScript (`to`/`amount`) format is also accepted, as well as lists of either format.
 - The `action` is the CashScript method to perform (`build`, `meep`, or the default `send`)
@@ -959,6 +959,40 @@ Full access to the CashScript SDK (opReturn, fees, change, age, time) is documen
 ## Utilities
 
 Certain tools common in bitcoin-like currencies may not be in a standard library.
+
+### Decoding transactions
+
+You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/util/decode_transaction \
+  -H "Content-Type: application/json" \
+  -d '{
+  "network": "mainnet",
+  "transactionHashOrHex": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+}'
+```
+
+Response:
+
+```js
+{
+  blockhash: '00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
+  blocktime: 1231469665,
+  confirmations: 695463,
+  hash: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
+  hex: '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000',
+  locktime: 0,
+  size: 134,
+  time: 1231469665,
+  txid: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
+  version: 1,
+  vin: [ { coinbase: '04ffff001d0104', sequence: 4294967295 } ],
+  vout: [ { n: 0, scriptPubKey: [Object], value: 50 } ]
+}
+```
+
+The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
 
 ### Currency conversions
 

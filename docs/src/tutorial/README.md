@@ -139,7 +139,7 @@ To check if a named wallet already exists in the storage, you can invoke:
 const walletExists = await TestNetWallet.namedExists('user:1234');
 ```
 
-Say a user of your application has wiped the website data and his IndexedDB is now empty. But he still has the seed and derivation path info. A named wallet can be replaced (recovered) with the existing `walletId`:
+Say a user of your application has wiped the website data and his IndexedDB is now empty. But they still has the seed and derivation path info. A named wallet can be replaced (recovered) with the existing `walletId`:
 
 ```js
 const seed = "diary caution almost ...";
@@ -788,6 +788,16 @@ In Javascript, passing either hex or a Uint8Array to CashScript will work.
 
 ## Utilities
 
+### Decoding transactions
+
+You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
+
+```js
+  const wallet = await Wallet.newRandom();
+  const decoded = await wallet.util.decodeTransaction("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
+```
+
+The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
 
 ### Currency conversions
 
