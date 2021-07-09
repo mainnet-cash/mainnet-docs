@@ -793,8 +793,7 @@ In Javascript, passing either hex or a Uint8Array to CashScript will work.
 You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
 
 ```js
-  const wallet = await Wallet.newRandom();
-  const decoded = await wallet.util.decodeTransaction("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b");
+  const decoded = await Wallet.util.decodeTransaction("0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098");
 ```
 
 The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)

@@ -969,7 +969,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/util/decode_transaction \
   -H "Content-Type: application/json" \
   -d '{
   "network": "mainnet",
-  "transactionHashOrHex": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+  "transactionHashOrHex": "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098"
 }'
 ```
 
