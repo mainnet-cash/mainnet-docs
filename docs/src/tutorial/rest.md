@@ -133,10 +133,40 @@ Response:
 }
 ```
 
-The wallet's private key will be stored in the PostgreSQL database of the REST API server. 
+The wallet's private key will be stored in the PostgreSQL database of the REST API server.
 
-Note that `rest-unstable.mainnet.cash` will not allow you to store mainnet private keys, 
-you need to [run your own service](/tutorial/rest.md) for that. We really don't want to store your private keys! 
+Note that `rest-unstable.mainnet.cash` will not allow you to store mainnet private keys,
+you need to [run your own service](/tutorial/rest.md) for that. We really don't want to store your private keys!
+
+To check if a named wallet already exists in the storage, you can invoke:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/named_exists \
+    -H "Content-Type: application/json" \
+    -d '{"type": "seed", "network": "testnet", "name": "wallet_1"}'
+```
+
+Response:
+
+```json
+{"result":true}
+```
+
+Say a user of your application wants to change the wallet info to a new seed. Their wallet on the REST server can be replaced (recovered) with the existing `walletId`:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/replace_named \
+    -H "Content-Type: application/json" \
+    -d '{"name": "wallet_1", "walletId": "seed:testnet:diary caution almost ...:m/44'\''/0'\''/0'\''/0/0", "type": "seed", "network": "testnet"}'
+```
+
+Response:
+
+```json
+{"result":true}
+```
+
+If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
 
 ## Getting the balance
 
@@ -222,19 +252,21 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
         "value": 100,
         "unit": "sat"
       }
-    ]
+    ],
+    "options": {
+      "slpAware": true
+    }
   }'
 ```
 
-Note that you can send to many addresses at once. 
-
-<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add 
-`"slpAware": true,` to your request to prevent accidental token burning.
-SLP checks are a bit slow, so they are opt-in.
+Note that you can send to many addresses at once.
 
 It is also possible to specify which unspent outputs are used to send
 funds from by specifying a list of `utxoIds` in `options`: `"options": {"utxoIds": ["...", "..."]}`,
 see [wallet/utxo](https://rest-unstable.mainnet.cash/api-docs/#/wallet/utxos).
+
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
+SLP checks are a bit slow, so they are opt-in.
 
 Response:
 
@@ -267,7 +299,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
   }'
 ```
 
-This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction).
+This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs and SLP awareness.
 
 ## Waiting for a transaction
 
@@ -301,7 +333,7 @@ You can use this `src` directly in the image tag:
 
 ### Waiting
 
-Currently, the only way to wait for a tx is to poll the balance (this will improve later)
+See [WebSockets](#websocket-api-reference) and [WebHooks](#webhooks).
 
 ## Simple Ledger Protocol (SLP)
 
@@ -309,9 +341,23 @@ We currently fully support the SLP type 1 tokens [specification](https://slp.dev
 
 The interfaces were designed to be largely similar to those of BCH wallets.
 
-SLP methods can use the `walletId` created in `wallet/create` calls.
+<!-- SLP methods can use the `walletId` created in `wallet/create` calls. -->
 
-Rest server uses strings for the SLP amounts in order not to lose precision or have floating point issues
+Creating an SLP enabled wallet is similar to a BCH one, just use the `wallet/slp/create` endpoint.
+
+The SLP wallets are using the `m/44'/245'/0'/0/0` BIP44 derivation path unlike normal BCH wallets which use `m/44'/0'/0'/0/0`. This is done to lower the chances of accidental token burns.
+
+If you want to instantiate an SLP wallet which will use a different derivation path (assuming you already have your BIP39 seed phrase) you should construct the `walletId` parameter as follows
+
+```json
+{
+  walletId: "seed:mainnet:diary caution almost ...:m/44'/123'/0'/0/0"
+}
+```
+
+Note, that unless you are using the `walletId` from `wallet/slp/create` (example is a `wif` wallet) the SLP awareness is not guaranteed. This means that you have to provide `"slpAware": true` to your `options` parameter in `wallet/send` and `wallet/send_max` endpoints.
+
+Note, that REST server uses strings for the SLP amounts in order not to lose precision or have floating point issues.
 
 ### Token creation - Genesis
 
@@ -356,7 +402,7 @@ Response:
 
 ### Looking up token information
 
-If you want to get the genesis information of some token, you can simply call getTokenInfo:
+If you want to get the genesis information of some token, you can simply call `wallet/slp/token_info`:
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/token_info \
@@ -393,7 +439,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/mint \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "value": "10000",
+  "value": "50",
   "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
   "endBaton": false,
   "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
@@ -401,7 +447,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/mint \
 }'
 ```
 
-Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the mintin baton to other authority.
+Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the minting baton to other authority.
 
 Response:
 
@@ -409,7 +455,7 @@ Response:
 {
   "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
   "balances": {
-    "value": "20000",
+    "value": "10050",
     "ticker": "MNC",
     "name": "Mainnet coin",
     "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
@@ -450,7 +496,7 @@ Response:
 }
 ```
 
-Or you can send all tokens available with a simple sendMax method
+Or you can send all tokens available with a simple `wallet/slp/send_max` method
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/send_max \
@@ -651,12 +697,13 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/nft_child_genesis \
   "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
   "name": "Mainnet NFT Child",
   "ticker": "MNC_NFTC",
-  "initialAmount": "10",
+  "initialAmount": "1",
   "decimals": 0,
   "documentUrl": "https://mainnet.cash",
   "endBaton": false,
   "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  "parentTokenId": "90a0bac9a1e3c0dfb40b8b8cb2ab04db91b57e5f2b43251e55c080d2f7c4a668"
 }'
 ```
 
@@ -676,7 +723,7 @@ Response:
 ```
 In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.
 
-Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 0`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
+Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 1`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
 
 ## TestNet faucet
 
@@ -784,7 +831,7 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
 By *default* the above command will build and transmit the transaction.  To **only** build the transaction hex, (without transmitting) and inspect the hex or transmit the hex manually, simply pass `"action": "build"` and the hex will be returned on the `"hex"` field.  In addition, to inspect the contract in the Bitcoin Script debugger, as a `meep` action may be passed, `"action": "meep"`.
 
 You can also specify the exact UTXO IDs to spend 
-(you can use [utxos call](https://rest-unstable.mainnet.cash/api-docs/#/contract/escrowUtxos) to list them):
+(you can use [utxos call](https://rest-unstable.mainnet.cash/api-docs/#/contract/escrow/utxos) to list them):
 
 ```
 ...
@@ -794,8 +841,8 @@ You can also specify the exact UTXO IDs to spend
 ...
 ```
 
+2) Seller refunds
 
-1) Seller refunds
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
@@ -896,7 +943,7 @@ curl -X POST "https://rest-unstable.mainnet.cash/contract/call" \
     "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"
   ],
   "to": {
-    "cashaddr":"bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0", 
+    "cashaddr":"bchtest:qpttdv3qg2usm4nm7talhxhl05mlhms3ys43u76rn0",
     "value":100,
     "unit":"sat"
     }
@@ -904,7 +951,7 @@ curl -X POST "https://rest-unstable.mainnet.cash/contract/call" \
 ```
 The above call is a simple example with minimum required arguments:
 
-- The `function` is the method on the contract to call. 
+- The `function` is the method on the contract to call.
 - In this case, the argument is a keypair signature (`sig`), so the **walletId** is passed to generate the CashScript SignatureTemplate server-side.
 - Finally, a transaction output is required, and the argument was passed in mainnet-js send format, but CashScript (`to`/`amount`) format is also accepted, as well as lists of either format.
 - The `action` is the CashScript method to perform (`build`, `meep`, or the default `send`)
@@ -943,6 +990,40 @@ This will return all the arguments to reconstruct or verify a contract.
 ## Utilities
 
 Certain tools common in bitcoin-like currencies may not be in a standard library.
+
+### Decoding transactions
+
+You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/util/decode_transaction \
+  -H "Content-Type: application/json" \
+  -d '{
+  "network": "mainnet",
+  "transactionHashOrHex": "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098"
+}'
+```
+
+Response:
+
+```js
+{
+  blockhash: '00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
+  blocktime: 1231469665,
+  confirmations: 695463,
+  hash: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
+  hex: '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000',
+  locktime: 0,
+  size: 134,
+  time: 1231469665,
+  txid: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
+  version: 1,
+  vin: [ { coinbase: '04ffff001d0104', sequence: 4294967295 } ],
+  vout: [ { n: 0, scriptPubKey: [Object], value: 50 } ]
+}
+```
+
+The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
 
 ### Currency conversions
 
@@ -1100,20 +1181,20 @@ To use this wallet from your code, just use `network`: `RegTest` in your calls.
 
 ## Webhooks
 
-Webhooks are custom callbacks which notify user upon certain actions. Mainnet provides the webhook functionality to monitor addresses and transactions.
+Webhooks are custom callbacks which notify user upon certain actions. Mainnet.cash provides the webhook functionality to monitor addresses and transactions.
 
 You can register a webhook with the following `curl` call:
 
 ```bash
 curl -X POST "https://rest-unstable.mainnet.cash/webhook/watch_address" \
-  -H  "accept: application/json"
-  -H  "Content-Type: application/json"
+  -H  "accept: application/json" \
+  -H  "Content-Type: application/json" \
   -d '{
-    "cashaddr":"bchtest:qzd0tv75gx6y0zspzwqpgkwkq0n72g8fsq2zch26s2",
-    "url":"http://example.com/webhook",
-    "type":"transaction:in,out",
-    "recurrence":"recurrent",
-    "duration_sec":86400
+    "cashaddr": "bchtest:qzd0tv75gx6y0zspzwqpgkwkq0n72g8fsq2zch26s2",
+    "url": "http://example.com/webhook",
+    "type": "transaction:in,out",
+    "recurrence": "recurrent",
+    "duration_sec": 86400
   }'
 ```
 
@@ -1121,7 +1202,11 @@ The endpoint you specify in the `url` parameter will be called with HTTP POST me
 
 Webhooks can be set up to fire once and expire if the `recurrence` parameter is set to `once` or continuously until they expire by the timeout.
 
-See full webhook REST documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress)
+We also support SLP-enabled webhooks to monitor token balance or token transactions. When using SLP webhooks you have to pass `tokenId` parameter. `cashaddr` param can be either cash address or SLP address, the necessary conversions will happen under the hood.
+
+See full webhook REST documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress).
+
+When deploying your own mainnet.cash REST server you cat set webhook specific parameters like postgres `DATABASE_URL` or `WEBHOOK_EXPIRE_TIMEOUT_SECONDS`. See related documentation [here](https://github.com/mainnet-cash/mainnet-js/blob/master/generated/serve/docker/README.md).
 
 ## WebSocket API reference
 
@@ -1232,7 +1317,7 @@ Response: Raw transaction in verbose format as per [specification](https://elect
 
 #### waitForBlock
 
-Waits for the next next block or for the blockchain to reach a certain height.
+Waits for the next block or for the blockchain to reach a certain height.
 ```json
 {
   method: "waitForBlock",

@@ -70,13 +70,13 @@ openssl req -newkey rsa:4096 \
     -keyout /var/www/tls/fulcrum-key.pem
 ```
 
-Install Fulcrum (replace `1.4.1` with the [latest](https://github.com/cculianu/Fulcrum/releases/latest) version)
+Install Fulcrum (replace `1.5.2` with the [latest](https://github.com/cculianu/Fulcrum/releases/latest) version)
 
 ```shell script
-wget https://github.com/cculianu/Fulcrum/releases/download/v1.4.1/Fulcrum-1.4.1-x86_64-linux.tar.gz
-tar zxvf Fulcrum-1.4.1-x86_64-linux.tar.gz
-rm Fulcrum-1.4.1-x86_64-linux.tar.gz
-cd Fulcrum-1.4.1-x86_64-linux
+wget https://github.com/cculianu/Fulcrum/releases/download/v1.5.2/Fulcrum-1.5.2-x86_64-linux.tar.gz
+tar zxvf Fulcrum-1.5.2-x86_64-linux.tar.gz
+rm Fulcrum-1.5.2-x86_64-linux.tar.gz
+cd Fulcrum-1.5.2-x86_64-linux
 
 mkdir -p /mnt/fulcrum
 ./Fulcrum --datadir=/mnt/fulcrum \
