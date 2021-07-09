@@ -640,7 +640,7 @@ In the case that you only have Charlie's cashaddr,
 it won't be possible to get the full public key,
 but a public key hash may be used in the contract instead
 ```js
-const charlie = await TestNetWallet.newRandom();
+const charlie = await TestNetWallet.watchOnly("bchtest:qqz52tne6ny78tltw82f0tufcum0752zg5tnwcf0v9")
 ```
 In javascript, the contract can take a binary argument as a Uint8Array or 
 hexadecimal strings just like CashScript, but passing passing `true`
@@ -721,6 +721,27 @@ Wallets have the following convenience methods for passing data to CashScript:
 | `getPublicKeyHash()` | Hex String or Uint8Array |`bytes20` |
 
 In Javascript, passing either hex or a Uint8Array to CashScript will work.
+
+In the case that a contractId is stored, or received from another party, a convience method exists to list information contained in a contractId, the `info()` interface is available to return the parsed data.
+
+The return should be an object with the same contractId, deposit cashaddr, script source, input parameters and a contract nonce that is added for uniqueness.
+
+```js
+contract.info()
+// {
+//   "contractId": "testnet:TURRellXWTNabVF5WmpVeVpUa3dNVFEzTldOa1pEUXhPRFZoWWpWa1ptVmlZamMyTXpNM09EQTVNV0psTVRrd1lXUXlOMkZrTXpRM1lUZGtPR1kwTmpOa1pqSXlaVE5sT0dKbFlUaGtaRGcwTldKaE1XUXlNR00xWmpCbFl6QTJNek13WmpNM01ETTFZbUpsTkdFME1UZzNPVEUzTVRCaVlUbGpNakUxWkRaa05RPT06TURSbE9EZGtOV1ZrTlRCbU16VXdZVFZtTjJFMk16aG1abVkyT0RFek5HTTNOekJsT1RGaVlUUTFNV0l4TXpSaVlqTTVOVEJqTUdVMk9ETTJNR0poWW1JNE0ySTJOMlF3TnpSaU16WTFOVFl4WVdVMU0ySmxaVEV6TXpBNFl6TTFPVEF6TnpOaU5qTm1aV1F6TVRKallXVTNNMlk0TXpWaE56SmlaR00xWldFek53PT06TWpFMQ==:Y29udHJhY3QgVHJhbnNmZXJXaXRoVGltZW91dChwdWJrZXkgc2VuZGVyLCBwdWJrZXkgcmVjaXBpZW50LCBpbnQgdGltZW91dCkgewogICAgLy8gUmVxdWlyZSByZWNpcGllbnQncyBzaWduYXR1cmUgdG8gbWF0Y2gKICAgIGZ1bmN0aW9uIHRyYW5zZmVyKHNpZyByZWNpcGllbnRTaWcpIHsKICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHJlY2lwaWVudFNpZywgcmVjaXBpZW50KSk7CiAgICB9CgogICAgLy8gUmVxdWlyZSB0aW1lb3V0IHRpbWUgdG8gYmUgcmVhY2hlZCBhbmQgc2VuZGVyJ3Mgc2lnbmF0dXJlIHRvIG1hdGNoCiAgICBmdW5jdGlvbiB0aW1lb3V0KHNpZyBzZW5kZXJTaWcpIHsKICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHNlbmRlclNpZywgc2VuZGVyKSk7CiAgICAgICAgcmVxdWlyZSh0eC50aW1lID49IHRpbWVvdXQpOwogICAgfQp9:544951395",
+//   "cashaddr": "bchtest:ppv649rmxcd9fpwgk78pq0yek30krgwreva8unzm0x",
+//   "script": "contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {\n    // Require recipient's signature to match\n    function transfer(sig recipientSig) {\n        require(checkSig(recipientSig, recipient));\n    }\n\n    // Require timeout time to be reached and sender's signature to match\n    function timeout(sig senderSig) {\n        require(checkSig(senderSig, sender));\n        require(tx.time >= timeout);\n    }\n}",
+//   "parameters": [
+//     "043af7fd2f52e901475cdd4185ab5dfebb763378091be190ad27ad347a7d8f463df22e3e8bea8dd845ba1d20c5f0ec06330f37035bbe4a418791710ba9c215d6d5",
+//     "04e87d5ed50f350a5f7a638fff68134c770e91ba451b134bb3950c0e68360babb83b67d074b365561ae53bee13308c3590373b63fed312cae73f835a72bdc5ea37",
+//     "215"
+//   ],
+//   "nonce": 544951395
+// }
+```
+
+Combined with the `getPublicKeyHash()` method described above, another party could verify that the script of the contract matched an agreement and that the counter-party's public key hash was indeed a parameter to the contract.
 
 ## Utilities
 
