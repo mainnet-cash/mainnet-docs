@@ -41,24 +41,24 @@ Response:
 }
 ```
 
-This creates a **TestNet** wallet.  This has the cashaddress of the wallet, where you can send money, and the `walletId`. 
-Note the `walletId` - we're going to need it later. This wallet will not be persisted. See below for persistent wallets. 
+This creates a **TestNet** wallet.  This has the cashaddress of the wallet, where you can send money, and the `walletId`.
+Note the `walletId` - we're going to need it later. This wallet will not be persisted. See below for persistent wallets.
 
 ::: danger walletId contains the private key
 
 Keep `walletId` a secret as it contains the private key that allows spending from this wallet. WalletId, Seed phrase, WIF - all
-these are a form of a private key. 
+these are a form of a private key.
 
 :::
 
 ::: tip What is TestNet? Where to get TestNet money and a wallet?
 
-`TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
-which is what people usually mean when they talk about Bitcoin Cash network.  
+`TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`,
+which is what people usually mean when they talk about Bitcoin Cash network.
 
 You can get free TestNet money using our TestNet faucet (see below) or [here](https://faucet.fullstack.cash/).
 
-If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and 
+If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and
 run it using `electron-cash --testnet` flag. For example, on MacOS that would be:
 
 `/Applications/Electron-Cash.app/Contents/MacOS/Electron-Cash --testnet`
@@ -66,7 +66,7 @@ run it using `electron-cash --testnet` flag. For example, on MacOS that would be
 
 :::
 
-To create a MainNet wallet (Bitcoin Cash production network): 
+To create a MainNet wallet (Bitcoin Cash production network):
 
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
@@ -223,7 +223,7 @@ watch:testnet:bchtest:qq1234567
 
 ## Sending money
 
-Let's create another wallet and send some of our money there. 
+Let's create another wallet and send some of our money there.
 
 Remember, that first you need to send some satoshis to the cashaddr of your original wallet (see the TestNet note above).
 
@@ -261,13 +261,6 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
 
 Note that you can send to many addresses at once.
 
-It is also possible to specify which unspent outputs are used to send
-funds from by specifying a list of `utxoIds` in `options`: `"options": {"utxoIds": ["...", "..."]}`,
-see [wallet/utxo](https://rest-unstable.mainnet.cash/api-docs/#/wallet/utxos).
-
-<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
-SLP checks are a bit slow, so they are opt-in.
-
 Response:
 
 ```json
@@ -277,8 +270,23 @@ Response:
 }
 ```
 
+#### Options
+
+There is also an `options` parameter that specifies how money is spent.
+
+* `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
+* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs
+* `changeAddress` cash address to receive change to
+* `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
+* `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
+
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
+SLP checks are a bit slow, so they are opt-in.
+
 You get the transaction ID (txid) that [you can see on the TestNet block explorer](https://explorer.bitcoin.com/tbch/tx/316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69)
 and the balance left in the original wallet.
+
+#### Getting balance
 
 Let's print the balance of `...z2pu` wallet:
 
@@ -299,7 +307,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
   }'
 ```
 
-This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs and SLP awareness.
+This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs, SLP awareness and others (see above).
 
 ## Waiting for a transaction
 
