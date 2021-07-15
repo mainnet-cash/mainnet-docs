@@ -184,7 +184,11 @@ Let's create another wallet and send some of our money there:
 const seller = await TestNetWallet.named('seller');
 
 const txData = await wallet.send([
-    [seller.depositAddress(), 0.01, 'USD'],
+  {
+    cashaddr: seller.getDepositAddress(),
+    value: 0.01,
+    unit: 'usd',
+  }
 ]);
 ```
 
@@ -198,14 +202,23 @@ const txData = await wallet.send([
 ```
 
 
-Note that you can send to many addresses at once. 
+Note that you can send to many addresses at once.
 
-If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>, 
+If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>,
 you have to use the `wallet.slpAware().send([...])` method to prevent accidental token burning.
 SLP checks are a bit slow, so they are opt-in.
 
-There is also an `options` parameter that specifies how money is spent, for example specifying which 
-unspent outputs are used as inputs: `{utxoIds: ["...", "..."]}`. SLP awareness can also be passed as a member of `options` parameter: `{slpAware: true}`.
+#### Options
+
+There is also an `options` parameter that specifies how money is spent.
+
+* `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
+* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs
+* `changeAddress` cash address to receive change to
+* `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
+* `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
+
+#### Getting balance
 
 Let's print the balance of the seller's wallet:
 
@@ -219,10 +232,10 @@ Great! You've just made your first transaction!
 Now you can send all of your money somewhere else:
 
 ```js
-const txData = await seller.sendMax(wallet.depositAddress());
+const txData = await seller.sendMax(wallet.getDepositAddress());
 ```
 
-... which also returns:
+... which also supports `options` object and returns:
 
 ```js
 {
