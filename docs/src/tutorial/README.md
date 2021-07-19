@@ -824,13 +824,13 @@ Combined with the `getPublicKeyHash()` method described above, another party cou
 
 ### Decoding transactions
 
-You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
+You can decode a transaction by its hash (if it *already exists* on the blockchain) or full raw contents in hex format using the following snippet:
 
 ```js
-  const decoded = await Wallet.util.decodeTransaction("0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098");
+  const decoded = await Wallet.util.decodeTransaction("36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d", true);
 ```
 
-The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+The returned object is compatible with [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get) with extra information about input values and cash addresses if `loadInputValues` parameter is specified and set to `true`.
 
 ### Currency conversions
 

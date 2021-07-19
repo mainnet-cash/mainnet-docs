@@ -1001,14 +1001,15 @@ Certain tools common in bitcoin-like currencies may not be in a standard library
 
 ### Decoding transactions
 
-You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
+You can decode a transaction by its hash (if it *already exists* on the blockchain) or full raw contents in hex format using the following snippet:
 
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/util/decode_transaction \
   -H "Content-Type: application/json" \
   -d '{
   "network": "mainnet",
-  "transactionHashOrHex": "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098"
+  "transactionHashOrHex": "36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d",
+  "loadInputValues": true
 }'
 ```
 
@@ -1016,22 +1017,51 @@ Response:
 
 ```js
 {
-  blockhash: '00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
-  blocktime: 1231469665,
-  confirmations: 695463,
-  hash: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
-  hex: '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000',
-  locktime: 0,
-  size: 134,
-  time: 1231469665,
-  txid: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
-  version: 1,
-  vin: [ { coinbase: '04ffff001d0104', sequence: 4294967295 } ],
-  vout: [ { n: 0, scriptPubKey: [Object], value: 50 } ]
-}
+    {
+      "vin": [
+        {
+          "scriptSig": {
+            "hex": "4730440220..."
+          },
+          "sequence": 4294967294,
+          "txid": "84b4c10680c4b74c04f7d858511c42a6c208bae93f4d692983830a962c14b95b",
+          "vout": 0,
+          "address": "bitcoincash:qpcycvlv8xudnxdqhy7hfvxhtj62d6mxzvtl2ahsyx",
+          "value": 0.22175736
+        }
+      ],
+      "vout": [
+        {
+          "n": 0,
+          "scriptPubKey": {
+            "addresses": [
+              "bitcoincash:qqgyr7czf0t6zvuw7x2eqf4mh2rqqe87tudgnnjjk4"
+            ],
+            "hex": "76a9141041fb024bd7a1338ef1959026bbba860064fe5f88ac"
+          },
+          "value": 0.0856647
+        },
+        {
+          "n": 1,
+          "scriptPubKey": {
+            "addresses": [
+              "bitcoincash:qpza4sgsywd85wq52dwptpvtjwfpr7zjnqj2wqltx3"
+            ],
+            "hex": "76a91445dac110239a7a3814535c15858b939211f8529888ac"
+          },
+          "value": 0.1360904
+        }
+      ],
+      "locktime": 519777,
+      "version": 1,
+      "hash": "36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d",
+      "hex": "0100000001...",
+      "txid": "36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d",
+      "size": 225
+    }
 ```
 
-The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+The returned object is compatible with [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get) with extra information about input values and cash addresses if `loadInputValues` parameter is specified and set to `true`.
 
 ### Currency conversions
 
