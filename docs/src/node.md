@@ -1,8 +1,15 @@
-# Running Bitcoin Cash node
+# Running Bitcoin Cash servers (BCHN, Fulcrum)
 
 ## BCHN on Ubuntu
 
-Create a directory for the data (it should have ~210G free space as of Nov 2020), let's say: `/mnt/bchn`
+Create a directory for the data, let's say: `/mnt/bchn` (and for example `/mnt/fulcrum` for Fulcrum)
+
+The space requirements as of February 2021:
+
+```shell
+182G    /mnt/bchn
+36G     /mnt/fulcrum
+```
 
 ### Remove Bitcoin ABC if it was running
 
@@ -14,7 +21,7 @@ sudo add-apt-repository --remove ppa:bitcoin-abc/ppa
 
 ### Install Bitcoin Cash Node
 
-#### Run this Ubuntu 16.04 and 18.04 only:
+#### Run this on Ubuntu 16.04 and 18.04 only:
 
 ```shell script
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -25,6 +32,7 @@ sudo apt-get install g++-7
 Install the node:
 
 ```shell script
+sudo apt-get install software-properties-common
 sudo add-apt-repository ppa:bitcoin-cash-node/ppa
 sudo apt-get update
 sudo apt-get install bitcoind
@@ -33,21 +41,22 @@ sudo apt-get install bitcoind
 ### Start Bitcoin Cash Node
 
 ```shell script
+mkdir -p /mnt/bchn
 bitcoind -datadir=/mnt/bchn -rpcallowip=127.0.0.1 \
     -rpcbind=127.0.0.1:8332 -rpcuser=rpc \
-    -rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM \
-    -txindex=1
+    -txindex=1 \
+    -rpcpassword=RANDOMPASSWORD
 ```
 
-Replace the password with something random (try `head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo ''` on Linux)
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">Replace the password</span> with something random (try `head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo ''` on Linux)
 
 To open your RPC for other computers on the Internet (not recommended, even if password protected):
 
 ```shell script
 bitcoind -datadir=/mnt/bchn -rpcallowip=0.0.0.0/0 \
     -rpcbind=0.0.0.0:8332 -rpcuser=rpc \
-    -rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM \
-    -txindex=1
+    -txindex=1 \
+    -rpcpassword=RANDOMPASSWORD
 ```
 
 ## Running Fulcrum (Electron Cash compatible server)
@@ -61,26 +70,78 @@ openssl req -newkey rsa:4096 \
     -keyout /var/www/tls/fulcrum-key.pem
 ```
 
-Install Fulcrum (replace `1.3.1` with the [latest](https://github.com/cculianu/Fulcrum/releases/latest) version)
+Install Fulcrum (replace `1.5.2` with the [latest](https://github.com/cculianu/Fulcrum/releases/latest) version)
 
 ```shell script
-wget https://github.com/cculianu/Fulcrum/releases/download/v1.3.1/Fulcrum-1.3.1-x86_64-linux.tar.gz
-tar zxvf Fulcrum-1.3.1-x86_64-linux.tar.gz
-rm Fulcrum-1.3.1-x86_64-linux.tar.gz
-cd Fulcrum-1.3.1-x86_64-linux
+wget https://github.com/cculianu/Fulcrum/releases/download/v1.5.2/Fulcrum-1.5.2-x86_64-linux.tar.gz
+tar zxvf Fulcrum-1.5.2-x86_64-linux.tar.gz
+rm Fulcrum-1.5.2-x86_64-linux.tar.gz
+cd Fulcrum-1.5.2-x86_64-linux
 
-./Fulcrum --datadir=/mnt/bchn \
+mkdir -p /mnt/fulcrum
+./Fulcrum --datadir=/mnt/fulcrum \
   --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
-  --rpcpassword=dqwaDOvqEqxkIsD9oQCZA2lOagPpHuYM \
   --ssl=0.0.0.0:50002 \
-  --cert=/var/www/tls/fulcrum-certificate.pem --key=/var/www/tls/fulcrum-key.pem
+  --cert=/var/www/tls/fulcrum-certificate.pem \
+  --key=/var/www/tls/fulcrum-key.pem \
+  --rpcpassword=RANDOMPASSWORD
 ```
+
+### WebSocket port for mainnet library
+
+To be able to connect to this Fulcrum from mainnet library, you need to enable WebSocket port (50004)
+and get a valid certificate. First assign a domain name to your IP address (buy one, usually there's a domain name
+manager, add an A entry). Let's say your domain name is `fulcrum.test.cash`
+
+```shell
+sudo apt-get install -y certbot
+certbot certonly --manual --preferred-challenges dns -d fulcrum.test.cash
+```
+
+Follow the instructions of `certbot`.
+
+Now run:
+
+```shell
+./Fulcrum --datadir=/mnt/fulcrum \
+  --bitcoind=127.0.0.1:8332 --rpcuser=rpc \
+  --ssl=0.0.0.0:50002 \
+  --cert=/var/www/tls/fulcrum-certificate.pem \
+  --key=/var/www/tls/fulcrum-key.pem \
+  --rpcpassword=RANDOMPASSWORD \
+  --wss=0.0.0.0:50004 \
+  --wss-cert=/etc/letsencrypt/live/fulcrum.test.cash/fullchain.pem \ 
+  --wss-key=/etc/letsencrypt/live/fulcrum.test.cash/privkey.pem
+```
+
+Remember to replace `fulcrum.test.cash` with your domain name and `RANDOMPASSWORD` with an actual password.
+
+Now you can setup your REST server:
+
+```shell
+docker run --env ELECTRUM="wss://fulcrum.test.cash:50004" -p 127.0.0.1:3000:80 \
+   mainnet/mainnet-rest:latest
+```
+
+Your REST server will be available at `http://127.0.0.1:3000` connected to your own Fulcrum instance
+
+See [here](/tutorial/running-rest.html) for more options (including LetsEncrypt certificate for your REST server)
 
 ## Running Insomnia (REST server to serve Fulcrum results)
 
 ```shell script
 git clone https://github.com/fountainhead-cash/insomnia.git
 cd insomnia
-yarn install
-yarn start
+npm install
+```
+
+Edit the config file
+
+```shell
+cp src/config.ts.example src/config.ts
+$(EDITOR) src/config.ts
+```
+
+```shell
+npm start
 ```

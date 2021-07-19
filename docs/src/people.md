@@ -66,8 +66,6 @@ Tireless moderators of [r/btc](https://old.reddit.com/r/btc) (very important c
 
 **awemany** - [Bitcoin Unlimited](https://www.bitcoinunlimited.info/), [Bitcoin ABC](https://www.bitcoinabc.org/), Storm, inflation bug finder extraordinaire
 
-**Antony Zegers** - [Bitcoin ABC](https://www.bitcoinabc.org/), formerly also [Bitcoin Unlimited](https://www.bitcoinunlimited.info/)
-
 **Andrea Suisani** - [Bitcoin Unlimited](https://www.bitcoinunlimited.info/), helped to create [Bitcoin ABC](https://www.bitcoinabc.org/) 
 
 **Dagur Valberg Johannsson** - [Bitcoin XT](https://en.wikipedia.org/wiki/Bitcoin_XT), [Bitcoin Unlimited](https://www.bitcoinunlimited.info/), ABC, [Electron Cash](https://electroncash.org/)
@@ -124,8 +122,6 @@ Anonymous creator of [txstreet.com](https://txstreet.com/)
 
 **Corentin Mercier** - [This guy](https://merc1er.com/) is spreading Bitcoin Cash adoption to merchants like crazy; created [telegram BCH tipperbot](https://t.me/BCHtipbot)
 
-**donwonton** - The guy behind the "[Decentralized Thought](https://www.youtube.com/channel/UCMpAklXQxme_wZi3sdHdHVQ)" YouTube channel where [Craig Wright shows off his watches](https://www.youtube.com/watch?v=BMKBd0x6TNA) in an attempt to humiliate donwonton but he handled it gracefully
-
 **Emil Oldenburg** - [CTO of Bitcoin.com](https://twitter.com/emilolden) and really smart guy
 
 **Gavin Andresen** - Satoshi Nakamoto handed over the development of Bitcoin to [Gavin Andresen](https://twitter.com/gavinandresen) and is one of the granddaddy of cryptocurrencies
@@ -164,8 +160,6 @@ Anonymous creator of [txstreet.com](https://txstreet.com/)
 
 **tracyspacy** - Creator of [memopay.xyz](https://memopay.xyz/) where you can advertise your products/services directly to Bitcoin Cash users
 
-**Shammah Chancellor** - ex-[ABC](https://www.bitcoinabc.org/) developer
-
 **@Hostfat** - moderator of many BCH chats, beta-tester of many applications, great collaborator of the community
 
 **Collin Enstad** - host of [Collin' It Like It Is](https://www.youtube.com/channel/UCGKUQoz7AzGxziNqHFS_2Rg)
@@ -187,6 +181,12 @@ Anonymous creator of [txstreet.com](https://txstreet.com/)
 **Tom Harding** - [Bitcoin XT](https://en.wikipedia.org/wiki/Bitcoin_XT) lead developer, [BCH DAA](https://news.bitcoin.com/bitcoin-cash-networks-block-intervals-settle-with-new-daa/) & double spend research
 
 **apagut** - [HandCash](https://handcash.io/)
+
+**Shammah Chancellor** - ex-[ABC](https://www.bitcoinabc.org/) developer
+
+**Antony Zegers** - [Bitcoin ABC](https://www.bitcoinabc.org/), formerly also [Bitcoin Unlimited](https://www.bitcoinunlimited.info/)
+
+**donwonton** - The guy behind the "[Decentralized Thought](https://www.youtube.com/channel/UCMpAklXQxme_wZi3sdHdHVQ)" YouTube channel where [Craig Wright shows off his watches](https://www.youtube.com/watch?v=BMKBd0x6TNA) in an attempt to humiliate donwonton but he handled it gracefully
 
 ## Notable sources
 

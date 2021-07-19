@@ -1,38 +1,47 @@
-# JavaScript (in browser)
+# JavaScript (client wallets)
 
-::: danger
+## Introduction
 
-Note: This site is a work-in-progress and the mainnet library is currently in a prototype stage.
-Things may and will change randomly. There is no backward compatibility guarantee yet,
-even though we try not to break things too often. Use at your own risk. To see the old site with the full plan
-(yet to be implemented), go [here](https://web.archive.org/web/20200810182937/https://mainnet.cash/).
+Our Javascript library is designed so you can rapidly and easily provide secure financial services to your users using 
+standard web development knowledge. You no longer have to be a blockchain wizard to give the powers of magic internet 
+money to your customers.
 
-:::
+With this library you will be able to create advanced, non-custodial, in-browser wallets.
 
-::: tip A working demo
-
-You can see a fully working demo [here](https://jsfiddle.net/5oc2uw9a/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
-
-:::
+<p style="font-size: 90%;">The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>.
+Things may change randomly. There is no backward compatibility guarantee yet,
+even though we try not to break things too often.</p>
 
 <!-- Your stack: Browser + IndexedDB PHP Other -->
 
 ## Let's get programming
 
-Note that this tutorial describes `Browser + IndexedDB` approach, which means that the wallets will be created
-and persisted inside of a user browser. See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other-languages.html) for other approaches.
+Note that this tutorial mostly describes `Browser + IndexedDB` approach, which means that the wallets will be created
+and persisted inside of a user browser. 
+
+See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other-languages.html) for other approaches.
+
+### node.js / webpack
+
+Install using:
+
+```sh
+npm install mainnet-js
+```
+
+### &lt;script> tag in HTML
 
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.2.28.js"
- integrity="sha384-yNARexmnMZlxKP+/hVma4GE3pLz61GvdbS0JD5uvIRDTSfigiwpLghUG3aRlYcL2"
+<script src="https://cdn.mainnet.cash/mainnet-0.3.30.js"
+ integrity="sha384-77X9TtfBsIy5iUm4Y8VfVNRy8Ym1T5U0JJQYW13NR4LTaZeL6tNE4esP7HRGhW+6"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.2.28.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.3.30.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -51,12 +60,13 @@ This creates a **TestNet** wallet.
 ::: tip What is TestNet? Where to get TestNet money and a wallet?
 
 `TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
-which is what people usually mean when they talk about Bitcoin Cash network.  You can get free TestNet money [here](https://faucet.fullstack.cash/).
+which is what people usually mean when they talk about Bitcoin Cash network.  You can get free TestNet money using 
+the `getTestnetSatoshis()` call (see below) or [here](https://faucet.fullstack.cash/).
+
 If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and
 run it using `electron-cash --testnet` flag. For example, on MacOS that would be:
 
 `/Applications/Electron-Cash.app/Contents/MacOS/Electron-Cash --testnet`
-
 
 :::
 
@@ -69,7 +79,7 @@ const wallet = await Wallet.newRandom();
 If you want to create a wallet from a mnemonic seed phrase, use this call:
 
 ```js
-const wallet = Wallet.fromSeed('.....');
+const wallet = await Wallet.fromSeed('.....');
 ```
 
 ::: tip
@@ -79,24 +89,37 @@ Seed phrase wallets use the derivation path `m/44'/0'/0'/0/0` by default (Bitcoi
 Optionally, a [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) derivation path may be added as a second argument.
 
 ```js
-const wallet = Wallet.fromSeed("horse duck stapler...", "m/44'/1'/145'/0/0");
+const wallet = await Wallet.fromSeed("horse duck stapler...", "m/44'/1'/145'/0/0");
 ```
 
 If you want to create a wallet from a WIF (private key), use this call:
 
 ```js
-const wallet = Wallet.fromWIF('.....');
+const wallet = await Wallet.fromWIF('.....');
 ```
 
-Networks: 
+::: danger Keep the private key and the seed phrase secret
+
+Remember to keep the private key (in "WIF" form) and/or the seed phrase (aka "mnemonic") secret as they allow spending money from this wallet.
+You can access them using `wallet.privateKeyWif` and `wallet.mnemonic` (you'll also need the derivation path from `wallet.derivationPath`)
+
+:::
+
+Available networks: 
 
 - mainnet: `Wallet`
 - Testnet: `TestNetWallet`
 - RegTest: `RegTestWallet` ([see below](#regtest-wallets))
 
+::: tip
+
+You can see a working demo [here](https://jsfiddle.net/5oc2uw9a/) and a video of it [here](https://www.youtube.com/watch?v=6Z4ef2Isod4)
+
+:::
+
 ## Named wallets (persistent)
 
-Named wallets are used to saved the private key generated by the browser, so that you
+Named wallets are used to save the private key generated by the browser, so that you
 can run ```await Wallet.named(`user`)``` and always get the same wallet back.
 
 Note that it's better to run something like ```await Wallet.named(`user:${id}`)```, i.e. use some ID of the user,
@@ -110,14 +133,47 @@ const wallet = await TestNetWallet.named('user:1234');
 
 `user:1234` is an optional name for the wallet. The wallet is saved in user's browser for future re-use.
 
-## Getting the balance
-
-To get the balance of the wallet you can do this:
+To check if a named wallet already exists in the storage, you can invoke:
 
 ```js
-await seller.getBalance('usd') // 0.00
-await seller.getBalance('bch') // 0.00
-await seller.getBalance('sat') // 0
+const walletExists = await TestNetWallet.namedExists('user:1234');
+```
+
+Say a user of your application has wiped the website data and his IndexedDB is now empty. But they still has the seed and derivation path info. A named wallet can be replaced (recovered) with the existing `walletId`:
+
+```js
+const seed = "diary caution almost ...";
+const derivationPath = "m/44'/0'/0'/0/0";
+const walletId = `seed:testnet:${seed}:${derivationPath}`;
+const wallet = await TestNetWallet.replaceNamed('user:1234', walletId);
+```
+
+If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
+
+### Watch-only wallets
+
+Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of adress' balances, subscribe to its incoming and outgoing transactions, etc.
+
+They are constructed from a cashaddress as follows:
+
+```js
+const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567...');
+```
+
+## Getting the balance
+
+To get the balance of the wallet you can use `getBalance` method:
+
+```js
+await wallet.getBalance() // { bch: 0.20682058, sat: 20682058, usd: 91.04 }
+```
+
+If you want to receive balance as number denominated in a unit of your choice, you can call `getBalance` with an argument:
+
+```js
+await wallet.getBalance('usd') // 91.04
+await wallet.getBalance('bch') // 0.20682058
+await wallet.getBalance('sat') // 20682058
 ```
 
 You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in case you forget the exact name).
@@ -125,16 +181,7 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 - 1 satoshi = 0.000 000 01 Bitcoin Cash
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
-`USD` returns the amount at the current exchange rate.
-
-### Watch-only wallets
-
-You can find out a balance of any cashaddr (say `bchtest:qq1234567`) like this:
-
-```js
-const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567');
-await wallet.getBalance('usd');
-```
+`usd` returns the amount at the current exchange rate, fetched from CoinGecko or Bitcoin.com.
 
 ## Sending money
 
@@ -144,11 +191,41 @@ Let's create another wallet and send some of our money there:
 const seller = await TestNetWallet.named('seller');
 
 const txData = await wallet.send([
-    [seller.depositAddress(), 0.01, 'USD'],
+  {
+    cashaddr: seller.getDepositAddress(),
+    value: 0.01,
+    unit: 'usd',
+  }
 ]);
 ```
 
-Note that you can send to many addresses at once. There are also some options about how money is spent, such as specifying which unspent outputs are used as inputs.
+... which returns an object containing the remaining balance and the transaction ID:
+
+```js
+{
+  txId: "2fc2...af",
+  balance: {bch: 1.0, sat: 100000000, usd: 1000.00}
+}
+```
+
+
+Note that you can send to many addresses at once.
+
+If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>,
+you have to use the `wallet.slpAware().send([...])` method to prevent accidental token burning.
+SLP checks are a bit slow, so they are opt-in.
+
+#### Options
+
+There is also an `options` parameter that specifies how money is spent.
+
+* `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
+* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs
+* `changeAddress` cash address to receive change to
+* `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
+* `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
+
+#### Getting balance
 
 Let's print the balance of the seller's wallet:
 
@@ -162,7 +239,16 @@ Great! You've just made your first transaction!
 Now you can send all of your money somewhere else:
 
 ```js
-const txData = await seller.sendMax(wallet.depositAddress());
+const txData = await seller.sendMax(wallet.getDepositAddress());
+```
+
+... which also supports `options` object and returns:
+
+```js
+{
+  txId: "2fc2...af",
+  balance: {bch: 0, sat: 0, usd: 0}
+}
 ```
 
 ## Waiting for a transaction
@@ -232,14 +318,28 @@ We currently fully support the SLP type 1 tokens [specification](https://slp.dev
 
 The interfaces were designed to be largely similar to those of BCH wallets.
 
-The SLP functionality is available via Wallet.slp accessor:
+Creating an SLP enabled wallet is similar to a BCH one, just add an `.slp` static accessor after the wallet class you want to use:
 
 ```js
-const wallet = await TestNetWallet.fromId("testnet:wif:qq...")
+const wallet = await TestNetWallet.slp.newRandom();
+```
 
-const slpAddress = wallet.slp.getDepositAddress()
+The SLP wallets are using the `m/44'/245'/0'/0/0` BIP44 derivation path unlike normal BCH wallets which use `m/44'/0'/0'/0/0`. This is done to lower the chances of accidental token burns.
 
-const qrCode = wallet.slp.getDepositQr()
+If you want to instantiate an SLP wallet which will use a different derivation path (assuming you already have your BIP39 seed phrase):
+
+```js
+const wallet = await Wallet.slp.fromSeed("diary caution almost ...", "m/44'/123'/0'/0/0");
+```
+
+Note, that SLP-enabled wallets are by default SLP aware and token burn checks are ensured when spending UTXOs.
+
+The SLP functions are then available via Wallet.slp accessor:
+
+```js
+const slpAddress = wallet.slp.getDepositAddress();
+
+const qrCode = wallet.slp.getDepositQr();
 ```
 
 Note, that working with SLP tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the SLP transactions.
@@ -283,8 +383,18 @@ If you decide to increase the token circulation supply, you would need to `mint`
 In the following example we issue 50 more tokens we just created in genesis:
 
 ```js
-const {txId, balance} = await wallet.slp.mint(50, tokenId)
+const mintOptions = {
+  value: "50",
+  tokenId: tokenId,
+  endBaton: false,
+  tokenReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
+  batonReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
+}
+
+const {txId, balance} = await wallet.slp.mint(mintOptions);
 ```
+
+Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the minting baton to other authority.
 
 ### Sending tokens
 
@@ -614,7 +724,7 @@ In the case that you only have Charlie's cashaddr,
 it won't be possible to get the full public key,
 but a public key hash may be used in the contract instead
 ```js
-const charlie = await TestNetWallet.newRandom();
+const charlie = await TestNetWallet.watchOnly("bchtest:qqz52tne6ny78tltw82f0tufcum0752zg5tnwcf0v9")
 ```
 In javascript, the contract can take a binary argument as a Uint8Array or 
 hexadecimal strings just like CashScript, but passing passing `true`
@@ -737,7 +847,7 @@ In this section, we'll revisit the escrow contract and see ways to cause the con
 
 This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
 
-### Step 1, "oh yeah, the fees"
+### Step 1, "Neglect the fees"
 
 Small transaction fees are currently used on Bitcoin Cash to make the cost of a large spam attack non-trivial to the attacker. There are other finite measures, such as coindays (or the age of coins being spent). However, for a the time being, Bitcoin Cash software largely agrees to use 1 sat/byte, because the mechanism was simple to implement across a lot of diverse and interconnected software.
 
@@ -836,9 +946,9 @@ await escrow.call(buyer.privateKeyWif, "spend");
 
 ```
 
-### Step 2, rejection by network rules.
+### Step 2, Rejection by network rules.
 
-A library can handle some common errors around a static contract, but if you develop your own contract (or have issues with the builtin escrow contract), the transaction is likely to be rejected by the network because the rules of the contract don't authorize funds to be spent.
+A library can handle some common errors around a static contract, but if you develop your own contract (or have issues with the builtin escrow contract), a transaction may be rejected by the network because the rules of the contract don't authorize funds to be spent.
 
 Let's do this with the same escrow contract from above and see how to figure out what happened.
 
@@ -851,7 +961,7 @@ await escrow.getBalance()
 // 20837
 ```
 
-Now lets break the rules and attempt to `refund` with the seller's key
+Now lets attempt to break the rules by `spend`ing to the seller's address, with the seller's key
 
 
 ```js
@@ -871,11 +981,11 @@ In the above error output, we see the operation that failed was `OP_VERIFY` and 
 
 ![Meep](./assets/escrow_seller_spend_meep.png)
 
-Stepping through the Bitcoin Script in `meep`, we can see the translation of the CashScript contract. The contract repeats the same pattern with the `spend` and `refund` blocks in an if,else,endif structure. And that the failure occurs in the on an `OP_VERIFY` in the first or `spend` block.
+Stepping through the Bitcoin Script in `meep`, we can see the translation of the CashScript contract to Bitcoin Script. The contract repeats the same pattern with the `spend` and `refund` blocks in an `if,else,endif` structure. And that the failure occurs on an `OP_VERIFY` in the first or `spend` block.
 
-We can also see in the `RedeemScript` section that the nonce (`88bcc308`), amount (`204e`), as well as the public key hashes for the arbiter (`0048...b033`), buyer and seller.  These are the arguments to our CashScript function, but reversed order.  
+We can also see in the `RedeemScript` section that the nonce (`88bcc308`), amount (`204e`), as well as the public key hashes for the arbiter (`0048...b033`), buyer and seller.  These are the arguments to our CashScript function, but in reversed order.  
 
-Walking through the contract with meep, we can see that there are two `OP_HASH160` operations performed and then the contract fails on `OP_VERIFY`.  Looking at the escrow contract, it should be clear that this corresponds to the highlighted line in the `spend` function, where the contract requires that either the `arbiterPkh` or `buyerPkh` match the `signingPkh` provided.  
+Walking through the contract with `meep`, we can see that there are two `OP_HASH160` operations performed and then the contract fails on `OP_VERIFY`.  Looking at the escrow contract, it should be clear that this corresponds to the highlighted line in the `spend` function, where the contract requires that either the `arbiterPkh` or `buyerPkh` match the `signingPkh` provided.  
 
 
 ```solidity{5}
@@ -910,7 +1020,6 @@ To examine the execution of a transaction that would succeed, we can call a the 
 await escrow.call(buyer.privateKeyWif, "spend", undefined, true);
 ```
 
-
 This will return the hex of the transaction with the buyer spending the funds.
 
 ```json
@@ -925,11 +1034,20 @@ This can be passed to `meep` to see how the Bitcoin Script would be executed.
 meep debug --tx=020000000191eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000fdcf020437dd393402214e41863b47e9de111d43b48c4dc4f7d87fa8c07daab8cf3ee45753a1eba31d71933c2088f1716c8f9b1b0f3f123137c656d55bf5721af754dd418b063d3fb267c3f4412103a7ca01e2f5eaaa30e36d2d6687a88dae3cb4531ec6573f2793bcf37d1cb200e34d7d0102000000af4e505b95af3b69f119865b3e1f81bad1ba191e4adc2c61bd5fa450359eda9618606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe19891eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000e00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff947dfa2869621f5af52e85b6c88641f864c9e36791808a8db94b6491f0dc443f8502000041000000004ce00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a9141136f7ac42b3d65345906b2228d5644f0f1c7c3b88ac85020000 --idx=0 --amt=20837 --pkscript=a91430392b5580c38e409fec5810045d59a62531ef2f87
 ```
 
-Passing the hex with appropriate arguments will show the execution stack for your Bitcoin Script at each stage, in the above case finishing without error.
+Passing the hex with appropriate arguments will show the execution stack for your Bitcoin Script at each stage, using the above command, it should finish without error.
 
 
 ## Utilities
 
+### Decoding transactions
+
+You can decode a transaction by its hash (if it *already exists* on the blockchain) or full raw contents in hex format using the following snippet:
+
+```js
+  const decoded = await Wallet.util.decodeTransaction("36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d", true);
+```
+
+The returned object is compatible with [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get) with extra information about input values and cash addresses if `loadInputValues` parameter is specified and set to `true`.
 
 ### Currency conversions
 
@@ -940,7 +1058,108 @@ await convert(100, "usd", "sat")
 // 28067024
 ```
 
-[filename](_regtest.md ':include')
+## Signed Messages
+
+One of the perks of having a wallet is the ability to sign message text or verify the signatures of other parties using their public key.
+
+Full-nodes and SPV wallets often include this feature as standard. 
+
+### Signing a message with a wallet
+
+Let's try signing with an example from a common test case:
+
+```js
+message = "Chancellor on brink of second bailout for banks"
+francisWallet = await Wallet.fromWIF(
+      `L1TnU2zbNaAqMoVh65Cyvmcjzbrj41Gs9iTLcWbpJCMynXuap6UN`
+    );
+
+francisWallet.cashaddr
+// "bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7eatdkqt05lt3nw"
+
+signature = (await francisWallet.sign(message)).signature;
+// H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y=
+
+// or 
+
+sigResult = await francisWallet.sign(message);
+```
+Where the full `sigResult` result is:
+```json
+
+{
+  "raw": {
+    "ecdsa": "/2Mw6ePgwVsfd3u3jIJD2LsOBlT9VnbvzDf7JK/YXjIix2qOxzmeDeSY3w5kBOGDJ8Jk5DFkJbNr1XlfOVVjRg==",
+    "schnorr": "rSeWfhxN6tI+3hNQpHwU6E+pZC34rk6gR/h8hqxS0YjUd6mxsOd4OCmMkGJXsqNvVZ1F/Fs/Y81dyzSDBhxp9w==",
+    "der": "MEUCIQD/YzDp4+DBWx93e7eMgkPYuw4GVP1Wdu/MN/skr9heMgIgIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
+  },
+  "details": {
+    "recoveryId": 0,
+    "compressed": true,
+    "messageHash": "gE9BDBFAOqW+yoOzABjnM+LQRWHd4dvUVrsTR+sIWsU="
+  },
+  "signature": "H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
+}
+```
+
+::: danger Please be aware
+ The above contains both ECDSA and Schnorr signatures. If they had been created using the same random nonce, an attacker could derive the private key. To avoid this risk, the underlying library ([libauth](https://libauth.org/interfaces/secp256k1.html#signmessagehashschnorr)) uses nonces for Schorr signatures with the additional data field set to `Schnorr+SHA256`. Such measures are an important security requirement for any financial software producing both types of signatures. 
+:::
+
+For most cases, the relevant information here is the `"signature"` field, which can be used in an SPV wallet such as electron cash or with [bitcoin.com's verify tool](https://tools.bitcoin.com/verify-message/). The following signature will validate as belonging to Francis' address:
+
+
+**Bitcoin Address:**  bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7eatdkqt05lt3nw
+
+**Message:**          Chancellor on brink of second bailout for banks
+
+**Signature:**        H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y=
+
+It should also be noted that the signature is "recoverable", meaning the `publicKey` can be derived from it and the message.  This is important when validating against a `cashaddr`, because only a `publicKeyHash` can be derived from a `cashaddr`.
+
+If one of the `"raw"` signatures are used instead, the `publicKey` may have to be passed manually.
+
+### Verifying a message with a wallet
+
+To verify the above signature (without having access to the private key), by using a `watchOnly` wallet to represent the party in the example above.
+
+
+```js
+
+francisPublic = await Wallet.watchOnly("bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7eatdkqt05lt3nw")
+
+message = "Chancellor on brink of second bailout for banks"
+sig = "H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
+
+verifyResult = await francisPublic.verify(message, sig);
+```
+
+where `verifyResult` is
+
+```json
+{
+  "valid": true,
+  "details": {
+    "signatureValid": true,
+    "signatureType": "recoverable",
+    "messageHash": "gE9BDBFAOqW+yoOzABjnM+LQRWHd4dvUVrsTR+sIWsU=",
+    "publicKeyHashMatch": true
+  }
+}
+```
+
+In the default case, with a `"signatureType"` of `"recoverable"`, the cashaddr `publicKeyHash` has been checked against the hashed `publicKey`, which is recovered from the provided message and signature.
+
+Under the hood, all signature types, the message is serialized or formatted in four parts before hashing:
+
+```
+\x18                       // 1) length the prefix
+Bitcoin Signed Message:\n  // 2) A prefix w/newline
+<\x???>                    // 3) length of the message
+<message>                  // 4) the message string as utf8 encoded binary 
+```
+
+The above message formatting is typically handled automatically by the signing software (i.e. wallet.sign(...)), and the `messageHash` is the double sha256 of the above as binary. For verification, only if the signature itself is valid **and** the recovered `publicKey` is valid for the provided `cashaddr` will the response have `"valid":true`, and the additional details given may be safely ignored in most cases.
 
 ## RegTest wallets
 
@@ -1028,4 +1247,4 @@ await conn.networkProvider.getBlockHeight()
 // 669347
 ```
 
-This connection can be used to replace the common provider on `glboalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet.
+This connection can be used to replace the common provider on `globalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet.

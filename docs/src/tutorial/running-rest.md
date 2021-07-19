@@ -2,12 +2,21 @@
 
 The REST service is an express javascript app run from nodejs. The project is largely generated from the swagger definition. It uses the bundled library of the root project to complete requests and also serves documentation.
 
+## Restricting remote calls with API_KEY
+
+`API_KEY` environment variable controls the server security.
+
+If not set (default) any request will be served.
+
+If set to a certain value, clients must provide `Authorization: bearer <token>` HTTP header with `<token>` set to the value exactly corresponding to the `API_KEY` value. We currently use single API key which has global scope, e.g. all methods will require it.
+
+Example for booting up the cluster would be the following: `API_KEY=s3cr3t yarn api:serve:cluster`
+
 ## Requirements
 
 The REST server requires a postgres database to store named wallets. This setting is loaded via the `DATABASE_URL` environment variable.
 
 In development and testing, the url: `postgres://postgres:trusted@localhost:15432/wallet` is loaded automatically from `/.env.regtest`.
-
 
 ### Docker (exposed on localhost) <Badge text="recommended" type="tip"/>
 
@@ -61,7 +70,7 @@ cd mainnet-js
 npm i -g yarn
 yarn install
 yarn build
-yarn api:server:install
+yarn api:serve:install
 PORT=3000 WORKERS=5 yarn api:serve:cluster
 ```
 
@@ -98,6 +107,7 @@ The following variables are available to configure the REST server:
 | `TIMEOUT` | Request timeout (seconds)  | `60` |
 | `WORKERS` | Number of threads  | `10` |
 | `DATABASE_URL` | Postgres URL  | `undefined` |
+' `API_KEY` | API Key | `undefined` |
 
 The node package also has the following variables to control which electrum cash servers it connects to and how:
 
@@ -115,3 +125,5 @@ ELECTRUM="wss://fulcrum.fountainhead.cash,wss://bch.imaginary.cash:50004"
 ```
 
 Where the number of servers that must agree is controlled with `ELECTRUM_CONFIDENCE`
+
+See [here](/node.html) for instructions how to run your own Bitcoin Cash node and Fulcrum.
