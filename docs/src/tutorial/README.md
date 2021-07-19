@@ -34,14 +34,14 @@ npm install mainnet-js
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.3.29.js"
- integrity="sha384-2E/MjZdjyAYlQSP/7LkNyZdQ2oI/4/9x+CmqDlOSVSUiQvPrD4BtN4SCxADA7xGL"
+<script src="https://cdn.mainnet.cash/mainnet-0.3.30.js"
+ integrity="sha384-77X9TtfBsIy5iUm4Y8VfVNRy8Ym1T5U0JJQYW13NR4LTaZeL6tNE4esP7HRGhW+6"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.3.29.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.3.30.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
