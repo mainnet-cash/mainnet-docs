@@ -2,8 +2,7 @@
 
 ## Introduction
 
-Our REST API allows you to create advanced, performant, and secure financial applications without the usual complexity 
-of blockchain development.
+Our REST API allows you to create advanced, performant, and secure financial applications without the usual complexity of blockchain development.
 
 By deploying our REST API on your server, creating enterprise-level cryptocurrency applications becomes effortless.
 
@@ -41,24 +40,24 @@ Response:
 }
 ```
 
-This creates a **TestNet** wallet.  This has the cashaddress of the wallet, where you can send money, and the `walletId`. 
-Note the `walletId` - we're going to need it later. This wallet will not be persisted. See below for persistent wallets. 
+This creates a **TestNet** wallet.  This has the cashaddress of the wallet, where you can send money, and the `walletId`.
+Note the `walletId` - we're going to need it later. This wallet will not be persisted. See below for persistent wallets.
 
 ::: danger walletId contains the private key
 
 Keep `walletId` a secret as it contains the private key that allows spending from this wallet. WalletId, Seed phrase, WIF - all
-these are a form of a private key. 
+these are a form of a private key.
 
 :::
 
 ::: tip What is TestNet? Where to get TestNet money and a wallet?
 
-`TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`, 
-which is what people usually mean when they talk about Bitcoin Cash network.  
+`TestNet` is where you test your application. TestNet money has no price. Opposite of TestNet is `MainNet`,
+which is what people usually mean when they talk about Bitcoin Cash network.
 
 You can get free TestNet money using our TestNet faucet (see below) or [here](https://faucet.fullstack.cash/).
 
-If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and 
+If you need a wallet that supports the TestNet, download [Electron Cash](https://electroncash.org/) and
 run it using `electron-cash --testnet` flag. For example, on MacOS that would be:
 
 `/Applications/Electron-Cash.app/Contents/MacOS/Electron-Cash --testnet`
@@ -66,7 +65,7 @@ run it using `electron-cash --testnet` flag. For example, on MacOS that would be
 
 :::
 
-To create a MainNet wallet (Bitcoin Cash production network): 
+To create a MainNet wallet (Bitcoin Cash production network):
 
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
@@ -168,6 +167,19 @@ Response:
 
 If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
 
+
+### Watch-only wallets
+
+Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of adress' balances, subscribe to its incoming and outgoing transactions, etc.
+
+They are constructed from a cashaddress by building a `walletId` like this:
+
+```
+watch:testnet:bchtest:qq1234567
+```
+
+...and then doing the regular wallet querues like `wallet/balance`.
+
 ## Getting the balance
 
 To get the balance of your wallet you can do this (use the `walletId` that you got previously):
@@ -183,7 +195,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
 Response:
 
 ```json
-{"bch": 0, "sat": 0, "usd": 0}
+{"bch": 0.20682058, "sat": 20682058, "usd": 91.04}
 ```
 
 Or you can use `unit` in the call to get just the number:
@@ -192,7 +204,7 @@ Or you can use `unit` in the call to get just the number:
 curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
   -H "Content-Type: application/json" \
   -d '{
-    "walletId": "named:testnet:wallet_1", 
+    "walletId": "named:testnet:wallet_1",
     "unit": "sat"
   }'
 ```
@@ -208,22 +220,11 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 - 1 satoshi = 0.00000001 Bitcoin Cash (1/100,000,000th)
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
-`USD` returns the amount at the current exchange rate. 
-
-
-### Watch-only wallets
-
-You can find out a balance of any cashaddr (say `bchtest:qq1234567`) by building a `walletId` like this:
-
-```
-watch:testnet:bchtest:qq1234567
-```
-
-...and then doing the regular `wallet/balance` query.
+`usd` returns the amount at the current exchange rate, fetched from CoinGecko or Bitcoin.com.
 
 ## Sending money
 
-Let's create another wallet and send some of our money there. 
+Let's create another wallet and send some of our money there.
 
 Remember, that first you need to send some satoshis to the cashaddr of your original wallet (see the TestNet note above).
 
@@ -261,13 +262,6 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
 
 Note that you can send to many addresses at once.
 
-It is also possible to specify which unspent outputs are used to send
-funds from by specifying a list of `utxoIds` in `options`: `"options": {"utxoIds": ["...", "..."]}`,
-see [wallet/utxo](https://rest-unstable.mainnet.cash/api-docs/#/wallet/utxos).
-
-<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
-SLP checks are a bit slow, so they are opt-in.
-
 Response:
 
 ```json
@@ -277,8 +271,23 @@ Response:
 }
 ```
 
+#### Options
+
+There is also an `options` parameter that specifies how money is spent.
+
+* `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
+* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs
+* `changeAddress` cash address to receive change to
+* `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
+* `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
+
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
+SLP checks are a bit slow, so they are opt-in.
+
 You get the transaction ID (txid) that [you can see on the TestNet block explorer](https://explorer.bitcoin.com/tbch/tx/316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69)
 and the balance left in the original wallet.
+
+#### Getting balance
 
 Let's print the balance of `...z2pu` wallet:
 
@@ -299,7 +308,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
   }'
 ```
 
-This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs and SLP awareness.
+This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs, SLP awareness and others (see above).
 
 ## Waiting for a transaction
 
@@ -1379,14 +1388,15 @@ Certain tools common in bitcoin-like currencies may not be in a standard library
 
 ### Decoding transactions
 
-You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
+You can decode a transaction by its hash (if it *already exists* on the blockchain) or full raw contents in hex format using the following snippet:
 
 ```bash
 curl -X POST https://rest-unstable.mainnet.cash/wallet/util/decode_transaction \
   -H "Content-Type: application/json" \
   -d '{
   "network": "mainnet",
-  "transactionHashOrHex": "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098"
+  "transactionHashOrHex": "36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d",
+  "loadInputValues": true
 }'
 ```
 
@@ -1394,22 +1404,51 @@ Response:
 
 ```js
 {
-  blockhash: '00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
-  blocktime: 1231469665,
-  confirmations: 695463,
-  hash: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
-  hex: '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000',
-  locktime: 0,
-  size: 134,
-  time: 1231469665,
-  txid: '0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098',
-  version: 1,
-  vin: [ { coinbase: '04ffff001d0104', sequence: 4294967295 } ],
-  vout: [ { n: 0, scriptPubKey: [Object], value: 50 } ]
-}
+    {
+      "vin": [
+        {
+          "scriptSig": {
+            "hex": "4730440220..."
+          },
+          "sequence": 4294967294,
+          "txid": "84b4c10680c4b74c04f7d858511c42a6c208bae93f4d692983830a962c14b95b",
+          "vout": 0,
+          "address": "bitcoincash:qpcycvlv8xudnxdqhy7hfvxhtj62d6mxzvtl2ahsyx",
+          "value": 0.22175736
+        }
+      ],
+      "vout": [
+        {
+          "n": 0,
+          "scriptPubKey": {
+            "addresses": [
+              "bitcoincash:qqgyr7czf0t6zvuw7x2eqf4mh2rqqe87tudgnnjjk4"
+            ],
+            "hex": "76a9141041fb024bd7a1338ef1959026bbba860064fe5f88ac"
+          },
+          "value": 0.0856647
+        },
+        {
+          "n": 1,
+          "scriptPubKey": {
+            "addresses": [
+              "bitcoincash:qpza4sgsywd85wq52dwptpvtjwfpr7zjnqj2wqltx3"
+            ],
+            "hex": "76a91445dac110239a7a3814535c15858b939211f8529888ac"
+          },
+          "value": 0.1360904
+        }
+      ],
+      "locktime": 519777,
+      "version": 1,
+      "hash": "36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d",
+      "hex": "0100000001...",
+      "txid": "36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d",
+      "size": 225
+    }
 ```
 
-The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+The returned object is compatible with [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get) with extra information about input values and cash addresses if `loadInputValues` parameter is specified and set to `true`.
 
 ### Currency conversions
 

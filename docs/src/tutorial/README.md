@@ -34,14 +34,14 @@ npm install mainnet-js
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.3.23.js"
- integrity="sha384-yNARexmnMZlxKP+/hVma4GE3pLz61GvdbS0JD5uvIRDTSfigiwpLghUG3aRlYcL2"
+<script src="https://cdn.mainnet.cash/mainnet-0.3.30.js"
+ integrity="sha384-77X9TtfBsIy5iUm4Y8VfVNRy8Ym1T5U0JJQYW13NR4LTaZeL6tNE4esP7HRGhW+6"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0,3,16.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.3.30.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -150,14 +150,30 @@ const wallet = await TestNetWallet.replaceNamed('user:1234', walletId);
 
 If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
 
-## Getting the balance
+### Watch-only wallets
 
-To get the balance of the wallet you can do this:
+Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of adress' balances, subscribe to its incoming and outgoing transactions, etc.
+
+They are constructed from a cashaddress as follows:
 
 ```js
-await seller.getBalance('usd') // 0.00
-await seller.getBalance('bch') // 0.00
-await seller.getBalance('sat') // 0
+const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567...');
+```
+
+## Getting the balance
+
+To get the balance of the wallet you can use `getBalance` method:
+
+```js
+await wallet.getBalance() // { bch: 0.20682058, sat: 20682058, usd: 91.04 }
+```
+
+If you want to receive balance as number denominated in a unit of your choice, you can call `getBalance` with an argument:
+
+```js
+await wallet.getBalance('usd') // 91.04
+await wallet.getBalance('bch') // 0.20682058
+await wallet.getBalance('sat') // 20682058
 ```
 
 You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in case you forget the exact name).
@@ -165,16 +181,7 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 - 1 satoshi = 0.000 000 01 Bitcoin Cash
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
-`USD` returns the amount at the current exchange rate.
-
-### Watch-only wallets
-
-You can find out a balance of any cashaddr (say `bchtest:qq1234567`) like this:
-
-```js
-const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567');
-await wallet.getBalance('usd');
-```
+`usd` returns the amount at the current exchange rate, fetched from CoinGecko or Bitcoin.com.
 
 ## Sending money
 
@@ -184,7 +191,11 @@ Let's create another wallet and send some of our money there:
 const seller = await TestNetWallet.named('seller');
 
 const txData = await wallet.send([
-    [seller.depositAddress(), 0.01, 'USD'],
+  {
+    cashaddr: seller.getDepositAddress(),
+    value: 0.01,
+    unit: 'usd',
+  }
 ]);
 ```
 
@@ -198,14 +209,23 @@ const txData = await wallet.send([
 ```
 
 
-Note that you can send to many addresses at once. 
+Note that you can send to many addresses at once.
 
-If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>, 
+If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>,
 you have to use the `wallet.slpAware().send([...])` method to prevent accidental token burning.
 SLP checks are a bit slow, so they are opt-in.
 
-There is also an `options` parameter that specifies how money is spent, for example specifying which 
-unspent outputs are used as inputs: `{utxoIds: ["...", "..."]}`. SLP awareness can also be passed as a member of `options` parameter: `{slpAware: true}`.
+#### Options
+
+There is also an `options` parameter that specifies how money is spent.
+
+* `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
+* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs
+* `changeAddress` cash address to receive change to
+* `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
+* `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
+
+#### Getting balance
 
 Let's print the balance of the seller's wallet:
 
@@ -219,10 +239,10 @@ Great! You've just made your first transaction!
 Now you can send all of your money somewhere else:
 
 ```js
-const txData = await seller.sendMax(wallet.depositAddress());
+const txData = await seller.sendMax(wallet.getDepositAddress());
 ```
 
-... which also returns:
+... which also supports `options` object and returns:
 
 ```js
 {
@@ -1021,13 +1041,13 @@ Passing the hex with appropriate arguments will show the execution stack for you
 
 ### Decoding transactions
 
-You can decode a transaction *already existing* on the blockchain by its hash or full raw contents in hex format using the following snippet:
+You can decode a transaction by its hash (if it *already exists* on the blockchain) or full raw contents in hex format using the following snippet:
 
 ```js
-  const decoded = await Wallet.util.decodeTransaction("0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098");
+  const decoded = await Wallet.util.decodeTransaction("36a3692a41a8ac60b73f7f41ee23f5c917413e5b2fad9e44b34865bd0d601a3d", true);
 ```
 
-The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+The returned object is compatible with [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get) with extra information about input values and cash addresses if `loadInputValues` parameter is specified and set to `true`.
 
 ### Currency conversions
 
