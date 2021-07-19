@@ -366,6 +366,56 @@ const actualBalance = await wallet.slp.waitForBalance(10, tokenId);
 
 This will halt the program execution until the balance reaches the target value.
 
+### Non-fungible tokens (NFT)
+
+NFT1 is a simple extension to the SLP token type 1 protocol which allows many NFT tokens to be grouped together using a single ID. Having the ability to group NFTs in a provable manner opens the doors for many more token applications, and makes SLP more similar to other NFT protocols (e.g., ERC-721). NFT1 uses the same validation rules as SLP token type 1 with a few additional constraints. [See reference](https://slp.dev/specs/slp-nft-1/#simple-nft-vs-nft1-protocol). Non-fungible tokens can be produced by simply minting a non-divisible token supply of 1 without a minting baton.
+
+All operations apart from genesis and minting, which are used for SLP tokens Type1, support the NFT tokens and are used the same way with same interfaces.
+
+#### NFT Parent Genesis
+
+To create the NFT parent group use the following code snippet
+
+```js
+const genesisOptions = {
+  name: "Mainnet NFT Parent",
+  ticker: "MNC_NFTP",
+  decimals: 0,
+  initialAmount: 10000,
+  documentUrl: "https://mainnet.cash",
+  endBaton: false
+};
+const genesisResult =  await wallet.slp.nftParentGenesis(genesisOptions);
+const parentTokenId = genesisResult.tokenId;
+```
+
+Note: these tokens are transferrable and mintable. Decimal places of 0 is advised.
+
+#### NFT Child Genesis
+
+NFT child tokens are unique and one of a kind. To create an NFT child token use the following code snippet
+
+```js
+const genesisOptions = {
+  name: "Mainnet NFT Child",
+  ticker: "MNC_NFTC",
+  decimals: 0,
+  initialAmount: 1,
+  documentUrl: "https://mainnet.cash",
+  endBaton: true,
+  parentTokenId: parentTokenId
+};
+const {tokenId} =  await wallet.slp.nftChildGenesis(genesisOptions);
+```
+
+In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.
+
+Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overridden: `endBaton` will be set to `true`, `initialAmount: 1`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
+
+#### List of your NFTs
+
+See [Token Balances](#token-balances)
+
 ## TestNet faucet
 
 You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
@@ -400,7 +450,7 @@ but only act as an arbiter in case something goes wrong. It's possible in Bitcoi
 
 You'll need three addresses for this: `buyer`, `seller` and `arbiter`. 
 
-Note: The source for the contract is [here](https://github.com/mainnet-cash/mainnet-js/blob/a35c3ff9590eb04e03b122d7bb2d4bbb12150d66/src/contract/escrow/EscrowContract.ts#L98-L118). 
+Note: The source for the contract is [here](https://github.com/mainnet-cash/mainnet-js/blob/c1c80889b8c211231326ab8537e20e85658239fa/src/contract/escrow/EscrowContract.ts#L123-L144). 
 
 1) Buyer sends the money to the contract and could then release the money to the seller 
 2) The seller could refund the buyer
@@ -411,20 +461,21 @@ let escrow = new EscrowContract({
   arbiterAddr: arbiter.getDepositAddress(),
   buyerAddr: buyer.getDepositAddress(),
   sellerAddr: seller.getDepositAddress(),
+  amount: 5000
 });
 ```
 
 You can now send money to the contract:
 
 ```js
-await buyer.send([ [ escrow.getAddress(), 3700, "satoshis" ], ]);
+await buyer.send([ [ escrow.getAddress(), 8700, "satoshis" ], ]);
 ``` 
 
 Check the balance of the contract (in satoshis):
 
 ```js
 await escrow.getBalance()
-// 3700
+// 8700
 ```
 
 Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum what you can send to it is about 3700 satoshis. 
@@ -433,18 +484,18 @@ Now, we can execute the necessary functions:
 
 1) Buyer releases the funds
 ```js
-await escrow.run(buyer.privateKeyWif, "spend");
+await escrow.call(buyer.privateKeyWif, "spend");
 ```
 
 2) Seller refunds
 ```js
-await escrow.run(seller.privateKeyWif, "refund");
+await escrow.call(seller.privateKeyWif, "refund");
 ```
 
 3) Arbiter releases the funds or refunds
 ```js
-await escrow.run(arbiter.privateKeyWif, "spend");
-await escrow.run(arbiter.privateKeyWif, "refund");
+await escrow.call(arbiter.privateKeyWif, "spend");
+await escrow.call(arbiter.privateKeyWif, "refund");
 ```
 
 ### Saving the contract to the database
@@ -455,20 +506,19 @@ he could execute the necessary functions:
 Save:
 
 ```js
-const contractId = escrow.toString();
+const escrowContractId = escrow.toString();
 ```
 
 Restore it later:
 
 ```js
-const restoredEscrow = EscrowContract.fromId(contractId);
+const restoredEscrow = EscrowContract.fromId(escrowContractId);
 ```
 
 The escrow object implements a CashScript contract from a stock template, but if the template doesn't suit your needs, it is also possible to use any contract written in [CashScript](https://cashscript.org/).  
 
 ```solidity
-pragma cashscript ^0.5.3;
-
+pragma cashscript ^0.6.1;
 contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int contractAmount, int contractNonce) {
 
     function spend(pubkey signingPk, sig s, int amount, int nonce) {
@@ -595,7 +645,7 @@ This will give you a contract object that can be serialized and deserialized jus
 ```js
 // serialized to a string
 let contractStr = contract.toString()
-//testnet:TURSa05EV...nPT06TWpFMQ==:cHJhZ...gfQp9:61149027"
+//contract:testnet:TURSa05EV...nPT06TWpFMQ==:cHJhZ...gfQp9:61149027"
 
 // recreate the Contract object from a string
 let contractCopy = Contract.fromId(contractStr)
@@ -646,6 +696,238 @@ Wallets have the following convenience methods for passing data to CashScript:
 
 In Javascript, passing either hex or a Uint8Array to CashScript will work.
 
+In the case that a contractId is stored, or received from another party, a convenience method exists to list information contained in a contractId, the `info()` interface is available to return the parsed data.
+
+The return should be an object with the same contractId, deposit cashaddr, script source, input parameters and a contract nonce that is added for uniqueness.
+
+```js
+contract.info()
+// {
+//   "contractId": "contract:testnet:TURRellXWTNabVF5WmpVeVpUa3dNVFEzTldOa1pEUXhPRFZoWWpWa1ptVmlZamMyTXpNM09EQTVNV0psTVRrd1lXUXlOMkZrTXpRM1lUZGtPR1kwTmpOa1pqSXlaVE5sT0dKbFlUaGtaRGcwTldKaE1XUXlNR00xWmpCbFl6QTJNek13WmpNM01ETTFZbUpsTkdFME1UZzNPVEUzTVRCaVlUbGpNakUxWkRaa05RPT06TURSbE9EZGtOV1ZrTlRCbU16VXdZVFZtTjJFMk16aG1abVkyT0RFek5HTTNOekJsT1RGaVlUUTFNV0l4TXpSaVlqTTVOVEJqTUdVMk9ETTJNR0poWW1JNE0ySTJOMlF3TnpSaU16WTFOVFl4WVdVMU0ySmxaVEV6TXpBNFl6TTFPVEF6TnpOaU5qTm1aV1F6TVRKallXVTNNMlk0TXpWaE56SmlaR00xWldFek53PT06TWpFMQ==:Y29udHJhY3QgVHJhbnNmZXJXaXRoVGltZW91dChwdWJrZXkgc2VuZGVyLCBwdWJrZXkgcmVjaXBpZW50LCBpbnQgdGltZW91dCkgewogICAgLy8gUmVxdWlyZSByZWNpcGllbnQncyBzaWduYXR1cmUgdG8gbWF0Y2gKICAgIGZ1bmN0aW9uIHRyYW5zZmVyKHNpZyByZWNpcGllbnRTaWcpIHsKICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHJlY2lwaWVudFNpZywgcmVjaXBpZW50KSk7CiAgICB9CgogICAgLy8gUmVxdWlyZSB0aW1lb3V0IHRpbWUgdG8gYmUgcmVhY2hlZCBhbmQgc2VuZGVyJ3Mgc2lnbmF0dXJlIHRvIG1hdGNoCiAgICBmdW5jdGlvbiB0aW1lb3V0KHNpZyBzZW5kZXJTaWcpIHsKICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHNlbmRlclNpZywgc2VuZGVyKSk7CiAgICAgICAgcmVxdWlyZSh0eC50aW1lID49IHRpbWVvdXQpOwogICAgfQp9:544951395",
+//   "cashaddr": "bchtest:ppv649rmxcd9fpwgk78pq0yek30krgwreva8unzm0x",
+//   "script": "contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {\n    // Require recipient's signature to match\n    function transfer(sig recipientSig) {\n        require(checkSig(recipientSig, recipient));\n    }\n\n    // Require timeout time to be reached and sender's signature to match\n    function timeout(sig senderSig) {\n        require(checkSig(senderSig, sender));\n        require(tx.time >= timeout);\n    }\n}",
+//   "parameters": [
+//     "043af7fd2f52e901475cdd4185ab5dfebb763378091be190ad27ad347a7d8f463df22e3e8bea8dd845ba1d20c5f0ec06330f37035bbe4a418791710ba9c215d6d5",
+//     "04e87d5ed50f350a5f7a638fff68134c770e91ba451b134bb3950c0e68360babb83b67d074b365561ae53bee13308c3590373b63fed312cae73f835a72bdc5ea37",
+//     "215"
+//   ],
+//   "nonce": 544951395
+// }
+```
+
+Combined with the `getPublicKeyHash()` method described above, another party could verify that the script of the contract matched an agreement and that the counter-party's public key hash was indeed a parameter to the contract.
+
+## Debugging Contracts
+
+For developing, testing, or debugging contracts, it's useful to run your script on a [local regtest "network"](/tutorial/#regtest-wallets). 
+
+In this section, we'll revisit the escrow contract and see ways to cause the contract not to release funds and how to debug why that is happening.
+
+### Before you begin
+
+1. Have docker-compose installed
+2. Have the [`meep`](https://github.com/gcash/meep) Bitcoin Cash debugger installed, and the go language if necessary.
+2. See the [regtest wallets](/tutorial/#regtest-wallets) section below.
+3. Checkout a copy of the mainnet-js repository.
+4. From the mainnet-js project root, run:
+
+```shell
+./jest/docker/dev-start.sh
+```
+
+This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
+
+### Step 1, "oh yeah, the fees"
+
+Small transaction fees are currently used on Bitcoin Cash to make the cost of a large spam attack non-trivial to the attacker. There are other finite measures, such as coindays (or the age of coins being spent). However, for a the time being, Bitcoin Cash software largely agrees to use 1 sat/byte, because the mechanism was simple to implement across a lot of diverse and interconnected software.
+
+So a common way to break the escrow transaction flow is to neglect the fees, which we'll do below.
+
+Let's create our contract parties again. 
+
+You can do this by importing mainnet into nodejs, using a live coding tool or the console of web browser using `yarn relaod` at localhost:8080.
+
+```js
+seller = await RegTestWallet.newRandom()
+buyer = await RegTestWallet.newRandom()
+arbiter = await RegTestWallet.newRandom()
+```
+
+Next we need the buyer to have some funds. Luckily we know an address on your regtest network with lots of bitcoin mined to it when docker starts.  
+
+```js
+
+miner = await RegTestWallet.fromWIF("cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6")
+await miner.send([
+  {
+    cashaddr: buyer.getDepositAddress(),
+    value: 100000,
+    unit: "satoshis",
+  },
+]);
+```
+
+Next, let's create a contract between our parties:
+
+```js
+escrow = new EscrowContract({
+  arbiterAddr: arbiter.getDepositAddress(),
+  buyerAddr: buyer.getDepositAddress(),
+  sellerAddr: seller.getDepositAddress(),
+  amount: 20000
+});
+```
+Next the buyer sends funds for the transaction to the contract address, and checks the balance:
+
+```js
+await buyer.send({cashaddr:escrow.getDepositAddress(), value: 20000, unit:'sat'})
+await escrow.getBalance()
+// 20000
+```
+
+Since the contract is funded for the full amount, let's try to release funds to the seller using the buyer's private key:
+
+```js
+await escrow.call(buyer.privateKeyWif, "spend");
+```
+
+But instead of sending the funds successfully, this returns an error:
+
+```
+Uncaught (in promise) Error: Error: The contract amount (20000) could not be submitted for a tx fee (836) with the available with contract balance (20000)
+```
+
+In the above case, we attempted to spend 20,000 sat using the unlocking script, from an address with only 20,000 sat, we neglected to include enough to cover the transaction fee of 836 sats. 
+
+If we send another input to the contract address...
+
+```js
+await buyer.send({cashaddr:escrow.getDepositAddress(), value: 836, unit:'sat'})
+await escrow.getBalance()
+/// 20836
+await escrow.call(buyer.privateKeyWif, "spend");
+```
+
+... we'll be greeted with another error: 
+
+```
+Uncaught (in promise) Error: Error: The contract amount (20000) could not be submitted for a tx fee (1596) with the available with contract balance (20836)
+```
+
+The fees went up to 1596 sats!
+
+This error occurred because funds are now being spent from two inputs (20,000 & 836), so the resulting transaction is larger and requires a larger fee. Although the fee we added would have been enough to spend the first output, it's not enough to spend two outputs.
+
+Since the unlocking script is included for each input, we can double the amount needed to spend from one unspent transaction output and should be able to spend the full amount from three inputs:
+
+```js
+await buyer.send({cashaddr:escrow.getDepositAddress(), value: 1656, unit:'sat'})
+await escrow.getBalance()
+/// 22492
+```
+
+If the buyer attempts to `spend` funds now, the transaction will succeed.
+
+```js
+await escrow.call(buyer.privateKeyWif, "spend");
+
+// ​Object { inputs: (3) […], locktime: 645, outputs: (1) […], version: 2, txid: "612ca1da16492503d9fea53106800073fa8b3f573d7663aed1ab92e41d38d979",
+// hex: "0200000003a5e92065f28ba406b0ac020b961caba285fcb438535775978524ebe5c9d1b92800000000fdcf020488bcc30802a84e41020424b6ede0258de98a4d77770a7282878634ba348e3ef520853cfc13c0987d979d6f5574e49ba04f65d74003ac43da837a5ce7edd111b17b3ecdce0a223b7941210384ddcc77b7177d8fe61b9a5b8c8ee3d1c225e525ac986d249e2c9b4a26920c8b4d7d01020000009e..."
+
+```
+
+### Step 2, rejection by network rules.
+
+A library can handle some common errors around a static contract, but if you develop your own contract (or have issues with the builtin escrow contract), the transaction is likely to be rejected by the network because the rules of the contract don't authorize funds to be spent.
+
+Let's do this with the same escrow contract from above and see how to figure out what happened.
+
+
+Let's fund the contract address, with enough fee to spend...
+
+```js
+await buyer.send({cashaddr:escrow.getDepositAddress(), value: 20837, unit:'sat'})
+await escrow.getBalance()
+// 20837
+```
+
+Now lets break the rules and attempt to `refund` with the seller's key
+
+
+```js
+await escrow.call(seller.privateKeyWif, "spend");
+
+Uncaught (in promise) Error: Error: Transaction failed with reason: the transaction was rejected by network rules.
+
+mandatory-script-verify-flag-failed (Script failed an OP_VERIFY operation) (code 16)
+
+meep debug --tx=0200000001f0a7e4ace8584c254a12e65a1ff0b6b3b876160d102a8eec2456095ef7e6000700000000fdcf020488bcc30802214e410bcba486912488ef15eb1e9a1cac56768823ff750b9bec35106b75e698f53d69ca483acd26f9441f683aa4975078f73e11e803788255849fb9d6dbb87667a4204121025fc8b68ce77607a82169849b8ae03384948644b4c8d42655aa2a99803df56d474d7d010200000000d6d779b71176a783ff0d427e00ccc504cd3ee027dc4d8792392be2e562fdc718606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe198f0a7e4ace8584c254a12e65a1ff0b6b3b876160d102a8eec2456095ef7e6000700000000e00488bcc30802204e140048249a5b92081ed9899c8bc15767c7ad45b033149ec12aee1e1266036ae546b93620f1a7aebfc39614d20194262d3b448d55154b52ef69e13581d4af815579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff492b5e32f70d2c63e07cc0c5e08fcaecc34ec34237919d9d1675dbcf7f3065c9d700000041000000004ce00488bcc30802204e140048249a5b92081ed9899c8bc15767c7ad45b033149ec12aee1e1266036ae546b93620f1a7aebfc39614d20194262d3b448d55154b52ef69e13581d4af815579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a914d20194262d3b448d55154b52ef69e13581d4af8188acd7000000 --idx=0 --amt=20837 --pkscript=a914721245359aa9cb99428df5e449fd9e6a16270ee487
+    _sendMax webpack://mainnet-js/./src/contract/escrow/EscrowContract.ts?:245
+```
+
+In the above error output, we see the operation that failed was `OP_VERIFY` and we're provided with the `meep` debug command to step through this specific transaction.
+
+[`meep`](https://github.com/gcash/meep) is a Bitcoin Cash script debugger written in golang. After ensuring you have it installed, and it's callable on your computer, you may use the above supplied command to see where exactly in execution of the unlock script OP_VERIFY failed.
+
+![Meep](./assets/escrow_seller_spend_meep.png)
+
+Stepping through the Bitcoin Script in `meep`, we can see the translation of the CashScript contract. The contract repeats the same pattern with the `spend` and `refund` blocks in an if,else,endif structure. And that the failure occurs in the on an `OP_VERIFY` in the first or `spend` block.
+
+We can also see in the `RedeemScript` section that the nonce (`88bcc308`), amount (`204e`), as well as the public key hashes for the arbiter (`0048...b033`), buyer and seller.  These are the arguments to our CashScript function, but reversed order.  
+
+Walking through the contract with meep, we can see that there are two `OP_HASH160` operations performed and then the contract fails on `OP_VERIFY`.  Looking at the escrow contract, it should be clear that this corresponds to the highlighted line in the `spend` function, where the contract requires that either the `arbiterPkh` or `buyerPkh` match the `signingPkh` provided.  
+
+
+```solidity{5}
+pragma cashscript ^0.6.1;
+contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int contractAmount, int contractNonce) {
+
+    function spend(pubkey signingPk, sig s, int amount, int nonce) {
+        require(hash160(signingPk) == arbiterPkh || hash160(signingPk) == buyerPkh);
+        require(checkSig(s, signingPk));
+        require(amount >= contractAmount);
+        require(nonce == contractNonce);
+        bytes34 output = new OutputP2PKH(bytes8(amount), sellerPkh);
+        require(hash256(output) == tx.hashOutputs);
+    }
+
+    function refund(pubkey signingPk, sig s, int amount, int nonce) {
+        require(hash160(signingPk) == arbiterPkh||hash160(signingPk) == sellerPkh);
+        require(checkSig(s, signingPk));
+        require(amount >= contractAmount);
+        require(nonce == contractNonce);
+        bytes34 output = new OutputP2PKH(bytes8(amount), buyerPkh);
+        require(hash256(output) == tx.hashOutputs);
+    }
+}
+```
+
+The above process can be repeated to trace back which particular step the contract was rejected on, and what the state of the stack was when that rejection occurred.
+
+To examine the execution of a transaction that would succeed, we can call a the escrow function with getHexOnly set to true:
+
+```js
+await escrow.call(buyer.privateKeyWif, "spend", undefined, true);
+```
+
+
+This will return the hex of the transaction with the buyer spending the funds.
+
+```json
+{
+  "hex": "020000000191eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000fdcf020437dd393402214e41863b47e9de111d43b48c4dc4f7d87fa8c07daab8cf3ee45753a1eba31d71933c2088f1716c8f9b1b0f3f123137c656d55bf5721af754dd418b063d3fb267c3f4412103a7ca01e2f5eaaa30e36d2d6687a88dae3cb4531ec6573f2793bcf37d1cb200e34d7d0102000000af4e505b95af3b69f119865b3e1f81bad1ba191e4adc2c61bd5fa450359eda9618606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe19891eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000e00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff947dfa2869621f5af52e85b6c88641f864c9e36791808a8db94b6491f0dc443f8502000041000000004ce00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a9141136f7ac42b3d65345906b2228d5644f0f1c7c3b88ac85020000"
+}
+```
+
+This can be passed to `meep` to see how the Bitcoin Script would be executed.
+
+```shell
+meep debug --tx=020000000191eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000fdcf020437dd393402214e41863b47e9de111d43b48c4dc4f7d87fa8c07daab8cf3ee45753a1eba31d71933c2088f1716c8f9b1b0f3f123137c656d55bf5721af754dd418b063d3fb267c3f4412103a7ca01e2f5eaaa30e36d2d6687a88dae3cb4531ec6573f2793bcf37d1cb200e34d7d0102000000af4e505b95af3b69f119865b3e1f81bad1ba191e4adc2c61bd5fa450359eda9618606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe19891eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000e00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff947dfa2869621f5af52e85b6c88641f864c9e36791808a8db94b6491f0dc443f8502000041000000004ce00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a9141136f7ac42b3d65345906b2228d5644f0f1c7c3b88ac85020000 --idx=0 --amt=20837 --pkscript=a91430392b5580c38e409fec5810045d59a62531ef2f87
+```
+
+Passing the hex with appropriate arguments will show the execution stack for your Bitcoin Script at each stage, in the above case finishing without error.
+
+
 ## Utilities
 
 
@@ -662,12 +944,11 @@ await convert(100, "usd", "sat")
 
 ## RegTest wallets
 
-During the local development and testing, you might not want to use TestNet coins, so you can use so-called "RegTest wallets".
+During the local development and testing, you might not want to use TestNet coins, so you can use so-called "RegTest wallets". 
 
 ::: tip What is RegTest?
 
-`RegTest` is a mode, in which you can run your Bitcoin Cash node locally, and you can get as many test coins as you need, 
-but they exist on your machine only. RegTest wallets are supported by the mainnet library.
+Regression testing is the practice of testing software after a change to ensure previous code still works. Bitcoin full node software can be started in `RegTest` mode, which you can use to run your Bitcoin Cash node locally, and you can get as many test coins as you need, but they exist on your machine only. RegTest wallets are supported by the mainnet library. 
 
 :::
 
@@ -677,24 +958,21 @@ Docker Compose file at `jest/regtest-docker-compose.yml`
 It can be brought up with:
 
 ```bash
-./jest/docker/start.sh 
+./jest/docker/dev-start.sh 
 ```
 
 To stop it:
 
 ```bash
-./jest/docker/stop.sh
+./jest/docker/dev-stop.sh
 ```
 
 The Electrum server (Fulcrum) is available at `ws://127.0.0.1:60003` on your local machine.  
 The regtest BCHN node is on port `18443` available with RPC using credentials in `.env.regtest`. 
 An open Postgres server is also available on port `15432`
 
-To use this wallet from your code:
+A wallet is configured with the rewards from the first 215 blocks of the regtest network, you can get an instance of the wallet with this code:
 
-```js
-const wallet = await RegTestWallet.newRandom();
-```
 
 ## WebSockets
 
