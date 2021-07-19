@@ -2,8 +2,7 @@
 
 ## Introduction
 
-Our REST API allows you to create advanced, performant, and secure financial applications without the usual complexity 
-of blockchain development.
+Our REST API allows you to create advanced, performant, and secure financial applications without the usual complexity of blockchain development.
 
 By deploying our REST API on your server, creating enterprise-level cryptocurrency applications becomes effortless.
 
@@ -168,6 +167,19 @@ Response:
 
 If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
 
+
+### Watch-only wallets
+
+Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of adress' balances, subscribe to its incoming and outgoing transactions, etc.
+
+They are constructed from a cashaddress by building a `walletId` like this:
+
+```
+watch:testnet:bchtest:qq1234567
+```
+
+...and then doing the regular wallet querues like `wallet/balance`.
+
 ## Getting the balance
 
 To get the balance of your wallet you can do this (use the `walletId` that you got previously):
@@ -183,7 +195,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
 Response:
 
 ```json
-{"bch": 0, "sat": 0, "usd": 0}
+{"bch": 0.20682058, "sat": 20682058, "usd": 91.04}
 ```
 
 Or you can use `unit` in the call to get just the number:
@@ -192,7 +204,7 @@ Or you can use `unit` in the call to get just the number:
 curl -X POST https://rest-unstable.mainnet.cash/wallet/balance \
   -H "Content-Type: application/json" \
   -d '{
-    "walletId": "named:testnet:wallet_1", 
+    "walletId": "named:testnet:wallet_1",
     "unit": "sat"
   }'
 ```
@@ -208,18 +220,7 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 - 1 satoshi = 0.00000001 Bitcoin Cash (1/100,000,000th)
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
-`USD` returns the amount at the current exchange rate. 
-
-
-### Watch-only wallets
-
-You can find out a balance of any cashaddr (say `bchtest:qq1234567`) by building a `walletId` like this:
-
-```
-watch:testnet:bchtest:qq1234567
-```
-
-...and then doing the regular `wallet/balance` query.
+`usd` returns the amount at the current exchange rate, fetched from CoinGecko or Bitcoin.com.
 
 ## Sending money
 

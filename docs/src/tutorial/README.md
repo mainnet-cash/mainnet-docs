@@ -35,13 +35,13 @@ To get started using Bitcoin Cash on your site, include this tag in your `<head>
 
 ```html
 <script src="https://cdn.mainnet.cash/mainnet-0.3.29.js"
- integrity="sha384-yNARexmnMZlxKP+/hVma4GE3pLz61GvdbS0JD5uvIRDTSfigiwpLghUG3aRlYcL2"
+ integrity="sha384-2E/MjZdjyAYlQSP/7LkNyZdQ2oI/4/9x+CmqDlOSVSUiQvPrD4BtN4SCxADA7xGL"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0,3,16.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.3.29.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -150,14 +150,30 @@ const wallet = await TestNetWallet.replaceNamed('user:1234', walletId);
 
 If the wallet entry does not exist in the DB, it will be created. If it does - it will be replaced without exception.
 
-## Getting the balance
+### Watch-only wallets
 
-To get the balance of the wallet you can do this:
+Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of adress' balances, subscribe to its incoming and outgoing transactions, etc.
+
+They are constructed from a cashaddress as follows:
 
 ```js
-await seller.getBalance('usd') // 0.00
-await seller.getBalance('bch') // 0.00
-await seller.getBalance('sat') // 0
+const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567...');
+```
+
+## Getting the balance
+
+To get the balance of the wallet you can use `getBalance` method:
+
+```js
+await wallet.getBalance() // { bch: 0.20682058, sat: 20682058, usd: 91.04 }
+```
+
+If you want to receive balance as number denominated in a unit of your choice, you can call `getBalance` with an argument:
+
+```js
+await wallet.getBalance('usd') // 91.04
+await wallet.getBalance('bch') // 0.20682058
+await wallet.getBalance('sat') // 20682058
 ```
 
 You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in case you forget the exact name).
@@ -165,16 +181,7 @@ You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in 
 - 1 satoshi = 0.000 000 01 Bitcoin Cash
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
-`USD` returns the amount at the current exchange rate.
-
-### Watch-only wallets
-
-You can find out a balance of any cashaddr (say `bchtest:qq1234567`) like this:
-
-```js
-const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567');
-await wallet.getBalance('usd');
-```
+`usd` returns the amount at the current exchange rate, fetched from CoinGecko or Bitcoin.com.
 
 ## Sending money
 
