@@ -795,7 +795,8 @@ curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/create \
   "buyerAddr": "bchtest:qrnluuge56ahxsy6pplq43rva7k6s9dknu4p5278ah",
   "arbiterAddr": "bchtest:qzspcywxmm4fqhf9kjrknrc3grsv2vukeqyjqla0nt",
   "sellerAddr": "bchtest:qz00pk9lfs0k9f5vf3j8h66qfmqagk8nc56elq4dv2",
-  "amount": 10000
+  "amount": 10000,
+  "nonce":1075184727
 }'
 ```
 
@@ -803,15 +804,15 @@ Response:
 
 ```json
 {
-  "contractId": "testnet␝MTU4LDI0MCwyMTYsMTkxLDc2LDMxLDk4LDE2NiwxNDAsNzYsMTAwLDEyMywyMzUsNjQsNzgsMTkzLDIxMiw4OCwyNDMsMTk3␞MjMxLDI1NCwxMTMsMjUsMTY2LDE4NywxMTUsNjQsMTU0LDgsMTI2LDEwLDE5NiwxMDgsMjM5LDE3MywxNjgsMjEsMTgyLDE1OQ==␞MTYwLDI4LDE3LDE5OCwyMjIsMjM0LDE0NCw5MywzNywxODAsMTM1LDEwNSwxNDMsMTcsNjQsMjI0LDE5Nyw1MSwxNTAsMjAw␞MTAwMDA=␞ODA4␝cHJhZ21hIGNhc2hzY3JpcHQgXjAuNS4zOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg",
-  "cashaddr": "bchtest:pz77d0jkycc6kfrv5cdvxg5afd8qnlj495tfqt60hs"
+    "escrowContractId": "escrowContract:testnet:WW1Ob2RHVnpkRHB4ZWpBd2NHczViR1p6TUdzNVpqVjJaak5xT0dnMk5uRm1iWEZoWjJzNGJtTTFObVZzY1RSa2RqST06WW1Ob2RHVnpkRHB4Y201c2RYVm5aVFUyWVdoNGMzazJjSEJzY1RRemNuWmhOMnMyY3psa2EyNTFOSEExTWpjNFlXZz06WW1Ob2RHVnpkRHB4ZW5Od1kzbDNlRzF0TkdaeGFHWTVhMnB5YTI1eVl6Tm5jbk4yTW5aMWEyVnhlV3B4YkdFd2JuUT06TVRBd01EQT0=:TVRVNExESTBNQ3d5TVRZc01Ua3hMRGMyTERNeExEazRMREUyTml3eE5EQXNOellzTVRBd0xERXlNeXd5TXpVc05qUXNOemdzTVRrekxESXhNaXc0T0N3eU5ETXNNVGszOk1qTXhMREkxTkN3eE1UTXNNalVzTVRZMkxERTROeXd4TVRVc05qUXNNVFUwTERnc01USTJMREV3TERFNU5pd3hNRGdzTWpNNUxERTNNeXd4Tmpnc01qRXNNVGd5TERFMU9RPT06TVRZd0xESTRMREUzTERFNU9Dd3lNaklzTWpNMExERTBOQ3c1TXl3ek55d3hPREFzTVRNMUxERXdOU3d4TkRNc01UY3NOalFzTWpJMExERTVOeXcxTVN3eE5UQXNNakF3Ok1UQXdNREE9Ok1UYzVNRGt4TURrME9RPT0=:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1790910949",
+  "cashaddr": "bchtest:pqjqp8gca556cn5k6d4hwyf9zhmlpy68mcwlupfpe7"
 }
 ```
 
-The `contractId` has all the data needed about the contract (but it's pretty big). Store it in your database, so
+The `escrowContractId` has all the data needed about the escrow contract. Store it in your database, so
 that you can execute all the necessary functions later.
 
-You can now send money to the contract (just use the `cashaddr` from the response) and check the balance of the contract.
+You can now send money to the escrow contract (just use the `cashaddr` from the response) and check the balance of the contract.
 
 Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum that you can send to it is about 3700 satoshis. 
 
@@ -822,7 +823,7 @@ Now, we can execute the necessary functions:
 curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
   -d '{
-    "contractId": "....",
+    "escrowContractId": "escrowContract:testnet:WW1Ob2RHVnpkRHB4ZWpBd2NHczViR1p6TUdzNVpqVjJaak5xT0dnMk5uRm1iWEZoWjJzNGJtTTFObVZzY1RSa2RqST06WW1Ob2RHVnpkRHB4Y201c2RYVm5aVFUyWVdoNGMzazJjSEJzY1RRemNuWmhOMnMyY3psa2EyNTFOSEExTWpjNFlXZz06WW1Ob2RHVnpkRHB4ZW5Od1kzbDNlRzF0TkdaeGFHWTVhMnB5YTI1eVl6Tm5jbk4yTW5aMWEyVnhlV3B4YkdFd2JuUT06TVRBd01EQT0=:TVRVNExESTBNQ3d5TVRZc01Ua3hMRGMyTERNeExEazRMREUyTml3eE5EQXNOellzTVRBd0xERXlNeXd5TXpVc05qUXNOemdzTVRrekxESXhNaXc0T0N3eU5ETXNNVGszOk1qTXhMREkxTkN3eE1UTXNNalVzTVRZMkxERTROeXd4TVRVc05qUXNNVFUwTERnc01USTJMREV3TERFNU5pd3hNRGdzTWpNNUxERTNNeXd4Tmpnc01qRXNNVGd5TERFMU9RPT06TVRZd0xESTRMREUzTERFNU9Dd3lNaklzTWpNMExERTBOQ3c1TXl3ek55d3hPREFzTVRNMUxERXdOU3d4TkRNc01UY3NOalFzTWpJMExERTVOeXcxTVN3eE5UQXNNakF3Ok1UQXdNREE9Ok1UQTNOVEU0TkRjeU53PT0=:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1075184727",
     "walletId": "seed:testnet:....",
     "function": "spend"
   }'
@@ -847,7 +848,7 @@ You can also specify the exact UTXO IDs to spend
 curl -X POST https://rest-unstable.mainnet.cash/contract/escrow/call \
   -H "Content-Type: application/json" \
   -d '{
-      "contractId": "....",
+      "escrowContractId": "....",
       "walletId": "seed:testnet:....",
       "function": "refund"
     }'
@@ -986,6 +987,391 @@ This will return all the arguments to reconstruct or verify a contract.
   "nonce": 1996128042
 }
 ```
+
+
+## Debugging Contracts
+
+For developing, testing, or debugging contracts, it's useful to run your script on a [local regtest "network"](/rest.html#regtest-wallets). 
+
+In this section, we'll revisit the escrow contract and see ways to cause the contract not to release funds and how to debug why that is happening.
+
+### Before you begin
+
+1. Have docker-compose installed
+2. Have the [`meep`](https://github.com/gcash/meep) Bitcoin Cash debugger installed, and the go language if necessary.
+2. See the [regtest wallets](/rest.html#regtest-wallets) section below.
+3. Checkout a copy of the mainnet-js repository.
+4. From the mainnet-js project root, run:
+
+```shell
+./jest/docker/dev-start.sh
+```
+
+This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
+
+### Step 1, "oh yeah, the fees"
+
+Small transaction fees are currently used on Bitcoin Cash to make the cost of a large spam attack non-trivial to the attacker. There are other finite measures, such as coindays (or the age of coins being spent). However, for a the time being, Bitcoin Cash software largely agrees to use 1 sat/byte, because the mechanism was simple to implement across a lot of diverse and interconnected software.
+
+So a common way to break the escrow transaction flow is to neglect the fees, which we'll do below.
+
+To test rest commands locally, it may be useful to serve the Swagger (OpenAPI) documentation and use the web interface to post test commands. This can be started by running 
+
+`yarn api:serve` 
+
+from the mainnet-js project directory.  This should serve a copy of the documentation hosted at http://localhost:3000
+
+Let's a regtest wallet for the buyer in this transaction:
+
+```shell
+curl -X POST "http://localhost:3000/wallet/create" 
+-H  "accept: application/json" 
+-H  "Content-Type: application/json" 
+-d '{
+  "type": "seed",
+  "network": "regtest"
+}'
+```
+
+This returns an unnamed wallet we'll use as the buyer's wallet:
+
+```json
+{
+  "name": "",
+  "cashaddr": "bchreg:qzwvqdl8sy5czu3hk548zrg7rc9kxz89eqcceq4j9k",
+  "slpaddr": "slptest:qzwvqdl8sy5czu3hk548zrg7rc9kxz89eqesg6vk5d",
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "seed": "priority obey finish winter setup group picture regret dream home smile electric",
+  "derivationPath": "m/44'/0'/0'/0/0",
+  "network": "regtest"
+}
+```
+
+Repeating the `wallet/create` command we'll obtain two more regtest cash addresses, one for the seller, and one for the arbiter:
+
+```shell
+curl -X POST "http://localhost:3000/wallet/create" 
+-H  "accept: application/json" 
+-H  "Content-Type: application/json" 
+-d '{
+  "type": "seed",
+  "network": "regtest"
+}'
+```
+
+In this case, we're just using the endpoint to generate random valid addresses—the rest can be discarded.
+
+```
+"sellerAddr": "bchreg:qrdfdfrt78cqmwsrfr04aqs080uju26ysq76az464d",
+"arbiterAddr": "bchreg:qpr3pr6gfyvetqnaf3pt0u2aq39fmux44vk9u9vls7",
+```
+
+Next we need the buyer to have some funds. Luckily we know an address on your regtest network with lots of bitcoin mined to it when docker starts.  Simply replace the `cashaddr` below with the buyer's regtest address you generated above, 
+
+```shell
+  curl -X POST "http://localhost:3000/wallet/send" \
+  -H  "accept: application/json" \
+  -H  "Content-Type: application/json" \
+  -d '{ 
+    "walletId": "wif:regtest:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+    "to": {
+      "unit": "sat",
+      "cashaddr": "bchreg:qzwvqdl8sy5czu3hk548zrg7rc9kxz89eqcceq4j9k",
+      "value": 100000
+    }
+  }'
+  ```
+
+This returns the transaction id and remaining miner balance (with usd at mainnet rates):
+
+```json
+{
+  "txId": "38b5dcb39dbec1c532983dd57b1b53bd2d71f07549e67cb4028d6503f190cc2c",
+  "balance": {
+    "bch": 14156.24782788,
+    "sat": 1415624782788,
+    "usd": 5882911.91
+  },
+  "explorerUrl": "38b5dcb39dbec1c532983dd57b1b53bd2d71f07549e67cb4028d6503f190cc2c"
+}
+```
+
+Next, let's create a contract between our parties:
+
+```shell
+curl -X POST "http://localhost:3000/contract/escrow/create" \
+ -H  "accept: application/json" \
+ -H  "Content-Type: application/json" \
+ -d '{
+  "buyerAddr": "bchreg:qzwvqdl8sy5czu3hk548zrg7rc9kxz89eqcceq4j9k",
+  "arbiterAddr": "bchreg:qpr3pr6gfyvetqnaf3pt0u2aq39fmux44vk9u9vls7",
+  "sellerAddr": "bchreg:qrdfdfrt78cqmwsrfr04aqs080uju26ysq76az464d",
+  "amount": 20000
+}'
+```
+
+Which returns the `escrowContractId` and the `cashaddr`:
+
+```json
+{
+  "escrowContractId": "escrowContract:regtest:WW1Ob2NtVm5PbkZ5Wkdaa1puSjBOemhqY1cxM2MzSm1jakEwWVhGek1EZ3dkV3AxTWpaNWMzRTNObUY2TkRZMFpBPT06WW1Ob2NtVm5PbkY2ZDNaeFpHdzRjM2sxWTNwMU0yaHJOVFE0ZW5Kbk4zSmpPV3Q0ZWpnNVpYRmpZMlZ4TkdvNWF3PT06WW1Ob2NtVm5PbkZ3Y2pOd2NqWm5abmwyWlhSeGJtRm1NM0IwTUhVeVlYRXpPV1p0ZFhnME5IWnJPWFU1ZG14ek53PT06TWpBd01EQT0=:TWpFNExERTFNQ3d4TmpRc01UQTNMREkwTVN3eU5EQXNNVE1zTVRnMkxETXNOeklzTWpJekxEazBMREV6TUN3eE5TdzFPU3d5TkRrc05EWXNORE1zTmpnc01USTQ6TVRVMkxERTVNaXcxTlN3eU16RXNNVEk1TERReExERXlPU3d4TVRRc05UVXNNVGd4TERReUxERXhNeXd4TXl3ek1Dd3pNQ3d4TVN3NU9TdzRMREl5T1N3eU1EQT06TnpFc01UWXNNVFF6TERjeUxEY3pMREkxTERFME9Td3hNekFzTVRJMUxEYzJMRFkyTERFNE15d3lOREVzT1RNc05DdzNOQ3d4TlRjc01qUXdMREl4TXl3eE56RT06TWpBd01EQT06TVRJd09Ea3dNak14TUE9PQ==:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1208902310",
+  "cashaddr": "bchreg:prgtla0ua2gjapxk85gm2dfqfff4uuu7csrrkdcykl"
+}
+```
+
+Next, using the escrow contract `cashaddr`, the buyer sends funds for the transaction to the contract address, and checks the balance:
+
+
+```shell
+curl -X POST "http://localhost:3000/wallet/send" \
+  -H  "accept: application/json" \
+  -H  "Content-Type: application/json" \
+  --data-binary @- << EOF
+{ 
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "to": {
+    "unit": "sat",
+    "cashaddr": "bchreg:prgtla0ua2gjapxk85gm2dfqfff4uuu7csrrkdcykl",
+    "value": 20000
+  }
+}
+EOF
+```
+
+```json
+{
+  "txId": "287e54872f594bae531593c2fd8170a37b1c2d4437333fff531df4f76cf652f1",
+  "balance": {
+    "bch": 0.00039641,
+    "sat": 39641,
+    "usd": 0.17
+  },
+  "explorerUrl": "287e54872f594bae531593c2fd8170a37b1c2d4437333fff531df4f76cf652f1"
+}
+```
+
+Now that the contract is funded for the full amount, let's try to release funds to the seller using the buyer's private key:
+
+```shell
+curl -X POST "http://localhost:3000/contract/escrow/call" \
+ -H  "accept: application/json" \
+-H  "Content-Type: application/json" \
+--data-binary @- << EOF
+{
+  "escrowContractId": "escrowContract:regtest:WW1Ob2NtVm5PbkZ5Wkdaa1puSjBOemhqY1cxM2MzSm1jakEwWVhGek1EZ3dkV3AxTWpaNWMzRTNObUY2TkRZMFpBPT06WW1Ob2NtVm5PbkY2ZDNaeFpHdzRjM2sxWTNwMU0yaHJOVFE0ZW5Kbk4zSmpPV3Q0ZWpnNVpYRmpZMlZ4TkdvNWF3PT06WW1Ob2NtVm5PbkZ3Y2pOd2NqWm5abmwyWlhSeGJtRm1NM0IwTUhVeVlYRXpPV1p0ZFhnME5IWnJPWFU1ZG14ek53PT06TWpBd01EQT0=:TWpFNExERTFNQ3d4TmpRc01UQTNMREkwTVN3eU5EQXNNVE1zTVRnMkxETXNOeklzTWpJekxEazBMREV6TUN3eE5TdzFPU3d5TkRrc05EWXNORE1zTmpnc01USTQ6TVRVMkxERTVNaXcxTlN3eU16RXNNVEk1TERReExERXlPU3d4TVRRc05UVXNNVGd4TERReUxERXhNeXd4TXl3ek1Dd3pNQ3d4TVN3NU9TdzRMREl5T1N3eU1EQT06TnpFc01UWXNNVFF6TERjeUxEY3pMREkxTERFME9Td3hNekFzTVRJMUxEYzJMRFkyTERFNE15d3lOREVzT1RNc05DdzNOQ3d4TlRjc01qUXdMREl4TXl3eE56RT06TWpBd01EQT06TVRJd09Ea3dNak14TUE9PQ==:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1208902310",
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "function": "spend",
+  "to":"bchreg:qrdfdfrt78cqmwsrfr04aqs080uju26ysq76az464d"
+}
+EOF
+```
+
+But instead of sending the funds successfully from the contract to the seller, this returns an error:
+
+```json
+{
+  "code": 500,
+  "message": "Error: The contract amount (20000) could not be submitted for a tx fee (836) with the available with contract balance (20000)"
+}
+```
+
+In the above case, we attempted to spend 20,000 sat using the unlocking script, from an address with only 20,000 sat, we neglected to include enough to cover the transaction fee of 836 sats. 
+
+If we send another input to the contract address...
+
+```shell
+curl -X POST "http://localhost:3000/wallet/send" \
+-H  "accept: application/json" \
+-H  "Content-Type: application/json" \
+--data-binary @- << EOF
+{ 
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "to": {
+    "unit": "sat",
+    "cashaddr": "bchreg:prgtla0ua2gjapxk85gm2dfqfff4uuu7csrrkdcykl",
+    "value": 836
+  }
+}
+EOF
+  ```
+
+Repeating the spend command from above:
+
+```shell
+curl -X POST "http://localhost:3000/contract/escrow/call" \
+ -H  "accept: application/json" \
+-H  "Content-Type: application/json" \
+--data-binary @- << EOF
+{
+  "escrowContractId": "escrowContract:regtest:WW1Ob2NtVm5PbkZ5Wkdaa1puSjBOemhqY1cxM2MzSm1jakEwWVhGek1EZ3dkV3AxTWpaNWMzRTNObUY2TkRZMFpBPT06WW1Ob2NtVm5PbkY2ZDNaeFpHdzRjM2sxWTNwMU0yaHJOVFE0ZW5Kbk4zSmpPV3Q0ZWpnNVpYRmpZMlZ4TkdvNWF3PT06WW1Ob2NtVm5PbkZ3Y2pOd2NqWm5abmwyWlhSeGJtRm1NM0IwTUhVeVlYRXpPV1p0ZFhnME5IWnJPWFU1ZG14ek53PT06TWpBd01EQT0=:TWpFNExERTFNQ3d4TmpRc01UQTNMREkwTVN3eU5EQXNNVE1zTVRnMkxETXNOeklzTWpJekxEazBMREV6TUN3eE5TdzFPU3d5TkRrc05EWXNORE1zTmpnc01USTQ6TVRVMkxERTVNaXcxTlN3eU16RXNNVEk1TERReExERXlPU3d4TVRRc05UVXNNVGd4TERReUxERXhNeXd4TXl3ek1Dd3pNQ3d4TVN3NU9TdzRMREl5T1N3eU1EQT06TnpFc01UWXNNVFF6TERjeUxEY3pMREkxTERFME9Td3hNekFzTVRJMUxEYzJMRFkyTERFNE15d3lOREVzT1RNc05DdzNOQ3d4TlRjc01qUXdMREl4TXl3eE56RT06TWpBd01EQT06TVRJd09Ea3dNak14TUE9PQ==:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1208902310",
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "function": "spend",
+  "to":"bchreg:qrdfdfrt78cqmwsrfr04aqs080uju26ysq76az464d"
+}
+EOF
+```
+
+```json
+{
+  "code": 500,
+  "message": "Error: The contract amount (20000) could not be submitted for a tx fee (1596) with the available with contract balance (20836)"
+}
+```
+
+The fees went up to 1596 sats!
+
+This error occurred because funds are now being spent from two inputs (20,000 sat & 836 sat), so the resulting transaction is larger and requires a larger fee. Although the fee we added would have been enough to spend the first output, it's not enough to spend two outputs.
+
+Since the unlocking script is included for each input, we can double the amount needed to spend from one unspent transaction output and should be able to spend the full amount from three inputs:
+
+```shell
+curl -X POST "http://localhost:3000/wallet/send" \
+-H  "accept: application/json" \
+-H  "Content-Type: application/json" \
+--data-binary @- << EOF
+{ 
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "to": {
+    "unit": "sat",
+    "cashaddr": "bchreg:prgtla0ua2gjapxk85gm2dfqfff4uuu7csrrkdcykl",
+    "value": 1656
+  }
+}
+EOF
+```
+
+If the buyer attempts to `spend` funds now, the transaction will succeed.
+
+
+```shell
+curl -X POST "http://localhost:3000/contract/escrow/call" \
+ -H  "accept: application/json" \
+ -H  "Content-Type: application/json" \
+--data-binary @- << EOF
+{
+  "escrowContractId": "escrowContract:regtest:WW1Ob2NtVm5PbkZ5Wkdaa1puSjBOemhqY1cxM2MzSm1jakEwWVhGek1EZ3dkV3AxTWpaNWMzRTNObUY2TkRZMFpBPT06WW1Ob2NtVm5PbkY2ZDNaeFpHdzRjM2sxWTNwMU0yaHJOVFE0ZW5Kbk4zSmpPV3Q0ZWpnNVpYRmpZMlZ4TkdvNWF3PT06WW1Ob2NtVm5PbkZ3Y2pOd2NqWm5abmwyWlhSeGJtRm1NM0IwTUhVeVlYRXpPV1p0ZFhnME5IWnJPWFU1ZG14ek53PT06TWpBd01EQT0=:TWpFNExERTFNQ3d4TmpRc01UQTNMREkwTVN3eU5EQXNNVE1zTVRnMkxETXNOeklzTWpJekxEazBMREV6TUN3eE5TdzFPU3d5TkRrc05EWXNORE1zTmpnc01USTQ6TVRVMkxERTVNaXcxTlN3eU16RXNNVEk1TERReExERXlPU3d4TVRRc05UVXNNVGd4TERReUxERXhNeXd4TXl3ek1Dd3pNQ3d4TVN3NU9TdzRMREl5T1N3eU1EQT06TnpFc01UWXNNVFF6TERjeUxEY3pMREkxTERFME9Td3hNekFzTVRJMUxEYzJMRFkyTERFNE15d3lOREVzT1RNc05DdzNOQ3d4TlRjc01qUXdMREl4TXl3eE56RT06TWpBd01EQT06TVRJd09Ea3dNak14TUE9PQ==:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1208902310",
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "function": "spend",
+  "to":"bchreg:qrdfdfrt78cqmwsrfr04aqs080uju26ysq76az464d"
+}
+EOF
+  ```
+
+
+This returns successfully with the transaction id and hex for the transaction:
+
+```json
+{
+  "escrowContractId":"escrowContract:regtest:WW1Ob2NtVm5PbkZ5Wkdaa1puSjBOemhqY1cxM2MzSm1jakEwWVhGek1EZ3dkV3AxTWpaNWMzRTNObUY2TkRZMFpBPT06WW1Ob2NtVm5PbkY2ZDNaeFpHdzRjM2sxWTNwMU0yaHJOVFE0ZW5Kbk4zSmpPV3Q0ZWpnNVpYRmpZMlZ4TkdvNWF3PT06WW1Ob2NtVm5PbkZ3Y2pOd2NqWm5abmwyWlhSeGJtRm1NM0IwTUhVeVlYRXpPV1p0ZFhnME5IWnJPWFU1ZG14ek53PT06TWpBd01EQT0=:TWpFNExERTFNQ3d4TmpRc01UQTNMREkwTVN3eU5EQXNNVE1zTVRnMkxETXNOeklzTWpJekxEazBMREV6TUN3eE5TdzFPU3d5TkRrc05EWXNORE1zTmpnc01USTQ6TVRVMkxERTVNaXcxTlN3eU16RXNNVEk1TERReExERXlPU3d4TVRRc05UVXNNVGd4TERReUxERXhNeXd4TXl3ek1Dd3pNQ3d4TVN3NU9TdzRMREl5T1N3eU1EQT06TnpFc01UWXNNVFF6TERjeUxEY3pMREkxTERFME9Td3hNekFzTVRJMUxEYzJMRFkyTERFNE15d3lOREVzT1RNc05DdzNOQ3d4TlRjc01qUXdMREl4TXl3eE56RT06TWpBd01EQT06TVRJd09Ea3dNak14TUE9PQ==:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1208902310",
+  "txId":"e442bcd969d5db9fd40b05fb6510744176db1a6774bc2629c37a957053f3c7a8",
+  "hex":"020000000374d67acd17b7790095b0e4e2461ccbf5e02a05a38fdda980a56bcac75da49b6300000000fdcf0204a6620e4802a84e41bad0a4ffbca2c1941f99b6138365cf18056da5ed0f6c767d0fa5f1d2c09409138e8c91e19d6b92a7c0cc186d4647f0a9c74335fa63b493d22ec815df6e08d58541210209068ea1926189a4479da16753d51009906e7dc9e2f6862049203dc7fc9e8e074d7d01020000003bae17b02846e97b2f338e3b698667320bbf8a7db386fa989b8555f88b7fc61b39ecf0df480455e1c5a4fe1bc4e3ee5cacf75b79e5c1835462c9921cf54ad7b874d67acd17b7790095b0e4e2461ccbf5e02a05a38fdda980a56bcac75da49b6300000000e004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87684403000000000000feffffffe3e280579e7d47bb03fdcf40b8d25aed7c8759c33bb58c0e08dfc7c4e600695a8502000041000000004ce004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff9b560843737f124f07e90e091ddc2b409798b5a0d12a540d9a1953fad25d0d7b00000000fdcf0204a6620e4802a84e415ba4113262ac417935679e2e22d4a2e482738bb4ecbf3173135f4998c1ec6acc8b6b5e5121f58e34e57bcd4e59a0c55014aaa68d9da3ab0b26fc4c5cf5e04e8441210209068ea1926189a4479da16753d51009906e7dc9e2f6862049203dc7fc9e8e074d7d01020000003bae17b02846e97b2f338e3b698667320bbf8a7db386fa989b8555f88b7fc61b39ecf0df480455e1c5a4fe1bc4e3ee5cacf75b79e5c1835462c9921cf54ad7b89b560843737f124f07e90e091ddc2b409798b5a0d12a540d9a1953fad25d0d7b00000000e004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768204e000000000000feffffffe3e280579e7d47bb03fdcf40b8d25aed7c8759c33bb58c0e08dfc7c4e600695a8502000041000000004ce004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff6b6ecff3a7720bfeff9cc72fba1165aa621763ef7bba5dec4102b017a015a08c00000000fdcf0204a6620e4802a84e414ce03c538b30748cb204ff6882e5455c703f652fae258d217303bb063fb584607edcaedd21839d6b20e661a251e755930d2768d9d14ad6f58c49fc3ef583183541210209068ea1926189a4479da16753d51009906e7dc9e2f6862049203dc7fc9e8e074d7d01020000003bae17b02846e97b2f338e3b698667320bbf8a7db386fa989b8555f88b7fc61b39ecf0df480455e1c5a4fe1bc4e3ee5cacf75b79e5c1835462c9921cf54ad7b86b6ecff3a7720bfeff9cc72fba1165aa621763ef7bba5dec4102b017a015a08c00000000e004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87687806000000000000feffffffe3e280579e7d47bb03fdcf40b8d25aed7c8759c33bb58c0e08dfc7c4e600695a8502000041000000004ce004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01a84e0000000000001976a914da96a46bf1f00dba0348df5e820f3bf92e2b448088ac85020000"
+}
+
+```
+
+### Step 2, rejection by network rules.
+
+A library can handle some common errors around a static contract, but if you develop your own contract (or have issues with the builtin escrow contract), a transaction may be rejected by the network because the rules of the contract don't authorize funds to be spent.
+
+Let's do this with the same escrow contract from above and see how to figure out what happened.
+
+Let's fund the contract address, with enough fee to spend...
+
+```shell
+curl -X POST "http://localhost:3000/wallet/send" \
+-H  "accept: application/json" \
+-H  "Content-Type: application/json" \
+--data-binary @- << EOF
+{ 
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "to": {
+    "unit": "sat",
+    "cashaddr": "bchreg:prgtla0ua2gjapxk85gm2dfqfff4uuu7csrrkdcykl",
+    "value": 20837
+  }
+}
+EOF
+```
+
+This will return the balance of the buyer and the transaction id:
+```json
+{
+  "txId":"71e62cc26921fa4ceecc10c961301e9ee1af2afb3c8c94d3e1b5a1d01a664479",
+  "balance":
+  {
+    "bch":0.00068991,
+    "sat":68991,
+    "usd":0.29
+  },
+  "explorerUrl":"71e62cc26921fa4ceecc10c961301e9ee1af2afb3c8c94d3e1b5a1d01a664479"
+}
+```
+
+Now lets break the rules, what would happen if the buyer decided to `refund` themselves after they received the goods with their own key?
+
+Below we've added the buyer's address as receipt and changed the function to `refund`.
+
+```shell
+curl -X POST "http://localhost:3000/contract/escrow/call" \
+ -H  "accept: application/json" \
+ -H  "Content-Type: application/json" \
+--data-binary @- << EOF
+{
+  "escrowContractId": "escrowContract:regtest:WW1Ob2NtVm5PbkZ5Wkdaa1puSjBOemhqY1cxM2MzSm1jakEwWVhGek1EZ3dkV3AxTWpaNWMzRTNObUY2TkRZMFpBPT06WW1Ob2NtVm5PbkY2ZDNaeFpHdzRjM2sxWTNwMU0yaHJOVFE0ZW5Kbk4zSmpPV3Q0ZWpnNVpYRmpZMlZ4TkdvNWF3PT06WW1Ob2NtVm5PbkZ3Y2pOd2NqWm5abmwyWlhSeGJtRm1NM0IwTUhVeVlYRXpPV1p0ZFhnME5IWnJPWFU1ZG14ek53PT06TWpBd01EQT0=:TWpFNExERTFNQ3d4TmpRc01UQTNMREkwTVN3eU5EQXNNVE1zTVRnMkxETXNOeklzTWpJekxEazBMREV6TUN3eE5TdzFPU3d5TkRrc05EWXNORE1zTmpnc01USTQ6TVRVMkxERTVNaXcxTlN3eU16RXNNVEk1TERReExERXlPU3d4TVRRc05UVXNNVGd4TERReUxERXhNeXd4TXl3ek1Dd3pNQ3d4TVN3NU9TdzRMREl5T1N3eU1EQT06TnpFc01UWXNNVFF6TERjeUxEY3pMREkxTERFME9Td3hNekFzTVRJMUxEYzJMRFkyTERFNE15d3lOREVzT1RNc05DdzNOQ3d4TlRjc01qUXdMREl4TXl3eE56RT06TWpBd01EQT06TVRJd09Ea3dNak14TUE9PQ==:cHJhZ21hIGNhc2hzY3JpcHQgXjAuNi4xOwogICAgICAgICAgICBjb250cmFjdCBlc2Nyb3coYnl0ZXMyMCBzZWxsZXJQa2gsIGJ5dGVzMjAgYnV5ZXJQa2gsIGJ5dGVzMjAgYXJiaXRlclBraCwgaW50IGNvbnRyYWN0QW1vdW50LCBpbnQgY29udHJhY3ROb25jZSkgewoKICAgICAgICAgICAgICAgIGZ1bmN0aW9uIHNwZW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtoIHx8IGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShjaGVja1NpZyhzLCBzaWduaW5nUGspKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGFtb3VudCA+PSBjb250cmFjdEFtb3VudCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShub25jZSA9PSBjb250cmFjdE5vbmNlKTsKICAgICAgICAgICAgICAgICAgICBieXRlczM0IG91dHB1dCA9IG5ldyBPdXRwdXRQMlBLSChieXRlczgoYW1vdW50KSwgc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gyNTYob3V0cHV0KSA9PSB0eC5oYXNoT3V0cHV0cyk7CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgZnVuY3Rpb24gcmVmdW5kKHB1YmtleSBzaWduaW5nUGssIHNpZyBzLCBpbnQgYW1vdW50LCBpbnQgbm9uY2UpIHsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGhhc2gxNjAoc2lnbmluZ1BrKSA9PSBhcmJpdGVyUGtofHxoYXNoMTYwKHNpZ25pbmdQaykgPT0gc2VsbGVyUGtoKTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHMsIHNpZ25pbmdQaykpOwogICAgICAgICAgICAgICAgICAgIHJlcXVpcmUoYW1vdW50ID49IGNvbnRyYWN0QW1vdW50KTsKICAgICAgICAgICAgICAgICAgICByZXF1aXJlKG5vbmNlID09IGNvbnRyYWN0Tm9uY2UpOwogICAgICAgICAgICAgICAgICAgIGJ5dGVzMzQgb3V0cHV0ID0gbmV3IE91dHB1dFAyUEtIKGJ5dGVzOChhbW91bnQpLCBidXllclBraCk7CiAgICAgICAgICAgICAgICAgICAgcmVxdWlyZShoYXNoMjU2KG91dHB1dCkgPT0gdHguaGFzaE91dHB1dHMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAg:1208902310",
+  "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
+  "function": "refund",
+  "to":"bchreg:qzwvqdl8sy5czu3hk548zrg7rc9kxz89eqcceq4j9k"
+}
+EOF
+```
+
+```json
+{
+  "code":500,
+  "message":"Error: Transaction failed with reason: the transaction was rejected by network rules.\n\nmandatory-script-verify-flag-failed (Script failed an OP_VERIFY operation) (code 16)\n\nmeep debug --tx=02000000017944661ad0a1b5e1d3948c3cfb2aafe19e1e3061c910ccee4cfa2169c22ce67100000000fdcf0204a6620e4802214e41f40721b9cc9909bbaaa8d1831765300fa709301569432f6ced465049e094b6c0b584d394bc354b9cbeef111e40bcca140131c3dc114623f6c286b86873a0e77641210209068ea1926189a4479da16753d51009906e7dc9e2f6862049203dc7fc9e8e074d7d0102000000e386b3b136602efa44d2bbc5f6b8db6c835751780bc19c19c6dd7b244f0768f618606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe1987944661ad0a1b5e1d3948c3cfb2aafe19e1e3061c910ccee4cfa2169c22ce67100000000e004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff0f4efda089f65bddd117fc135bd32147d5914f301960042eef5ed8d3b950e8088502000041000000514ce004a6620e4802204e1447108f48491995827d4c42b7f15d044a9df0d5ab149cc037e78129817237b52a710d1e1e0b6308e5c814da96a46bf1f00dba0348df5e820f3bf92e2b44805579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a9149cc037e78129817237b52a710d1e1e0b6308e5c888ac85020000 --idx=0 --amt=20837 --pkscript=a914d0bff5fcea912e84d63d11b535204a535e739ec487"
+}
+```
+
+In the above error output, we see the operation that failed was `OP_VERIFY` and we're provided with the `meep` debug command to step through this specific transaction.
+
+[`meep`](https://github.com/gcash/meep) is a Bitcoin Cash script debugger written in golang. After ensuring you have it installed, and it's callable on your computer, you may use the above supplied command to see where exactly in execution of the unlock script OP_VERIFY failed.
+
+![Meep_rest](./assets/escrow_seller_spend_meep_rest.png)
+
+Stepping through the Bitcoin Script in `meep`, we can see the translation of the CashScript contract to Bitcoin Script. The contract repeats the same pattern with the `spend` and `refund` blocks in an `if,else,endif` structure. And that the failure occurs on an `OP_VERIFY` in the second or `refund` block. 
+
+The operations between the `OP_IF` and `OP_ELSE` are highlighted in red to show they've  been skipped.
+
+We can also see in the `RedeemScript` section that the nonce (`a6620e48`), amount (`214e`), as well as the public key hashes for the arbiter (`47108f484...df0d5ab`), buyer (`9cc037e781...b6308e5c8`) and seller (`da96a46bf...2e2b4480`).  These are the arguments to our CashScript function, but in reversed order.  
+
+Walking through the contract with `meep`, we can see that there are two `OP_HASH160` operations performed and then the contract fails on `OP_VERIFY`.  Looking at the escrow contract, it should be clear that this corresponds to the highlighted line in the `refund` function, where the contract requires that either the `arbiterPkh` or `sellerPkh` match the `signingPkh` provided (highlighted below).  
+
+
+```solidity{14}
+pragma cashscript ^0.6.1;
+contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int contractAmount, int contractNonce) {
+
+    function spend(pubkey signingPk, sig s, int amount, int nonce) {
+        require(hash160(signingPk) == arbiterPkh || hash160(signingPk) == buyerPkh);
+        require(checkSig(s, signingPk));
+        require(amount >= contractAmount);
+        require(nonce == contractNonce);
+        bytes34 output = new OutputP2PKH(bytes8(amount), sellerPkh);
+        require(hash256(output) == tx.hashOutputs);
+    }
+
+    function refund(pubkey signingPk, sig s, int amount, int nonce) {
+        require(hash160(signingPk) == arbiterPkh||hash160(signingPk) == sellerPkh);
+        require(checkSig(s, signingPk));
+        require(amount >= contractAmount);
+        require(nonce == contractNonce);
+        bytes34 output = new OutputP2PKH(bytes8(amount), buyerPkh);
+        require(hash256(output) == tx.hashOutputs);
+    }
+}
+```
+
+The above process can be repeated to trace back which particular step the contract was rejected on, and what the state of the stack was when that rejection occurred.
 
 ## Utilities
 
