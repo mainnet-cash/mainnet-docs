@@ -526,6 +526,12 @@ Note: these tokens are transferrable but not mintable. Regardless of options sup
 
 See [Token Balances](#token-balances)
 
+### Configuring SLP provider and endpoints
+
+You can switch between the default SLPDB and experimental Graph Search++ SLP providers by changing the static property `Wallet.slp.defaultProvider`. Valid values are `slpdb` and `gspp`. All other values will be not recognized and will default to SLPDB provider. The changes to this property will take effect globally next time you create a new wallet. If you want to change the provider for a single wallet only, you can do `wallet.slp.setProvider(...)`.
+
+You can change SLP provider data source and event source endpoints by changing static properties `SlpDbProvider.defaultServers` and `GsppProvider.defaultServers`. The changes will take effect globally next time you create a new wallet. If you want to change the endpoints for a single wallet only, you can do `wallet.slp.provider.servers = ...`.
+
 ## TestNet faucet
 
 You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
