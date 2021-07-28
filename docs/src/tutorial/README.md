@@ -197,6 +197,9 @@ const txData = await wallet.send([
     unit: 'usd',
   }
 ]);
+
+// or alternatively
+const txData = await wallet.send([seller.getDepositAddress(), 0.01, 'usd']);
 ```
 
 ... which returns an object containing the remaining balance and the transaction ID:
@@ -310,6 +313,33 @@ The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/
   height: number;
   hex: string;
 }
+```
+
+### Sending data with OP_RETURN
+
+You can store arbitrary data on blockchain using the OP_RETURN opcode. It is useful not only to store simple text messages, many protocols such as MEMO and SLP are utilizing it to build complex applications.
+
+You can send OP_RETURN messages as simple strings (supporting UTF8) or binary buffers as follows:
+
+```js
+await wallet.send([ OpReturnData.from("MEMO\x10LÖL😅") ]);
+await wallet.send([ OpReturnData.from(Buffer.from([0x4c, 0x4f, 0x4c])) ]);
+
+// or alternatively
+
+await wallet.send([ ["OP_RETURN", "MEMO\x10LÖL😅"] ]);
+await wallet.send([ ["OP_RETURN", Buffer.from([0x4c, 0x4f, 0x4c])] ]);
+```
+
+You can simply pass raw buffer containing your opcodes. If your buffer lacks the OP_RETURN and OP_PUSHDATA (followed by the length of the message) opcodes, they will be prepended.
+
+Sending funds and OP_RETURN messages can be mixed together, the output order will be preserved:
+
+```js
+await wallet.send([
+  OpReturnData.from("MEMO\x10LÖL😅"),
+  { cashaddr: otherWallet.cashaddr!, value: 546, unit: "sats" },
+]);
 ```
 
 ## Simple Ledger Protocol (SLP)

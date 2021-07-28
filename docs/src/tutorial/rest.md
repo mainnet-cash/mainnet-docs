@@ -310,7 +310,53 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
 
 This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs, SLP awareness and others (see above).
 
-## Waiting for a transaction
+### Sending data with OP_RETURN
+
+You can store arbitrary data on blockchain using the OP_RETURN opcode. It is useful not only to store simple text messages, many protocols such as MEMO and SLP are utilizing it to build complex applications.
+
+You can send OP_RETURN messages as simple strings (supporting UTF8) or binary buffers as follows:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+    "to": [
+      { "dataString": "MEMO\x10LÖL😅" },
+      { "dataBuffer": "TUVNTxBMw5ZM8J+YhQ==" }
+    ]
+  }'
+
+# or alternatively
+
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+    "to": [
+      ["OP_RETURN", "MEMO\x10LÖL😅"],
+      ["OP_RETURNB64": "TUVNTxBMw5ZM8J+YhQ=="]
+    ]
+  }'
+```
+
+`dataBuffer` and `OP_RETURNB64` contain Base64 encoded binary data arrays.
+
+You can simply pass raw buffer containing your opcodes. If your buffer lacks the OP_RETURN and OP_PUSHDATA (followed by the length of the message) opcodes, they will be prepended.
+
+Sending funds and OP_RETURN messages can be mixed together, the output order will be preserved:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+    "to": [
+      ["bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8", 546, "sats"],
+      ["OP_RETURNB64": "TUVNTxBMw5ZM8J+YhQ=="]
+    ]
+  }'
+```
 
 ### QR codes
 
@@ -340,7 +386,7 @@ You can use this `src` directly in the image tag:
 </p>
 ```
 
-### Waiting
+### Waiting for blockchain events
 
 See [WebSockets](#websocket-api-reference) and [WebHooks](#webhooks).
 
