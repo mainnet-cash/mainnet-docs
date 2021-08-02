@@ -289,10 +289,21 @@ The `balance` variable contains the actual balance of the wallet.
 You can wait for a wallet transaction and halt the program execution until it arrives.
 
 ```js
-const rawTransaction = await wallet.waitForTransaction();
+const options = {
+  getTransactionInfo: true,
+  getBalance: false,
+  txHash: undefined
+}
+const response = await wallet.waitForTransaction(options);
 ```
 
-The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+If `txHash` is supplied method will wait for a transaction with this exact hash to be propagated through and registered in the network by the Fulcrum indexer, otherwise any address transaction will trigger a response.
+
+Response: Object {transactionInfo: any, balance: any} depending on the options supplied.
+
+`transactionInfo` Raw transaction in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+
+`balance`: balance response object as per `getBalance` request.
 
 If you are willing to ~~spy on~~ monitor transactions of an address you do not own, you can create a [watchOnly wallet](#watch-only-wallets).
 

@@ -1757,12 +1757,21 @@ Waits for the next transaction of the address. Responds once.
 {
   method: "waitForTransaction",
   data: {
-    cashaddr: "bitcoincash:qzxzl07tth5qx4shphrpzz38wnstwac5ksqnc6yyr3"
+    cashaddr: "bitcoincash:qzxzl07tth5qx4shphrpzz38wnstwac5ksqnc6yyr3",
+    options: {
+      getTransactionInfo: true,
+      getBalance: false,
+      txHash: undefined
+    }
   }
 }
 ```
 
-Response: Raw transaction in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+If `txHash` is supplied method will wait for a transaction with this exact hash to be propagated through and registered in the network by the Fulcrum indexer, otherwise any address transaction will trigger a response.
+
+Response: Object {transactionInfo: any, balance: any} depending on the options supplied.
+
+`transactionInfo` Raw transaction in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
 ```json
 {
   hash: '0f617203d936386c4ed6a828f911e577394cd753b652745d5207fbb139c0d924',
@@ -1785,6 +1794,8 @@ Response: Raw transaction in verbose format as per [specification](https://elect
   ]
 }
 ```
+
+`balance`: balance response object as per `getBalance` request.
 
 #### waitForBlock
 
