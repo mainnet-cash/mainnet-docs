@@ -29,6 +29,14 @@
             Non-custodial enterprise wallet<br>on your own server
           </p>
         </div>
+        <div style="margin-left: 10px;">
+          <a href="/tutorial/smartbch.html" class="nav-link action-button">
+            SmartBch →
+          </a>
+          <p style="font-size: 90%;">
+            Interact with SmartBch <br> wallets, contracts and tokens
+          </p>
+        </div>
       </div>
 
       <div style="display: flex; justify-content: space-between; width: 10em; margin: 0 auto; font-size: 70%;">

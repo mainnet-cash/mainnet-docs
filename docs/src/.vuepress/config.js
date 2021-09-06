@@ -54,6 +54,8 @@ module.exports = {
                 children: [
                     '/tutorial/',
                     '/tutorial/rest.html',
+                    '/tutorial/smartbch.html',
+                    '/tutorial/smartbch-rest.html',
                     '/tutorial/other-languages.html',
                     '/tutorial/running-rest.html',
                 ]

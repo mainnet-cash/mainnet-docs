@@ -987,7 +987,7 @@ The response is a serialized contract, (storing the network, raw script, and con
 
 ### Calling a contract function
 
-Using with the `contractId` and a `walletId`git , it is fairly straight-forward to call the function in CashScript:
+Using with the `contractId` and a `walletId`, it is fairly straight-forward to call the function in CashScript:
 
 ```bash
 curl -X POST "https://rest-unstable.mainnet.cash/contract/call" \
