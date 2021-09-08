@@ -353,7 +353,7 @@ Coming soon.
 
 ## SEP20 (ERC20) token protocol
 
-We currently fully support the ERC20 tokens [specification](https://docs.smartbch.org/smartbch/smartbch-evolution-proposals-seps/sep-20)
+We currently fully support the SEP20 tokens [specification](https://docs.smartbch.org/smartbch/smartbch-evolution-proposals-seps/sep-20)
 
 The interfaces were designed to be largely similar to those of BCH wallets and SLP protocol.
 
@@ -370,7 +370,7 @@ Note, that there might be many tokens with the same name. Remember, that only 42
 In the following example 10000.00 MNC tokens will be created.
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/smartbch/erc20/genesis \
+curl -X POST https://rest-unstable.mainnet.cash/smartbch/sep20/genesis \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
@@ -404,7 +404,7 @@ Optional `tokenReceiverAddress` and `batonReceiverAddress` allow to specify the 
 
 ### Looking up token information
 
-If you want to get the genesis information of some token, you can simply call `smartbch/erc20/token_info`:
+If you want to get the genesis information of some token, you can simply call `smartbch/sep20/token_info`:
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/token_info \
@@ -434,7 +434,7 @@ If you decide to increase the token circulation supply, you would need to `mint`
 In the following example we issue 50 more tokens we just created in genesis:
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/smartbch/erc20/mint \
+curl -X POST https://rest-unstable.mainnet.cash/smartbch/sep20/mint \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
@@ -469,7 +469,7 @@ Response:
 Sending tokens around is easy and is very similar to sending BCH. You can include many send requests in one call too!
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/smartbch/erc20/send \
+curl -X POST https://rest-unstable.mainnet.cash/smartbch/sep20/send \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
@@ -500,10 +500,10 @@ Response:
 }]
 ```
 
-Or you can send all tokens available with a simple `smartbch/erc20/send_max` method
+Or you can send all tokens available with a simple `smartbch/sep20/send_max` method
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/smartbch/erc20/send_max \
+curl -X POST https://rest-unstable.mainnet.cash/smartbch/sep20/send_max \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
@@ -534,7 +534,7 @@ Response:
 You can get token balance of a specific token with the following methods:
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/smartbch/erc20/balance \
+curl -X POST https://rest-unstable.mainnet.cash/smartbch/sep20/balance \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
@@ -762,16 +762,16 @@ Response:
 
 Note, that unlike the BCH contracts, SmartBch contract do not use nonce.
 
-We allow to deploy [solidity](http://solidity.readthedocs.io) based contracts. Example ERC20 contract:
+We allow to deploy [solidity](http://solidity.readthedocs.io) based contracts. Example SEP20 contract:
 
 ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/SEP20/SEP20.sol";
 
-contract MyToken is ERC20 {
-  constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+contract MyToken is SEP20 {
+  constructor(string memory name, string memory symbol) SEP20(name, symbol) {}
 }
 ```
 
@@ -807,7 +807,7 @@ curl -X POST https://rest-unstable.mainnet.cash/smartbch/contract/deploy \
   -H  "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:regtest:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
-  "script": "\n    // SPDX-License-Identifier: MIT\n    pragma solidity ^0.8.2;\n\n    import \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";\n\n    contract MyToken is ERC20 {\n      constructor(string memory name, string memory symbol) ERC20(name, symbol) {\n        _mint(msg.sender, 10000);\n      }\n    }",
+  "script": "\n    // SPDX-License-Identifier: MIT\n    pragma solidity ^0.8.2;\n\n    import \"@openzeppelin/contracts/token/SEP20/SEP20.sol\";\n\n    contract MyToken is SEP20 {\n      constructor(string memory name, string memory symbol) SEP20(name, symbol) {\n        _mint(msg.sender, 10000);\n      }\n    }",
   "parameters": [
     "MyToken",
     "MTK"
@@ -921,7 +921,7 @@ This will return all the arguments to reconstruct or verify a contract.
     "function transfer(address recipient, uint256 amount) returns (bool)",
     "function transferFrom(address sender, address recipient, uint256 amount) returns (bool)"
   ],
-  "script": "\n    // SPDX-License-Identifier: MIT\n    pragma solidity ^0.8.2;\n\n    import \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";\n\n    contract MyToken is ERC20 {\n      constructor(string memory name, string memory symbol) ERC20(name, symbol) {\n        _mint(msg.sender, 10000);\n      }\n    }",
+  "script": "\n    // SPDX-License-Identifier: MIT\n    pragma solidity ^0.8.2;\n\n    import \"@openzeppelin/contracts/token/SEP20/SEP20.sol\";\n\n    contract MyToken is SEP20 {\n      constructor(string memory name, string memory symbol) SEP20(name, symbol) {\n        _mint(msg.sender, 10000);\n      }\n    }",
   "parameters": [
     "MyToken",
     "MTK"

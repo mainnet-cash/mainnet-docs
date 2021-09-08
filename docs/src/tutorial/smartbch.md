@@ -348,19 +348,19 @@ The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/
 
 ## SEP20 (ERC20) token protocol
 
-We currently fully support the ERC20 tokens [specification](https://docs.smartbch.org/smartbch/smartbch-evolution-proposals-seps/sep-20)
+We currently fully support the SEP20 tokens [specification](https://docs.smartbch.org/smartbch/smartbch-evolution-proposals-seps/sep-20)
 
 The interfaces were designed to be largely similar to those of BCH wallets and SLP protocol.
 
-The ERC20 functions are then available via Wallet.erc20 accessor:
+The SEP20 functions are then available via Wallet.sep20 accessor:
 
 ```js
-const address = wallet.erc20.getDepositAddress();
+const address = wallet.sep20.getDepositAddress();
 
-const qrCode = wallet.erc20.getDepositQr();
+const qrCode = wallet.sep20.getDepositQr();
 ```
 
-Note, that working with ERC20 tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the token transactions.
+Note, that working with SEP20 tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the token transactions.
 
 ### Token creation - Genesis
 
@@ -380,7 +380,7 @@ const genesisOptions = {
   initialAmount: 10000,
   endBaton: false
 };
-const {tokenId} =  await wallet.erc20.genesis(genesisOptions)
+const {tokenId} =  await wallet.sep20.genesis(genesisOptions)
 ```
 
 Optional `tokenReceiverAddress` and `batonReceiverAddress` allow to specify the receiver of tokens and minting baton.
@@ -416,9 +416,9 @@ Optional `tokenReceiverAddress` allow to specify the receiver of tokens.
 Sending tokens around is easy and is very similar to sending BCH. You can include many send requests in one call too!
 
 ```js
-const {txId, balance} = await wallet.erc20.send([
+const {txId, balance} = await wallet.sep20.send([
   {
-    address: bobWallet.erc20.getDepositAddress(),
+    address: bobWallet.sep20.getDepositAddress(),
     value: 5,
     tokenId: tokenId
   }
@@ -428,7 +428,7 @@ const {txId, balance} = await wallet.erc20.send([
 Or you can send all tokens available with a simple sendMax method
 
 ```js
-const result = await wallet.erc20.sendMax(otherWallet.erc20.getDepositAddress(), tokenId);
+const result = await wallet.sep20.sendMax(otherWallet.sep20.getDepositAddress(), tokenId);
 ```
 
 ### Token balances
@@ -436,7 +436,7 @@ const result = await wallet.erc20.sendMax(otherWallet.erc20.getDepositAddress(),
 You can get token balance of a specific token with the following methods:
 
 ```js
-const tokenBalance = wallet.erc20.getBalance(tokenId);
+const tokenBalance = wallet.sep20.getBalance(tokenId);
 ```
 
 ### Watching/waiting for transactions
@@ -575,17 +575,17 @@ const slpSendResponse = await wallet.returnTestnetSlp(tokenId);
 
 Note, that unlike the BCH contracts, SmartBch contract do not use nonce.
 
-We allow to deploy [solidity](http://solidity.readthedocs.io) based contracts. (Browser environment to be supported yet). Example ERC20 contract:
+We allow to deploy [solidity](http://solidity.readthedocs.io) based contracts. (Browser environment to be supported yet). Example SEP20 contract:
 
 ```js
 const script = `
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/SEP20/SEP20.sol";
 
-contract MyToken is ERC20 {
-  constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+contract MyToken is SEP20 {
+  constructor(string memory name, string memory symbol) SEP20(name, symbol) {}
 }`
 ```
 
@@ -632,7 +632,7 @@ const contract = await Contract.deploy(
 );
 ```
 
-The above snippet deploys an ERC20 contract with constructor parameters `name`: `"Mainnet Coin"` and `symbol`: `MNC`. Note, that they are passed as function parameters.
+The above snippet deploys an SEP20 contract with constructor parameters `name`: `"Mainnet Coin"` and `symbol`: `MNC`. Note, that they are passed as function parameters.
 Note the last function parameter object. It is the optional `overrides` object to steer the network interaction.
 
 This will give you a contract object that can be serialized and deserialized just like a wallet:
