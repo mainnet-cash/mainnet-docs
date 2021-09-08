@@ -407,7 +407,7 @@ Optional `tokenReceiverAddress` and `batonReceiverAddress` allow to specify the 
 If you want to get the genesis information of some token, you can simply call `smartbch/sep20/token_info`:
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/token_info \
+curl -X POST https://rest-unstable.mainnet.cash/wallet/sep20/token_info \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
@@ -553,41 +553,12 @@ Response:
 }
 ```
 
-### SLP address UTXOs
-
-If you want to get the information about SLP UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/utxo \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45"
-}'
-```
-
-Response:
-
-```json
-[
-  {
-    "index": 0,
-    "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
-    "satoshis": 546,
-    "utxoId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0",
-    "value": "10000",
-    "decimals": 2,
-    "ticker": "MNC",
-    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-]
-```
-
-### Erc20 deposit address
+### Sep20 deposit address
 
 You can get the token deposit address:
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_address \
+curl -X POST https://rest-unstable.mainnet.cash/wallet/sep20/deposit_address \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45"
@@ -602,12 +573,12 @@ Response:
 }
 ```
 
-### SLP deposit QR code
+### Sep20 deposit QR code
 
 You can get the deposit address embedded in a QR code image. The response is ready to be used in HTML `src`, `title` and `alt` attributes of an `img` node.
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_qr \
+curl -X POST https://rest-unstable.mainnet.cash/wallet/sep20/deposit_qr \
   -H "Content-Type: application/json" \
   -d '{
   "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45"
