@@ -289,15 +289,11 @@ document.querySelector('#deposit').src = wallet.getDepositQr().src;
 ```
 ### Waiting for balance
 
-Coming soon.
-
-<!--
-
 You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
 
 ```js
 const balance = await wallet.waitForBalance(1.0, 'usd');
-````
+```
 
 The `balance` variable contains the actual balance of the wallet.
 
@@ -307,6 +303,7 @@ You can wait for a wallet transaction and halt the program execution until it ar
 
 ```js
 const options = {
+  confirmations: 1,
   getTransactionInfo: true,
   getBalance: false,
   txHash: undefined
@@ -314,21 +311,20 @@ const options = {
 const response = await wallet.waitForTransaction(options);
 ```
 
-If `txHash` is supplied method will wait for a transaction with this exact hash to be propagated through and registered in the network by the Fulcrum indexer, otherwise any address transaction will trigger a response.
+If `txHash` is supplied method will wait for a transaction with this exact hash to be propagated through and registered in the network by the indexer, otherwise any address transaction will trigger a response.
 
-Response: Object {transactionInfo: any, balance: any} depending on the options supplied.
+Response: Object `{transactionInfo: ethers.providers.TransactionReceipt, balance: BalanceResponse}` depending on the options supplied.
 
-`transactionInfo` Raw transaction in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+`transactionInfo` Raw transaction in verbose format as per [specification](https://docs.ethers.io/v5/api/providers/types/#providers-TransactionReceipt)
 
 `balance`: balance response object as per `getBalance` request.
+
+`confirmations`: is amount of confirmations of the transaction. Defaults to 1.
 
 If you are willing to ~~spy on~~ monitor transactions of an address you do not own, you can create a [watchOnly wallet](#watch-only-wallets). -->
 
 ### Waiting for block
 
-Coming soon.
-
-<!-- 
 If you want to wait for the next block or wait for blockhain to reach certain block height you can use the following method of the wallet's network provider:
 
 ```js
@@ -337,14 +333,7 @@ const nextBlockInfo = await wallet.provider.waitForBlock();
 const futureBlockInfo = await wallet.provider.waitForBlock(770000);
 ```
 
-The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-headers-subscribe) is simple:
-
-```json
-{
-  height: number;
-  hex: string;
-}
-``` -->
+Refer to the [response object's schema](https://docs.ethers.io/v5/api/providers/types/#providers-Block).
 
 ## SEP20 (ERC20) token protocol
 
