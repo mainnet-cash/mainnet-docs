@@ -313,13 +313,22 @@ If you are willing to ~~spy on~~ monitor transactions of an address you do not o
 
 ### Watching/Waiting for balance
 
-You can watch for wallet ballance changes with `watchBalance` method (which also returns a cancellation function). The balance object sent to the callback has the same type as returned from `getBalance` method.
+You can watch for wallet balance changes with `watchBalance` method (which also returns a cancellation function). The balance object sent to the callback has the same type as returned from `getBalance` method.
 
 ```js
 const cancelWatch = wallet.watchBalance((balance) => {
   console.log(balance);
   await cancelWatch();
 });
+```
+
+You can watch for wallet balance changes which are also sensitive to BCH/USD rate changes. The callback will be fired even if there are no actual transactions happening. You can change the polling interval by setting `usdPriceRefreshInterval` parameter, which defaults to 30000 milliseconds.
+
+```js
+const cancelWatch = wallet.watchBalanceUsd((balance) => {
+  console.log(balance);
+  await cancelWatch();
+}, 5000);
 ```
 
 You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
