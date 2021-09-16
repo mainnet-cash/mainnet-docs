@@ -254,7 +254,7 @@ const txData = await seller.sendMax(wallet.getDepositAddress());
 }
 ```
 
-## Waiting for a transaction
+## Watching/Waiting methods
 
 ### QR codes
 
@@ -274,19 +274,23 @@ Then you can replace it with an actual QR code of the deposit address:
 document.querySelector('#deposit').src = wallet.getDepositQr().src;
 ```
 
-### Waiting for balance
+### Watching/Waiting for transaction
 
-You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
+You can watch for incoming wallet transaction with `watchAddress` and `watchAddressTransactions` methods with the difference that the former will monitor transaction hashes and the latter will receive the decoded transactions in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get). Both methods return an async function which when evaluated will cancel watching.
 
 ```js
-const balance = await wallet.waitForBalance(1.0, 'usd');
-````
+wallet.watchAddress((txHash) => {
+  console.log(txHash);
+});
 
-The `balance` variable contains the actual balance of the wallet.
+const cancelWatch = wallet.watchAddressTransactions((tx) => {
+  if (tx.hash === someHash) {
+    await cancelWatch();
+  }
+});
+```
 
-### Waiting for transaction
-
-You can wait for a wallet transaction and halt the program execution until it arrives.
+You can also wait for a wallet transaction and halt the program execution until it arrives:
 
 ```js
 const options = {
@@ -307,14 +311,42 @@ Response: Object {transactionInfo: any, balance: any} depending on the options s
 
 If you are willing to ~~spy on~~ monitor transactions of an address you do not own, you can create a [watchOnly wallet](#watch-only-wallets).
 
-### Waiting for block
+### Watching/Waiting for balance
 
-If you want to wait for the next block or wait for blockhain to reach certain block height you can use the following method of the wallet's network provider:
+You can watch for wallet ballance changes with `watchBalance` method (which also returns a cancellation function). The balance object sent to the callback has the same type as returned from `getBalance` method.
 
 ```js
-const nextBlockInfo = await wallet.provider.waitForBlock();
+const cancelWatch = wallet.watchBalance((balance) => {
+  console.log(balance);
+  await cancelWatch();
+});
+```
 
-const futureBlockInfo = await wallet.provider.waitForBlock(770000);
+You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
+
+```js
+const balance = await wallet.waitForBalance(1.0, 'usd');
+```
+
+The `balance` variable contains the actual balance of the wallet.
+
+### Watching/Waiting for block
+
+You can watch for incoming blocks with `watchBlocks` method:
+
+```js
+const cancelWatch = wallet.watchBlocks((block) => {
+  console.log(block);
+  await cancelWatch();
+});
+```
+
+If you want to wait for the next block or wait for blockhain to reach certain block height you can use the following method:
+
+```js
+const nextBlockInfo = await wallet.waitForBlock();
+
+const futureBlockInfo = await wallet.waitForBlock(770000);
 ```
 
 The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-headers-subscribe) is simple:
