@@ -1326,4 +1326,10 @@ await conn.networkProvider.getBlockHeight()
 // 669347
 ```
 
-This connection can be used to replace the common provider on `globalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet.
+This connection can be used to replace the common provider on `globalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet:
+
+```js
+globalThis.BCH = conn.networkProvider;
+// or
+wallet.provider = conn.networkProvider;
+```
