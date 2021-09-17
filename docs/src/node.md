@@ -145,18 +145,42 @@ Then run Fulcrum as usuall adding the `fulcrum.conf` at the end:
 
 ## Running Insomnia (REST server to serve Fulcrum results)
 
+Install nodejs, git, then:
+
 ```shell script
 git clone https://github.com/fountainhead-cash/insomnia.git
 cd insomnia
 npm install
 ```
 
-Edit the config file
+Edit the config file:
 
 ```shell
 cp src/config.ts.example src/config.ts
 $(EDITOR) src/config.ts
 ```
+
+Some things that you need to change:
+
+```json
+"connectionType": "client",
+```
+```json
+"servers": [
+  "127.0.0.1:50002"
+]
+```
+
+You will probably need to <span style="background-color: #fffdbf">raise</span> the `ratelimit` too in the config:
+
+```json
+"ratelimit": {
+  "windowMs": 1 * 60 * 1000,
+  "max": 1000000 
+},
+```
+
+Then run:
 
 ```shell
 npm start
