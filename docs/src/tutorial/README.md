@@ -842,10 +842,16 @@ In this section, we'll revisit the escrow contract and see ways to cause the con
 4. From the mainnet-js project root, run:
 
 ```shell
-./jest/docker/dev-start.sh
+yarn regtest:up 
 ```
 
 This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
+
+When you want to shut regtest down, use:
+
+```shell
+yarn regtest:down 
+```
 
 ### Step 1, "Neglect the fees"
 
@@ -1177,13 +1183,13 @@ Docker Compose file at `jest/regtest-docker-compose.yml`
 It can be brought up with:
 
 ```bash
-./jest/docker/dev-start.sh 
+yarn regtest:up
 ```
 
 To stop it:
 
 ```bash
-./jest/docker/dev-stop.sh
+yarn regtest:down
 ```
 
 The Electrum server (Fulcrum) is available at `ws://127.0.0.1:60003` on your local machine.  
