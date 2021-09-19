@@ -26,7 +26,7 @@
             REST API →
           </a>
           <p style="font-size: 90%;">
-            Non-custodial enterprise wallet<br>on your own server
+            Enterprise wallet<br>on your own server
           </p>
         </div>
         <div style="margin-left: 10px;">
