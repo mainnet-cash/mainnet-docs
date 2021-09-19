@@ -34,14 +34,14 @@ npm install mainnet-js
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.3.30.js"
- integrity="sha384-77X9TtfBsIy5iUm4Y8VfVNRy8Ym1T5U0JJQYW13NR4LTaZeL6tNE4esP7HRGhW+6"
+<script src="https://cdn.mainnet.cash/mainnet-0.4.1.js"
+ integrity="sha384-ktM38++Qv/Fe7IYBz3ObOCIPnTiRHKPZ4sMmkgW6gdQFEzF51d/OjOskBO4FayrR"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.3.30.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.4.1.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -197,6 +197,9 @@ const txData = await wallet.send([
     unit: 'usd',
   }
 ]);
+
+// or alternatively
+const txData = await wallet.send([seller.getDepositAddress(), 0.01, 'usd']);
 ```
 
 ... which returns an object containing the remaining balance and the transaction ID:
@@ -251,7 +254,7 @@ const txData = await seller.sendMax(wallet.getDepositAddress());
 }
 ```
 
-## Waiting for a transaction
+## Watching/Waiting methods
 
 ### QR codes
 
@@ -271,36 +274,88 @@ Then you can replace it with an actual QR code of the deposit address:
 document.querySelector('#deposit').src = wallet.getDepositQr().src;
 ```
 
-### Waiting for balance
+### Watching/Waiting for transaction
+
+You can watch for incoming wallet transaction with `watchAddress` and `watchAddressTransactions` methods with the difference that the former will monitor transaction hashes and the latter will receive the decoded transactions in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get). Both methods return an async function which when evaluated will cancel watching.
+
+```js
+wallet.watchAddress((txHash) => {
+  console.log(txHash);
+});
+
+const cancelWatch = wallet.watchAddressTransactions((tx) => {
+  if (tx.hash === someHash) {
+    await cancelWatch();
+  }
+});
+```
+
+You can also wait for a wallet transaction and halt the program execution until it arrives:
+
+```js
+const options = {
+  getTransactionInfo: true,
+  getBalance: false,
+  txHash: undefined
+}
+const response = await wallet.waitForTransaction(options);
+```
+
+If `txHash` is supplied method will wait for a transaction with this exact hash to be propagated through and registered in the network by the Fulcrum indexer, otherwise any address transaction will trigger a response.
+
+Response: Object {transactionInfo: any, balance: any} depending on the options supplied.
+
+`transactionInfo` Raw transaction in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+
+`balance`: balance response object as per `getBalance` request.
+
+If you are willing to ~~spy on~~ monitor transactions of an address you do not own, you can create a [watchOnly wallet](#watch-only-wallets).
+
+### Watching/Waiting for balance
+
+You can watch for wallet balance changes with `watchBalance` method (which also returns a cancellation function). The balance object sent to the callback has the same type as returned from `getBalance` method.
+
+```js
+const cancelWatch = wallet.watchBalance((balance) => {
+  console.log(balance);
+  await cancelWatch();
+});
+```
+
+You can watch for wallet balance changes which are also sensitive to BCH/USD rate changes. The callback will be fired even if there are no actual transactions happening. You can change the polling interval by setting `usdPriceRefreshInterval` parameter, which defaults to 30000 milliseconds.
+
+```js
+const cancelWatch = wallet.watchBalanceUsd((balance) => {
+  console.log(balance);
+  await cancelWatch();
+}, 5000);
+```
 
 You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
 
 ```js
 const balance = await wallet.waitForBalance(1.0, 'usd');
-````
+```
 
 The `balance` variable contains the actual balance of the wallet.
 
-### Waiting for transaction
+### Watching/Waiting for block
 
-You can wait for a wallet transaction and halt the program execution until it arrives.
+You can watch for incoming blocks with `watchBlocks` method:
 
 ```js
-const rawTransaction = await wallet.waitForTransaction();
+const cancelWatch = wallet.watchBlocks((block) => {
+  console.log(block);
+  await cancelWatch();
+});
 ```
 
-The returned object follows [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
-
-If you are willing to ~~spy on~~ monitor transactions of an address you do not own, you can create a [watchOnly wallet](#watch-only-wallets).
-
-### Waiting for block
-
-If you want to wait for the next block or wait for blockhain to reach certain block height you can use the following method of the wallet's network provider:
+If you want to wait for the next block or wait for blockhain to reach certain block height you can use the following method:
 
 ```js
-const nextBlockInfo = await wallet.provider.waitForBlock();
+const nextBlockInfo = await wallet.waitForBlock();
 
-const futureBlockInfo = await wallet.provider.waitForBlock(770000);
+const futureBlockInfo = await wallet.waitForBlock(770000);
 ```
 
 The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-headers-subscribe) is simple:
@@ -310,6 +365,33 @@ The [response object's schema](https://electrum-cash-protocol.readthedocs.io/en/
   height: number;
   hex: string;
 }
+```
+
+### Sending data with OP_RETURN
+
+You can store arbitrary data on blockchain using the OP_RETURN opcode. It is useful not only to store simple text messages, many protocols such as MEMO and SLP are utilizing it to build complex applications.
+
+You can send OP_RETURN messages as simple strings (supporting UTF8) or binary buffers as follows:
+
+```js
+await wallet.send([ OpReturnData.from("MEMO\x10LÖL😅") ]);
+await wallet.send([ OpReturnData.from(Buffer.from([0x4c, 0x4f, 0x4c])) ]);
+
+// or alternatively
+
+await wallet.send([ ["OP_RETURN", "MEMO\x10LÖL😅"] ]);
+await wallet.send([ ["OP_RETURN", Buffer.from([0x4c, 0x4f, 0x4c])] ]);
+```
+
+You can simply pass raw buffer containing your opcodes. If your buffer lacks the OP_RETURN and OP_PUSHDATA (followed by the length of the message) opcodes, they will be prepended.
+
+Sending funds and OP_RETURN messages can be mixed together, the output order will be preserved:
+
+```js
+await wallet.send([
+  OpReturnData.from("MEMO\x10LÖL😅"),
+  { cashaddr: otherWallet.cashaddr!, value: 546, unit: "sats" },
+]);
 ```
 
 ## Simple Ledger Protocol (SLP)
@@ -525,6 +607,12 @@ Note: these tokens are transferrable but not mintable. Regardless of options sup
 #### List of your NFTs
 
 See [Token Balances](#token-balances)
+
+### Configuring SLP provider and endpoints
+
+You can switch between the default SLPDB and experimental Graph Search++ SLP providers by changing the static property `Wallet.slp.defaultProvider`. Valid values are `slpdb` and `gspp`. All other values will be not recognized and will default to SLPDB provider. The changes to this property will take effect globally next time you create a new wallet. If you want to change the provider for a single wallet only, you can do `wallet.slp.setProvider(...)`.
+
+You can change SLP provider data source and event source endpoints by changing static properties `SlpDbProvider.defaultServers` and `GsppProvider.defaultServers`. The changes will take effect globally next time you create a new wallet. If you want to change the endpoints for a single wallet only, you can do `wallet.slp.provider.servers = ...`.
 
 ## TestNet faucet
 
@@ -847,7 +935,7 @@ In this section, we'll revisit the escrow contract and see ways to cause the con
 
 This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
 
-### Step 1, "Oh, the fees"
+### Step 1, "Neglect the fees"
 
 Small transaction fees are currently used on Bitcoin Cash to make the cost of a large spam attack non-trivial to the attacker. There are other finite measures, such as coindays (or the age of coins being spent). However, for a the time being, Bitcoin Cash software largely agrees to use 1 sat/byte, because the mechanism was simple to implement across a lot of diverse and interconnected software.
 
@@ -1247,4 +1335,10 @@ await conn.networkProvider.getBlockHeight()
 // 669347
 ```
 
-This connection can be used to replace the common provider on `globalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet.
+This connection can be used to replace the common provider on `globalThis.BCH` or assigned to a particular wallet by overwriting the `provider` object of the wallet:
+
+```js
+globalThis.BCH = conn.networkProvider;
+// or
+wallet.provider = conn.networkProvider;
+```

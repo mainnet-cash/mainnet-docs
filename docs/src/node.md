@@ -4,24 +4,25 @@
 
 Create a directory for the data, let's say: `/mnt/bchn` (and for example `/mnt/fulcrum` for Fulcrum)
 
-The space requirements as of February 2021:
+The space requirements as of September 2021:
 
 ```shell
-182G    /mnt/bchn
-36G     /mnt/fulcrum
+202G    /mnt/bchn
+44G     /mnt/fulcrum
 ```
 
-### Remove Bitcoin ABC if it was running
+### Remove Bitcoin ABC 
+
+Only necessary <span style="background-color: #fffdbf">if you had Bitcoin ABC installed</span>:
 
 ```shell script
 sudo apt-get remove bitcoind bitcoin-qt bitcoin-tx
 sudo add-apt-repository --remove ppa:bitcoin-abc/ppa
 ```
 
-
 ### Install Bitcoin Cash Node
 
-#### Run this on Ubuntu 16.04 and 18.04 only:
+Run this <span style="background-color: #fffdbf">on Ubuntu 16.04 and 18.04 only</span>:
 
 ```shell script
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -127,7 +128,24 @@ Your REST server will be available at `http://127.0.0.1:3000` connected to your 
 
 See [here](/tutorial/running-rest.html) for more options (including LetsEncrypt certificate for your REST server)
 
+## Fulcrum config
+
+By default Fulcrum will not show some addresses that have some very long transaction history, you need this `fulcrum.conf`
+to change that:
+
+```
+max_history=10000000
+```
+
+Then run Fulcrum as usuall adding the `fulcrum.conf` at the end:
+
+```sh
+./Fulcrum ... fulcrum.conf
+```
+
 ## Running Insomnia (REST server to serve Fulcrum results)
+
+Install nodejs, git, then:
 
 ```shell script
 git clone https://github.com/fountainhead-cash/insomnia.git
@@ -135,12 +153,34 @@ cd insomnia
 npm install
 ```
 
-Edit the config file
+Edit the config file:
 
 ```shell
 cp src/config.ts.example src/config.ts
 $(EDITOR) src/config.ts
 ```
+
+Some things that you need to change:
+
+```json
+"connectionType": "client",
+```
+```json
+"servers": [
+  "127.0.0.1:50002"
+]
+```
+
+You will probably need to <span style="background-color: #fffdbf">raise</span> the `ratelimit` too in the config:
+
+```json
+"ratelimit": {
+  "windowMs": 1 * 60 * 1000,
+  "max": 1000000 
+},
+```
+
+Then run:
 
 ```shell
 npm start
