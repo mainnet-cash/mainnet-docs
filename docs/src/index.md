@@ -30,7 +30,7 @@ features:
   details: For non-custodial marketplaces
   url: /tutorial/#escrow-contracts
 - title: SmartBCH support
-  details: EVM(Ethereum)-compatible side chain that uses Bitcoin Cash using the same interface
+  details: EVM(Ethereum)-compatible side-chain that uses Bitcoin Cash using the same interface
   url: /tutorial/smartbch.html
 - title: Instant cheap transactions
   details: Bitcoin Cash network is production ready with less than 1 cent transaction fees and hundreds of thousands of transactions per day
