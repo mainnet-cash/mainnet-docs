@@ -25,27 +25,34 @@ and persisted inside of a user browser.
 
 See [calling the REST API](/tutorial/rest.html) or [Other programming languages](/tutorial/other-languages.html) for other approaches.
 
-### node.js / webpack
+### Getting the mainnet-cash SmartBCH package
 
-Install using:
+To keep the size of the packages small, both the Ethereum style SmartBch functionality and CashScript solidity contracts have been broken out into separate add-on packages (@mainnet-cash/smartbch & @mainnet-cash/contract). 
+
+#### Via npm / yarn
+
+If you are developing in node or for a webapp, import or require from `@mainnet-cash/smartbch` after installing the separate package using:
 
 ```sh
-npm install mainnet-js
+npm install @mainnet-cash/smartbch
+# or 
+yarn add @mainnet-cash/smartbch
+
 ```
 
-### &lt;script> tag in HTML
+#### &lt;script> tag in HTML
 
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.4.4.js"
+<script src="https://cdn.mainnet.cash/smartbch/smartbch-0.4.4.js"
  integrity="sha384-JvQziogFpFOWMzKokJ8RLxDFG6BsYTESjEXtPfnw888Cn5SGpRqV7LDSaq/xKAce"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.4.4.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/smartbch/smartbch-0.4.4.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,

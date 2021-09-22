@@ -642,6 +642,43 @@ const slpSendResponse = await wallet.returnTestnetSlp(tokenId);
 Alpha release
 :::
 
+### Getting the mainnet-cash Contract package
+
+To keep the size of the packages small, both CashScript contract and Ethereum style functionality have been broken out into separate add-on packages (@mainnet-cash/contract & @mainnet-cash/smartbch). 
+
+#### Via npm / yarn
+
+If you are developing in node or for a webapp, import or require from `@mainnet-cash/contract` after installing the separate package using:
+
+```sh
+npm install @mainnet-cash/contract
+# or 
+yarn add @mainnet-cash/contract
+
+```
+
+#### &lt;script> tag in HTML
+
+To get started using CashScript Contracts on your site, include this tag in your `<head>` section:
+
+```html
+<script src="https://cdn.mainnet.cash/contract/contract-0.4.1.js"
+ integrity="sha384-ktM38++Qv/Fe7IYBz3ObOCIPnTiRHKPZ4sMmkgW6gdQFEzF51d/OjOskBO4FayrR"
+ crossorigin="anonymous"></script>
+```
+
+<!--
+you can generate the integrity sha like in the following example:
+echo sha384-`curl https://cdn.mainnet.cash/contract-0.4.1.js | openssl dgst -sha384 -binary | openssl base64 -A`
+-->
+
+This will enable code required for Cashscript in the global scope of your browser.
+
+Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
+the user's browser will not run the script. Or you can download the library and serve it locally.
+
+### Using the pre-defined contract
+
 Ok, let's now assume that you are building a service where you want to connect a buyer and a seller (a freelance marketplace 
 or a non-custodial exchange), but at the same time you don't want to hold anyone's money, 
 but only act as an arbiter in case something goes wrong. It's possible in Bitcoin Cash and it's called "an escrow contract".
@@ -838,6 +875,14 @@ let contract = new Contract(
 
 ```
 
+
+::: tip `Contract is not a function` got you down?
+
+See the note at the top of the [previous section](#getting-the-mainnet-cash-contract-package) about getting the @mainnet-cash/contract package.
+
+:::
+
+
 This will give you a contract object that can be serialized and deserialized just like a wallet:
 
 ```js
@@ -930,10 +975,16 @@ In this section, we'll revisit the escrow contract and see ways to cause the con
 4. From the mainnet-js project root, run:
 
 ```shell
-./jest/docker/dev-start.sh
+yarn regtest:up 
 ```
 
 This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
+
+When you want to shut regtest down, use:
+
+```shell
+yarn regtest:down 
+```
 
 ### Step 1, "Neglect the fees"
 
@@ -1265,13 +1316,13 @@ Docker Compose file at `jest/regtest-docker-compose.yml`
 It can be brought up with:
 
 ```bash
-./jest/docker/dev-start.sh 
+yarn regtest:up
 ```
 
 To stop it:
 
 ```bash
-./jest/docker/dev-stop.sh
+yarn regtest:down
 ```
 
 The Electrum server (Fulcrum) is available at `ws://127.0.0.1:60003` on your local machine.  

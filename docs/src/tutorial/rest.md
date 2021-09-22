@@ -1064,7 +1064,7 @@ In this section, we'll revisit the escrow contract and see ways to cause the con
 
 This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
 
-### Step 1, "oh yeah, the fees"
+### Step 1, "Neglect the fees"
 
 Small transaction fees are currently used on Bitcoin Cash to make the cost of a large spam attack non-trivial to the attacker. There are other finite measures, such as coindays (or the age of coins being spent). However, for a the time being, Bitcoin Cash software largely agrees to use 1 sat/byte, because the mechanism was simple to implement across a lot of diverse and interconnected software.
 
