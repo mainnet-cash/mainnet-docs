@@ -310,7 +310,53 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send_max \
 
 This will send the maximum amount (minus the transaction fees of 1 satoshi per byte, there are usually 200-300 bytes per transaction). Note, that you can also use here the optional parameter `options` to ensure the spending of certain UTXOs, SLP awareness and others (see above).
 
-## Waiting for a transaction
+### Sending data with OP_RETURN
+
+You can store arbitrary data on blockchain using the OP_RETURN opcode. It is useful not only to store simple text messages, many protocols such as MEMO and SLP are utilizing it to build complex applications.
+
+You can send OP_RETURN messages as simple strings (supporting UTF8) or binary buffers as follows:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+    "to": [
+      { "dataString": "MEMO\x10LÖL😅" },
+      { "dataBuffer": "TUVNTxBMw5ZM8J+YhQ==" }
+    ]
+  }'
+
+# or alternatively
+
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+    "to": [
+      ["OP_RETURN", "MEMO\x10LÖL😅"],
+      ["OP_RETURNB64": "TUVNTxBMw5ZM8J+YhQ=="]
+    ]
+  }'
+```
+
+`dataBuffer` and `OP_RETURNB64` contain Base64 encoded binary data arrays.
+
+You can simply pass raw buffer containing your opcodes. If your buffer lacks the OP_RETURN and OP_PUSHDATA (followed by the length of the message) opcodes, they will be prepended.
+
+Sending funds and OP_RETURN messages can be mixed together, the output order will be preserved:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+    "to": [
+      ["bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8", 546, "sats"],
+      ["OP_RETURNB64": "TUVNTxBMw5ZM8J+YhQ=="]
+    ]
+  }'
+```
 
 ### QR codes
 
@@ -340,7 +386,7 @@ You can use this `src` directly in the image tag:
 </p>
 ```
 
-### Waiting
+### Waiting for blockchain events
 
 See [WebSockets](#websocket-api-reference) and [WebHooks](#webhooks).
 
@@ -941,7 +987,7 @@ The response is a serialized contract, (storing the network, raw script, and con
 
 ### Calling a contract function
 
-Using with the `contractId` and a `walletId`git , it is fairly straight-forward to call the function in CashScript:
+Using with the `contractId` and a `walletId`, it is fairly straight-forward to call the function in CashScript:
 
 ```bash
 curl -X POST "https://rest-unstable.mainnet.cash/contract/call" \
@@ -1711,12 +1757,21 @@ Waits for the next transaction of the address. Responds once.
 {
   method: "waitForTransaction",
   data: {
-    cashaddr: "bitcoincash:qzxzl07tth5qx4shphrpzz38wnstwac5ksqnc6yyr3"
+    cashaddr: "bitcoincash:qzxzl07tth5qx4shphrpzz38wnstwac5ksqnc6yyr3",
+    options: {
+      getTransactionInfo: true,
+      getBalance: false,
+      txHash: undefined
+    }
   }
 }
 ```
 
-Response: Raw transaction in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
+If `txHash` is supplied method will wait for a transaction with this exact hash to be propagated through and registered in the network by the Fulcrum indexer, otherwise any address transaction will trigger a response.
+
+Response: Object {transactionInfo: any, balance: any} depending on the options supplied.
+
+`transactionInfo` Raw transaction in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get)
 ```json
 {
   hash: '0f617203d936386c4ed6a828f911e577394cd753b652745d5207fbb139c0d924',
@@ -1739,6 +1794,8 @@ Response: Raw transaction in verbose format as per [specification](https://elect
   ]
 }
 ```
+
+`balance`: balance response object as per `getBalance` request.
 
 #### waitForBlock
 

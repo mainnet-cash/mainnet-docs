@@ -13,7 +13,7 @@
 
 
       <div class="action" style="display: flex; justify-content: center;">
-        <div style="margin-right: 10px;">
+        <div style="margin: 0 10px 0 10px;">
           <a href="/tutorial/" class="nav-link action-button">
             JavaScript →
           </a>
@@ -21,12 +21,20 @@
             Non-custodial client-side wallets<br>in user's browser
           </p>
         </div>
-        <div style="margin-left: 10px;">
+        <div style="margin: 0 20px 0 10px;">
           <a href="/tutorial/rest.html" class="nav-link action-button">
             REST API →
           </a>
           <p style="font-size: 90%;">
-            Non-custodial enterprise wallet<br>on your own server
+            Enterprise wallet<br>on your own server
+          </p>
+        </div>
+        <div style="margin: 0 10px 0 10px;">
+          <a href="/tutorial/smartbch.html" class="nav-link action-button">
+            SmartBCH →
+          </a>
+          <p style="font-size: 90%;">
+            Ethereum(EVM)-compatible<br>Bitcoin Cash side-chain
           </p>
         </div>
       </div>
@@ -46,7 +54,10 @@
         :key="index"
         class="feature"
       >
-        <h2>{{ feature.title }}</h2>
+        <h2>
+          <a :href="feature.url" v-if="feature.url">{{ feature.title }}</a>
+          <span v-else>{{ feature.title }}</span>
+        </h2>
         <p>{{ feature.details }}</p>
       </div>
     </div>
