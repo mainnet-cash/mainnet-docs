@@ -34,14 +34,14 @@ npm install mainnet-js
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-0.4.16.js"
- integrity="sha384-BuPS7ZzJgBao9BZBTkZpvqRcWtn4q2d7qcA7V83jGfQkEcGXaEIgCxz9utMbOvBg"
+<script src="https://cdn.mainnet.cash/mainnet-0.4.17.js"
+ integrity="sha384-gw62Lq4nYfGZynfuF3n2gFZmypwsiLoWXgXbyOYo7pQnZclPJc11pYZpl9FT9un2"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.4.16.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-0.4.17.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -662,8 +662,8 @@ yarn add @mainnet-cash/contract
 To get started using CashScript Contracts on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/contract/contract-0.4.16.js"
- integrity="sha384-CRMUnGkdChbUYYPZLi/lctjdAokUoc7hX80sHztfcrCcoYEhH8xXYpQgcQjiZCOP"
+<script src="https://cdn.mainnet.cash/contract/contract-0.4.17.js"
+ integrity="sha384-TCVkYNFUH0Sn2SVEa1kWqnDl0gC1W2mQ1o2O/fpQAT0BvxIw57Mw0BLxIdIP+qbQ"
  crossorigin="anonymous"></script>
 ```
 
