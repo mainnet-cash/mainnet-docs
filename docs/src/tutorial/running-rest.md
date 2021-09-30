@@ -107,6 +107,10 @@ The following variables are available to configure the REST server:
 | `TIMEOUT` | Request timeout (seconds)  | `60` |
 | `WORKERS` | Number of threads  | `10` |
 | `DATABASE_URL` | Postgres URL  | `undefined` |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | Whether to reject unauthorized certificates (i.e. self-signed for development). Must be set exactly to the string "false", if `false` is intended | true |
+| `DATABASE_SSL_CA` | Base64 encoded certificate authority as a string | `undefined` |
+| `DATABASE_SSL_KEY` | Base64 encoded certificate key as a string | `undefined` |
+| `DATABASE_SSL_CERT` | Base64 encoded certificate as a string | `undefined` |
 | `API_KEY` | API Key | `undefined` |
 | `SLP_PROVIDER` | SLP provider | `undefined` (implied default `slpdb`) |
 | `SLPDB_MAINNET_DATA` | SLP provider data endpoint | `undefined` (default https://slpdb.fountainhead.cash) |
