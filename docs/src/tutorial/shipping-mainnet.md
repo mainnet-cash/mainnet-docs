@@ -16,11 +16,13 @@ And create a new wallet like so:
 
     myWallet = await Wallet()
 
+Or use any code 
+
 ## General Notes
 
-`mainnet-js` acts as high level wrapper for many . As such, it can be quite large, but choosing packages utilizing WebAssembly also makes it quite fast.
+`mainnet-js` acts as high level wrapper for many bitcoin related toolsets. As such, the complete package with all functionality in one file would be quite large.
 
-The core crypto library (libauth) uses about one megabyte (1MB) unpacked, it includes a database, networking, bip39 mnemonic phrases, etc.
+The core crypto library (libauth) uses about one megabyte (1MB) unpacked. Mainet-js also usually includes an indexeddb database wrapper, networking for utilities, tools for bip39 mnemonic phrases, etc. 
 
 ## `electron-cash` configuration
 
