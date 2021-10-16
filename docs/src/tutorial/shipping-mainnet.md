@@ -97,9 +97,9 @@ module.exports = {
 
 ### Example VueJs v3 Config 
 
-A simple vue3 configuration that both transpiles `electrum-cash` and limits chunks to 230kb is below.
+A simple vue3 configuration that both transpiles `electrum-cash` and limits chunks to 230kb for the `mainnet-js` package alone is below.
 
-This configuration may be used with babel enabled. 
+This configuration should be used with babel enabled. 
 
 ```js
 # vue.config.js
