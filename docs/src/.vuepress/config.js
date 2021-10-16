@@ -58,6 +58,7 @@ module.exports = {
                     '/tutorial/smartbch-rest.html',
                     '/tutorial/other-languages.html',
                     '/tutorial/running-rest.html',
+                    '/tutorial/shipping-mainnet.html',
                 ]
             },
             {
