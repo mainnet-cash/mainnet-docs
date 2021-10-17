@@ -29,6 +29,12 @@ Install using:
 npm install mainnet-js
 ```
 
+::: tip
+
+If you are bundling a production webapp, see [detailed notes](./shipping-mainnet.md) on using mainnet-js in a webapp. 
+
+:::
+
 ### &lt;script> tag in HTML
 
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:

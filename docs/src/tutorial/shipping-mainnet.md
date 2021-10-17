@@ -74,12 +74,13 @@ module.exports = {
             "crypto": require.resolve('crypto-browserify'), // bip39
             "net":false, // electrum-cash tcp connections
             "tls":false, // electrum-cash tcp connections
+            "fs":false,  // qrcode-svg.save
 
             // @mainnet-cash/contract
-            "fs":false,    // cashscript/utils
             "url":false,   // cashscript/bitcoind-rpc
             "https":false, // cashscript/bitcoind-rpc
             "http":false,  // cashscript/bitcoind-rpc
+            //"fs":false,  // cashscript/utils
 
             // @mainnet-cash/smartbch
             "require-from-string":false,
