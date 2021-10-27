@@ -531,7 +531,7 @@ Response:
 
 ### Token balances
 
-You can get token balance of a specific token with the following methods:
+You can get all token balances of your wallet or a balance of a specific token with the following methods:
 
 ```shell script
 curl -X POST https://rest-unstable.mainnet.cash/smartbch/sep20/balance \
@@ -552,6 +552,32 @@ Response:
   "tokenId": "0xca4A3794Ba7761a480F1356CC1B22E35321C2b4e"
 }
 ```
+
+All balances:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/smartbch/sep20/all_balances \
+  -H "Content-Type: application/json" \
+  -d '{
+  "walletId": "privkey:testnet:0x758c7be51a76a9b6bc6b3e1a90e5ff4cc27aa054b77b7acb6f4f08a219c1ce45",
+}'
+```
+
+Response:
+
+```json
+[{
+  "value": "10000",
+  "ticker": "MNC",
+  "name": "Mainnet coin",
+  "tokenId": "0xca4A3794Ba7761a480F1356CC1B22E35321C2b4e"
+}]
+```
+
+`smartbch/sep20/all_balances` does a deep blockchain scan for tokens transferred to or from this address.
+Might take a long time to run and time out your request.
+Deep rescan will be skipped by default if a previous scan was performed for a particular wallet. If you know there were transactions including new tokens, use `forceRescan: true`.
+If you want to know the full list of tokens ever transferred to or from the address, use `hideEmpty: false`.
 
 ### Sep20 deposit address
 
@@ -681,51 +707,34 @@ Note: these tokens are transferrable but not mintable. Regardless of options sup
 
 ## TestNet faucet
 
-Coming soon.
+You can have some SmartBch TestNet satoshi or SEP20 tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
 
-<!-- 
-You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
-
-Your address will be refilled up to 10000 TestNet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+Your address will be refilled up to 0.1 TestNet BCH or up to 10 SEP20 tokens upon a call. There are request rate limiters set up to prevent abuse.
 
 We've integrated the faucet into the library so that you can do easy calls like the following.
 
 ### Get TestNet satoshis
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_bch \
+curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_sbch \
   -H "Content-Type: application/json" \
   -d '{
-  "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8"
+  "address": "0xE25ddbAF8DD61b627727e03e190E32feddBD1319"
 }'
 ```
 
-Response:
-
-```json
-{
-  "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}
-```
-
-### Get TestNet SLP tokens
+### Get TestNet SEP20 tokens
 
 ```shell script
-curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_slp \
+curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_sep20 \
   -H "Content-Type: application/json" \
   -d '{
-  "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
+  "address": "0xE25ddbAF8DD61b627727e03e190E32feddBD1319",
+  "tokenId": "0xdac17f958d2ee523a2206206994597c13d831ec7"
 }'
 ```
 
-Response:
-
-```json
-{
-  "txId": "dc38ee5d4233163e69144e4ec6e49257d41f5605e297d05c0af8f1d81ae1a387"
-}
-``` -->
+Requesting testnet funds uses a queue for batch-processing. Hence, no txId is returned immediately. The request is usually settled in 1-3 blocks.
 
 ## Smart Contracts
 

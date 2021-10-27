@@ -472,11 +472,25 @@ const result = await wallet.sep20.sendMax(otherWallet.sep20.getDepositAddress(),
 
 ### Token balances
 
-You can get token balance of a specific token with the following methods:
+You can get all token balances of your wallet or a balance of a specific token with the following methods:
 
 ```js
 const tokenBalance = wallet.sep20.getBalance(tokenId);
+
+const options = {
+  forceRescan: false,
+  hideEmpty: true,
+  progressCallback: (progress) => {
+    console.log(progress);
+  }
+}
+const allBalances = wallet.sep20.getAllBalances(options);
 ```
+
+`getAllBalances` does a deep blockchain scan for tokens transferred to or from this address.
+Might take a long time to run. Set progress `progressCallback` to get notified about the scan process.
+Deep rescan will be skipped by default if a previous scan was performed for a particular wallet. If you know there were transactions including new tokens, use `forceRescan: true`.
+If you want to know the full list of tokens ever transferred to or from the address, use `hideEmpty: false`.
 
 ### Watching/waiting for transactions
 
@@ -584,29 +598,29 @@ You can change SLP provider data source and event source endpoints by changing s
 -->
 ## TestNet faucet
 
-Coming soon.
 
-<!--
 
-You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
+You can have some SmartBch TestNet satoshi or SEP20 tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
 
-Your address will be refilled up to 10000 TestNet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+Your address will be refilled up to 0.1 TestNet BCH or up to 10 SEP20 tokens upon a call. There are request rate limiters set up to prevent abuse.
 
 We've integrated the faucet into the library so that you can do easy calls like the following:
 
 ```js
-const txid = await wallet.getTestnetSatoshis();
+await smartBchallet.getTestnetSatoshis();
 ...
 const sendResponse = await wallet.returnTestnetSatoshis();
 ```
 
-Same for SLP:
+Same for SEP20:
 
 ```js
-const txid = await wallet.getTestnetSlp(tokenId);
+await wallet.getTestnetSep20(tokenId);
 ...
-const slpSendResponse = await wallet.returnTestnetSlp(tokenId);
-``` -->
+const sep20SendResponse = await wallet.returnTestnetSep20(tokenId);
+```
+
+Requesting testnet funds uses a queue for batch-processing. Hence, no txId is returned immediately. The request is usually settled in 1-3 blocks.
 
 ## Smart Contracts
 
