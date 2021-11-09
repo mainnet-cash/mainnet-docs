@@ -260,6 +260,15 @@ const txData = await seller.sendMax(wallet.getDepositAddress());
 }
 ```
 
+If you want to know the maximum amount of available funds to send, e.g. your balance minus the network fees, you can use:
+```js
+const sendRequestOptions = { slpAware: true, utxoIds: [] };
+const options = { outputCount: 1, options: sendRequestOptions };
+const maxAmount = await wallet.getMaxAmountToSend(options);
+```
+
+This method returns a balance response object. The `options` object allows for fine-grained fee calculation based on the output count, slp awareness and specific UTXOs you are willing to spend. By default the method will target to spend all UTXOs into one output.
+
 ## Watching/Waiting methods
 
 ### QR codes
