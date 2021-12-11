@@ -229,7 +229,8 @@ SLP checks are a bit slow, so they are opt-in.
 There is also an `options` parameter that specifies how money is spent.
 
 * `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
-* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs
+* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs; relies on an external SLP indexer to be available.
+* `slpSemiAware` is a boolean flag (defaulting to `false`) which requires an UTXO to have more than 546 sats to be spendable and counted in the balance. It protects you from spending SLP-like UTXOs without using an external SLP indexer.
 * `changeAddress` cash address to receive change to
 * `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
 * `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
