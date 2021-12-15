@@ -224,6 +224,8 @@ If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5
 you have to use the `wallet.slpAware().send([...])` method to prevent accidental token burning.
 SLP checks are a bit slow, so they are opt-in.
 
+A faster way to be SLP aware is `wallet.slpSemiAware()` modifier. It skips all UTXOs with 546 sats when counting balance and sending funds. Also it is blazing fast.
+
 #### Options
 
 There is also an `options` parameter that specifies how money is spent.

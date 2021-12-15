@@ -282,8 +282,10 @@ There is also an `options` parameter that specifies how money is spent.
 * `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
 * `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
 
-<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true` to your request `options` to prevent accidental token burning.
 SLP checks are a bit slow, so they are opt-in.
+
+A faster way to be SLP aware is `"slpSemiAware": true` modifier. It skips all UTXOs with 546 sats when counting balance and sending funds. Also it is blazing fast.
 
 You get the transaction ID (txid) that [you can see on the TestNet block explorer](https://explorer.bitcoin.com/tbch/tx/316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69)
 and the balance left in the original wallet.
@@ -411,7 +413,7 @@ If you want to instantiate an SLP wallet which will use a different derivation p
 }
 ```
 
-Note, that unless you are using the `walletId` from `wallet/slp/create` (example is a `wif` wallet) the SLP awareness is not guaranteed. This means that you have to provide `"slpAware": true` to your `options` parameter in `wallet/send` and `wallet/send_max` endpoints.
+Note, that unless you are using the `walletId` from `wallet/slp/create` (example is a `wif` wallet) the SLP awareness is not guaranteed. This means that you have to provide `"slpAware": true` or `"slpSemiAware": true`to your `options` parameter in `wallet/send` and `wallet/send_max` endpoints.
 
 Note, that REST server uses strings for the SLP amounts in order not to lose precision or have floating point issues.
 
