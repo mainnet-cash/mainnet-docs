@@ -2,8 +2,8 @@
 
 - [https://fountainhead.cash/](https://fountainhead.cash/) - Tons of useful Bitcoin Cash services
 - [http://insomnia.fountainhead.cash/](http://insomnia.fountainhead.cash/) - REST services for Bitcoin Cash network
-- [Bitcoin Cash block explorer](https://explorer.bitcoin.com/)
-    - [TestNet explorer](https://explorer.bitcoin.com/tbch)
+- [Bitcoin Cash block explorer](https://blockchair.com/bitcoin-cash)
+    - [TestNet explorer](https://www.blockchain.com/bch-testnet)
     - [BCH TestNet faucet](https://faucet.fullstack.cash/)
 - [https://bitsocket2.fountainhead.cash/channel](https://bitsocket2.fountainhead.cash/channel) - Public BitSocket - subscribe to Bitcoin Cash balances and other real-time queries
 - [Double spend proofs via REST](https://dsproof.devops.cash/)

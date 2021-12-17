@@ -287,7 +287,7 @@ SLP checks are a bit slow, so they are opt-in.
 
 A faster way to be SLP aware is `"slpSemiAware": true` modifier. It skips all UTXOs with 546 sats when counting balance and sending funds. Also it is blazing fast.
 
-You get the transaction ID (txid) that [you can see on the TestNet block explorer](https://explorer.bitcoin.com/tbch/tx/316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69)
+You get the transaction ID (txid) that [you can see on the TestNet block explorer](https://www.blockchain.com/bch-testnet/tx/316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69)
 and the balance left in the original wallet.
 
 #### Getting balance
