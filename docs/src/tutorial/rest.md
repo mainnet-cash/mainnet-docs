@@ -1073,7 +1073,7 @@ Small transaction fees are currently used on Bitcoin Cash to make the cost of a 
 
 So a common way to break the escrow transaction flow is to neglect the fees, which we'll do below.
 
-To test rest commands locally, it may be useful to serve the Swagger (OpenAPI) documentation and use the web interface to post test commands. This can be started by running 
+To test REST commands locally, it may be useful to serve the Swagger (OpenAPI) documentation and use the web interface to post test commands. This can be started by running 
 
 `yarn api:serve` 
 
@@ -1433,7 +1433,8 @@ The above process can be repeated to trace back which particular step the contra
 
 ## Utilities
 
-Certain tools common in bitcoin-like currencies may not be in a standard library.
+Certain tools common in bitcoin-like currencies may not be in a standard library used in the language of your project. 
+
 
 ### Decoding transactions
 
@@ -1498,6 +1499,120 @@ Response:
 ```
 
 The returned object is compatible with [this specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get) with extra information about input values and cash addresses if `loadInputValues` parameter is specified and set to `true`.
+
+### Extended Public Key Derivation
+
+The REST service provides three endpoints related to [bip32 hierarchical deterministic wallets](https://en.bitcoin.it/wiki/BIP_0032). The first, provides cash addresses given an extended public key (xpubkey), starting path and count. A `wallet/xpubkeys` endpoint is provided to derive alternate paths for a given seed wallet. Finally, an xpubkey decoder is provided for debugging.
+
+Using the xpubkey to derive child addresses is limited to deriving non-hardened nodes. In addition, the parent for an xpubkey for a seed cannot be derived given a child node. So given the xpubkey for the node at `m/44'/0'/0'`, the node for `m/0'/0'/0'` or `m` cannot be derived given that information. 
+
+However, the xpubkey info endpoint can be used to decode a given extended public key to determine the depth and other information about the key.
+
+#### Deriving cashaddrs from an xpubkey
+
+To derive a number of cashaddrs from a given xpubkey, provide the xpubkey, starting path and the count of addresses to be derived.
+
+
+
+```bash
+curl -X 'POST' \
+  'http://rest-unstable.mainnet.cash/util/get_addrs_by_xpubkey' \
+  -H "Content-Type: application/json" \
+  -d '{
+  "xpubkey": "xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj",
+  "path": "0/0",
+  "count": 5
+}'
+```
+
+This returns:
+
+```json
+[
+  "bitcoincash:qrvcdmgpk73zyfd8pmdl9wnuld36zh9n4gms8s0u59",
+  "bitcoincash:qp4wzvqu73x22ft4r5tk8tz0aufdz9fescwtpcmhc7",
+  "bitcoincash:qr0kwqzf2h3wvjjhn4pg895lrxwp96wqgyhkksq2nh",
+  "bitcoincash:qrstk290as5j4l7gtv94th7v8v2a4y05yvag0asw3y",
+  "bitcoincash:qzkvwh3qg6jhlcx4cjrhce6jzss8a5jdhu5x8259tw"
+]
+```
+
+The above cashaddrs correspond to `0/0-4` keys. To derive the next five addresses, use `0/5` as the starting `path` argument. The cashaddrs are derived in about 0.3-4ms per address in linear time per request.
+
+
+#### Getting Extended Public Keys for a Wallet
+
+For a seed wallet, the BIP39 xpubkey will be returned with wallet info. By default, the bitcoin path: `m/44'/0'/0'` is used.
+
+However, an `wallet/xpubkeys` endpoint can also provide the extended public keys for other paths. 
+
+So to get the xpubkey for the path `m/1234'/0'/0'`, the following call may be used:
+
+```bash
+curl -X 'POST' \
+  'http://rest-unstable.mainnet.cash/wallet/xpubkeys' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "walletId": "seed:testnet:abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon:m/44'\''/0'\''/0'\''/0/0",
+"paths":["m/1234'\''/0'\''/0'\''"]
+}'
+```
+
+Which will return:
+
+```json
+{
+  "xpubkeys": [
+    [
+      {
+        "path": "m/1234'/0'/0'",
+        "xPubKey": "tpubDDU4UHPKqJ66jEKsSYMtVm9L6pz2P2yCwVTY8ZMuoRr24JRGKFtPBBR3GkiiLPACZviA1eFGkSMCARgMTucJqnG3L9sCeGBcdVowYsgoJhh"
+      }
+    ]
+  ]
+}
+```
+
+If no `paths` argument is provided, a list of `xpubkeys` for common keys for Bitcoin Cash will be paths will be returned by default.
+
+#### Decoding Extended Public Keys
+
+The `xpubkey` is a sting encoded according to BIP32, but that isn't very human friendly.
+
+Let's decode the data in some extended public key strings, using wallets generated with the mnemonic:
+
+    abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about
+
+You can determine various nodes in the hierarchical tree of nodes using a tool like [Ian Coleman's BIP39 Converter](https://iancoleman.io/bip39/), or using the `wallet/xpubkey/` endpoint, above. 
+
+Given the root path for: `m`
+```bash
+curl -X 'POST' \
+  'http://rest-unstable.mainnet.cash/util/get_xpubkey_info' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "xpubkey": "xpub661MyMwAqRbcFkPHucMnrGNzDwb6teAX1RbKQmqtEF8kK3Z7LZ59qafCjB9eCRLiTVG3uxBxgKvRgbubRhqSKXnGGb1aoaqLrpMBDrVxga8"
+}'
+```
+
+It returns the following:
+
+```json
+{
+  "version": "mainnet",
+  "depth": 0,
+  "parentFingerprint": "00000000",
+  "childNumber": 0,
+  "chain": "7923408dadd3c7b56eed15567707ae5e5dca089de972e07f3b860450e2a3b70e",
+  "data": "03d902f35f560e0470c63313c7369168d9d7df2d49bf295fd9fb7cb109ccee0494",
+  "fingerprint": "73c5da0a"
+}
+```
+
+This response indicates that it's the first node in the mainnet tree for a hierarchical set. 
+
 
 ### Currency conversions
 
