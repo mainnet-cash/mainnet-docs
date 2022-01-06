@@ -1203,6 +1203,67 @@ await convert(100, "usd", "sat")
 // 28067024
 ```
 
+
+### Extended Public Key Derivation
+
+By default a `seed` type wallet derives and uses the cashaddr for the first non-hardened address in the `m/44'/0'/0'` path, so `m/44'/0'/0'/0/0`.
+
+```js
+const wallet = await TestNetWallet.newRandom();
+wallet.derivationPath
+// "m/44'/0'/0'/0/0"
+```
+
+If you wanted to check different xPubKey paths for funds, 
+
+```js
+await wallet.getXPubKeys()
+```
+
+```json
+[
+  {
+    "path": "m/0",
+    "xPubKey": "tpubD8GnQw6feyPpQAa7Y2Zwp7LJxg9uAKwVYnVHd1okqkTkmcSheiGzcrygbJxf6xsTUxJk4Vx1SdJZvZTdfPgP8JLyne52nqMsiLTckkZUiyV"
+  },
+  {
+    "path": "m/0'",
+    "xPubKey": "tpubD8GnQw6ozdvnaPzEgcpRcdYsDgDrmmC3PDVUBXqngM26WtnMg3gUV6qjwHWK2LqPrnMmZx9gRCkSdEH352fG6wbcsabpPXB6xPdJCXJ7sir"
+  },
+ ... some paths omitted ...
+  {
+    "path": "m/44'/245'/0'",
+    "xPubKey": "tpubDDnJ2bvR5UhBYUAMGKiT78Cm8C9cR5BVB24Y9qWbz6qfc7NAGFkD1bAvcETofmHmtwwYtC4Yz7pqECvnEnZb3QuNpXBtsbbSTNWY6eXuMnN"
+  },
+  {
+    "path": "m/44'/245'/0'/0",
+    "xPubKey": "tpubDFSeg9a8jxVqi9FuCuTXY5e7vRUHYFkEKCVuGcpvkhf7sGqTLc6esVMoJK7hzs6weGcCT9T3nCsuhrqvRxHaBF2fjbhk2bdxHjVmSewYDBs"
+  }
+]
+```
+
+
+To derive the public addresses from a given xpubkey, a `getAddrsByXpubKey()` utility.
+
+
+```js
+await Mainnet.getAddrsByXpubKey("tpubDDfazrbXYF84Xxq7XqnakjAwVyCFVUGEWrsuQY3VqzpV8QgH2X2cczoZbEAyMdRmcra4nLhf67vEZ1jSnQ2KKcq5USoTGtFGaVTsXx7XsG7","0/0",5)
+```
+
+```json
+[
+  "bchtest:qqncw6u2duejwku54cgg74r25r2894ar6vtpr2mye5",
+  "bchtest:qzxhvrkthxtk33f9tnurz5k2h5v36ve7uqfu8mvvjz",
+  "bchtest:qpvc5t4tp3nule8gv53ln9j38n36795hnc20u9wj4v",
+  "bchtest:qzc826sf3mvvmnlkg7sr32d2jxt6stu84u70nqelfu",
+  "bchtest:qqgd46e75y3flz6vy3vn0tfrnkzmjtnw5v42573hs7"
+]
+```
+
+So the above addresses correspond to the cashaddrs for the paths `m/44'/0'/0'/0/0-4`.
+
+This will allow you to check for the existence of funds on alternate child or parent derivation paths, however full hierarchical deterministic (HD) wallets are not supported at this time.
+
 ## Signed Messages
 
 One of the perks of having a wallet is the ability to sign message text or verify the signatures of other parties using their public key.
