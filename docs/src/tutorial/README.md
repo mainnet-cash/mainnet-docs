@@ -237,6 +237,23 @@ There is also an `options` parameter that specifies how money is spent.
 * `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
 * `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
 
+#### Building transactions
+
+An advanced way to send funds around is to build the transaction manually. To do so we expose the `encodeTransaction` method which has the same call signature as `send` method. It hides all the weightlifting from the user: UTXO selection, fee calculation, signing, etc. and produces the binary transaction data ready to be broadcasted to the network with the `submitTransaction` method:
+
+```js
+const encodedTransaction = await wallet.encodeTransaction(
+  requests, // send requests as in `send` method
+  false, // discard change
+  options // options as described above
+);
+
+const txId = await wallet.submitTransaction(
+  encodedTransaction,
+  awaitTransactionPropagation // as in options.awaitTransactionPropagation
+);
+```
+
 #### Getting balance
 
 Let's print the balance of the seller's wallet:
