@@ -290,6 +290,50 @@ A faster way to be SLP aware is `"slpSemiAware": true` modifier. It skips all UT
 You get the transaction ID (txid) that [you can see on the TestNet block explorer](https://www.blockchain.com/bch-testnet/tx/316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69)
 and the balance left in the original wallet.
 
+#### Building transactions
+
+An advanced way to send funds around is to build the transaction manually. To do so we expose the `wallet/encode_transaction` endpoint which has the same call signature as `wallet/send` method. It hides all the weightlifting from the user: UTXO selection, fee calculation, signing, etc. and produces the binary transaction data ready to be broadcasted to the network with the `wallet/submit_transaction` method:
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/encode_transaction \
+  -H "Content-Type: application/json" \
+  -d '{
+      "walletId": "wif:regtest:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+      "to": [
+        {
+          "cashaddr": "bchreg:qp9ecptsetu05hunem6ry38m0l54zsqf0u50ay3453",
+          "unit": "satoshis",
+          "value": 2000
+        }
+      ]
+    }'
+```
+
+Response:
+
+```json
+{
+  "transactionHex": "020000000142f857ccf48dea9bdb26ce6965f87e57f7ca60535573088dd35e67eeee75f25c000000006441c400d5010ad61e1b8b862ed13ce7e531e1e07f22020815cf27955508f1231e265bf576c28f1d3ec2fc0256835ffca38828e34eeb3db5640413261e054aa6170e412103410ef048b3da351793f6ed14cc2fde460becc5b658d9138443b9a3000707a6a70000000002d0070000000000001976a9144b9c0570caf8fa5f93cef43244fb7fe95140097f88ac54e9052a010000001976a91456b6b22042b90dd67bf2fbfb9aff7d37fbee112488ac00000000"
+}
+```
+
+```bash
+curl -X POST https://rest-unstable.mainnet.cash/wallet/encode_transaction \
+  -H "Content-Type: application/json" \
+  -d '{
+      "walletId": "wif:regtest:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
+      "transactionHex": "020000000142f857ccf48dea9bdb26ce6965f87e57f7ca60535573088dd35e67eeee75f25c000000006441c400d5010ad61e1b8b862ed13ce7e531e1e07f22020815cf27955508f1231e265bf576c28f1d3ec2fc0256835ffca38828e34eeb3db5640413261e054aa6170e412103410ef048b3da351793f6ed14cc2fde460becc5b658d9138443b9a3000707a6a70000000002d0070000000000001976a9144b9c0570caf8fa5f93cef43244fb7fe95140097f88ac54e9052a010000001976a91456b6b22042b90dd67bf2fbfb9aff7d37fbee112488ac00000000"
+    }'
+```
+
+Response:
+
+```json
+{
+  "txId": "da9c2230ad8adb0a6a6fc6f1a65a4c08ee272558cc2f0a6965e2302aa5db6c63"
+}
+```
+
 #### Getting balance
 
 Let's print the balance of `...z2pu` wallet:
