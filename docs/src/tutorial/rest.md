@@ -280,6 +280,16 @@ There is also an `options` parameter that specifies how money is spent.
 * `changeAddress` cash address to receive change to
 * `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
 * `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
+* `feePaidBy` Fee allocation strategy. Convenience option to subtract fees from outputs if change is not sufficient to cover transaction costs. Options are as follows:
+  
+  - `change` - pay the fees from change or error
+  - `firstOutput` - pay the fee from the first output or error
+  - `lastOutput` - pay the fee from the last output or error
+  - `anyOutput` - pay the fee from dust outputs or divide across all remaining non-dust outputs.
+  - `changeThenFirst` - Use change then first output or error.
+  - `changeThenLast` - Use change then last output or error.
+  - `changeThenAny` - Use change then any output strategy or error. 
+
 
 <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true,` to your request `options` to prevent accidental token burning.
 SLP checks are a bit slow, so they are opt-in.
