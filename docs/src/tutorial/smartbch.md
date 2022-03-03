@@ -45,14 +45,14 @@ yarn add @mainnet-cash/smartbch
 To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/smartbch/smartbch-0.4.37.js"
- integrity="sha384-Gro4CM6xSwNlCr/Czb5Zjpeifgj2ihz4vCXxG8xQ8kLk1OJc4Jtk8idW8c3CRNAz"
+<script src="https://cdn.mainnet.cash/smartbch/smartbch-0.4.38.js"
+ integrity="sha384-SVt0Hucc+bcTfi16fcqFrb4eAzIr5BMvlQGDb1uAPMHXpNGAAm8xd/EOtXUEpFEM"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/smartbch/smartbch-0.4.37.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/smartbch/smartbch-0.4.38.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
