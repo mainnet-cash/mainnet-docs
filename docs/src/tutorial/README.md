@@ -797,7 +797,7 @@ const restoredEscrow = EscrowContract.fromId(escrowContractId);
 The escrow object implements a CashScript contract from a stock template, but if the template doesn't suit your needs, it is also possible to use any contract written in [CashScript](https://cashscript.org/).  
 
 ```solidity
-pragma cashscript ^0.6.1;
+pragma cashscript ^0.7.0;
 contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int contractAmount, int contractNonce) {
 
     function spend(pubkey signingPk, sig s, int amount, int nonce) {
@@ -805,8 +805,10 @@ contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int con
         require(checkSig(s, signingPk));
         require(amount >= contractAmount);
         require(nonce == contractNonce);
-        bytes34 output = new OutputP2PKH(bytes8(amount), sellerPkh);
-        require(hash256(output) == tx.hashOutputs);
+        bytes25 lockingCode = new LockingBytecodeP2PKH(sellerPkh);
+        bool sendsToSeller = tx.outputs[0].lockingBytecode == lockingCode;
+        require(tx.outputs[0].value == amount);
+        require(sendsToSeller);
     }
 
     function refund(pubkey signingPk, sig s, int amount, int nonce) {
@@ -814,8 +816,10 @@ contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int con
         require(checkSig(s, signingPk));
         require(amount >= contractAmount);
         require(nonce == contractNonce);
-        bytes34 output = new OutputP2PKH(bytes8(amount), buyerPkh);
-        require(hash256(output) == tx.hashOutputs);
+        bytes25 lockingCode = new LockingBytecodeP2PKH(buyerPkh);
+        bool sendsToSeller = tx.outputs[0].lockingBytecode == lockingCode;
+        require(tx.outputs[0].value == amount);
+        require(sendsToSeller);
     }
 }
 ```
