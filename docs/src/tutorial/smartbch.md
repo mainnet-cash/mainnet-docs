@@ -429,7 +429,7 @@ Optional `tokenReceiverAddress` and `batonReceiverAddress` allow to specify the 
 If you want to get the genesis information of some token, you can simply call getTokenInfo:
 
 ```js
-const info = await wallet.slp.getTokenInfo(tokenId);
+const info = await wallet.sep20.getTokenInfo(tokenId);
 ```
 
 ### Additional token creation - Minting
@@ -445,7 +445,7 @@ const mintOptions = {
   tokenReceiverAddress: "0xE25ddbAF8DD61b627727e03e190E32feddBD1319",
 }
 
-const {txId, balance} = await wallet.slp.mint(mintOptions);
+const {txId, balance} = await wallet.sep20.mint(mintOptions);
 ```
 
 Optional `tokenReceiverAddress` allow to specify the receiver of tokens.
