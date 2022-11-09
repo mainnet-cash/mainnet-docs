@@ -79,6 +79,7 @@ module.exports = {
                 children: [
                     '/developing_mainnet.html',
                     '/original.html',
+                    '/chips.html'
                 ]
             },
         ]
