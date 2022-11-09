@@ -10,6 +10,8 @@ As part of this process, stakeholders participate in the agreement building proc
 
 ### Mainnet.cash supports CHIP-2022-02-CashTokens
 
+*2022-11-09*
+
 [CashTokens](https://github.com/bitjson/cashtokens#readme) is an exciting proposal to bring tokens to a highly scalable UTXO blockchain as a first-class feature. 
 
 In addition to both non-fungible and fungible tokens, the design allows for cross-contract communication, or the ability to create messages that can be read by other contracts. This opens an exciting realm of possibilities as outlined in the [examples](https://github.com/bitjson/cashtokens/blob/master/examples.md#usage-examples) section of the CHIP.
