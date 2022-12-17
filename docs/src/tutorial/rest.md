@@ -447,6 +447,380 @@ You can use this `src` directly in the image tag:
 
 See [WebSockets](#websocket-api-reference) and [WebHooks](#webhooks).
 
+## CashTokens
+
+Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BCMR](https://github.com/bitjson/chip-bcmr) - BitcoinCash Metadata Registries.
+
+These upgrades can be tested on a chipnet (special testnet which supports the latest CHIPs). They will also be activated on BCH mainnet after May23 network upgrade.
+
+N.B. To support CashTokens we had to upgrade our core dependency libauth to v2, which made us to convert mainnet.cash library to an ESM module.
+
+Unlike SLP tokens, CashTokens do not have thier own namespace of wallet type - all token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
+
+Furthermore, unlike SLP tokens, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
+
+Each token UTXO may or may not contain the following attributes:
+
+*  `amount: number;` - fungible token amount. N.B. After genesis the total amount of fungible tokens can not be increased. Max amount is `9223372036854775807`
+*  `tokenId: string;` - the category Id of the token, this is a 32 bytes hex encoded transaction hash which was spent in the token genesis process
+*  `commitment?: string;` - 0 to 40 bytes long hex encoded string representing the token commitment message. This can be a serial number of an NFT in the group or any other user defined data.
+*  `capability?: NFTCapability;` - Non-fungible token capability.
+    - `none`: token is immutable (can not change its commitment) and can not mint new NFTs
+    - `mutable`: token can be spent to create a singular new NFT token with different commitment and optionally `mutable` capability
+    - `minting`: token can be spent to create any amount of new NFT tokens with different commitment and any capability
+
+Also token carrying utxos do have a BCH value which can not be lower than 798 satoshi for p2pkh token outputs (dust limit), otherwise these inputs would be unspendable. For simplicity mainnet allows to omit the BCH value for token UTXOs. If new token UTXOs are created the value for them will be set to 1000 satoshi. If a singular token UTXO is spent to a single new UTXO its BCH value will be carried over to the new one.
+
+By the specification the token aware wallets should signal to the user that they can handle the CashTokens. `Wallet` class received new property `tokenaddr`, and new methods `getTokenDepositAddress` and `getTokenDepositQr` which should be used and presented to the end-user.
+
+### Token creation - Genesis
+
+It is very easy to create new token category:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/token_genesis \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8",
+        "amount": 5,
+        "commitment": "abcd",
+        "capability": "none",
+        "value": 1000,
+      }'
+```
+
+Response:
+
+```json
+{
+  "txId": "641c56cb980437f93932421dc7f162a3b0ff1d3cba26d21a3c8b577384d0445a",
+  "balance": {},
+  "explorerUrl": "641c56cb980437f93932421dc7f162a3b0ff1d3cba26d21a3c8b577384d0445a",
+  "tokenIds": [
+    "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f"
+  ]
+}
+```
+
+### Looking up token information
+
+If you want to get the BCMR information about your token (given you have imported it), you can invoke [`wallet/bcmr/get_token_info`](/tutorial/rest.html#bcmr-bitcoincash-metadata-registries) method .
+
+Please refer to BCMR specification to learn more about identity snapshots and how to get the detailed token information.
+
+### Additional token creation - Minting
+
+If you decide to mint new NFT tokens or to mutate the existing token, you would need to use `wallet/token_mint` method.
+
+In the following example we mint 2 new NFTS:
+
+```shell script
+# mint 2 NFTs, amount reducing
+curl -X POST https://rest-unstable.mainnet.cash/wallet/token_genesis \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f",
+        "requests": [{
+          "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8",
+          "commitment": "01",
+          "capability": "none",
+          "value": 1000,
+        }, {
+          "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8",
+          "commitment": "02",
+          "capability": "mutable",
+          "value": 1000,
+        }],
+        "deductTokenAmount": true,
+      }'
+```
+
+Response:
+
+```json
+{
+  "txId": "431a8ffd1d4d22b98d376091f540c2fda70490d879c26237933242299d3bbc51",
+  "balance": {},
+  "explorerUrl": "431a8ffd1d4d22b98d376091f540c2fda70490d879c26237933242299d3bbc51",
+  "tokenIds": [
+    "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f"
+  ]
+}
+```
+
+The last boolean parameter might come handy in the case you want to track the amount of tokens left to be minted - for example you have created the token category with 1000 fungible tokens and if you will mint 2 new NFT tokens while this parameter being set to `true`, the minting token will have its FT amount reduced to 998. Note, that will not prevent you to mint more tokens when FT amount reaches 0.
+
+### Sending tokens
+
+Sending tokens around is easy and can be combined with sending BCH! You can include many token send requests in one call, even different token categories:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "requests": [{
+          "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8",
+          "amount": 100,
+          "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f",
+          "value": 1000,
+        }, {
+          "cashaddr": "bchtest:qrnluuge56ahxsy6pplq43rva7k6s9dknu4p5278ah",
+          "tokenId": "01092b7b61d8b377eb84ff0131d7c4146b51088bf246a01dd12a8029d1a2d17c",
+          "commitment": "abcd",
+          "capability": "none",
+          "value": 1000,
+        }, {
+          "cashaddr": "bchtest:qzspcywxmm4fqhf9kjrknrc3grsv2vukeqyjqla0nt",
+          "value": 100000,
+          "unit": "satoshis",
+        }],
+      }'
+```
+
+Response:
+
+```json
+{
+  "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
+  "balance": {},
+  "explorerUrl": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
+  "tokenIds": [
+    "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f",
+    "01092b7b61d8b377eb84ff0131d7c4146b51088bf246a01dd12a8029d1a2d17c"
+  ]
+}
+```
+
+### Token burning
+
+To explicitly burn the CashTokens they must be sent to an OP_RETURN output. `wallet/token_burn` method does this:
+
+```shell script
+# burn 1 FT
+curl -X POST https://rest-unstable.mainnet.cash/wallet/token_burn \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f",
+        "amount": 1,
+        "capability": "minting",
+        "commitment": "abcd",
+        "message": "burn",
+      }'
+```
+
+Response:
+
+```json
+{
+  "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
+  "balance": {},
+  "explorerUrl": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
+  "tokenIds": [
+    "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f"
+  ]
+}
+```
+
+If token has fungible amount, the burning mechanism will reduce the token amount. If no fungible amount is left, the NFT will be burnt, effectively destroying the token category.
+
+There is a way to implicitly burn fungible tokens without sending them to an OP_RETURN, just ensure that you send less tokens than you have, while setting the `checkTokenQuantities` of SendRequestOptions object to false:
+
+```shell script
+# send and burn
+curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "requests": [...],
+        "options": {
+          "checkTokenQuantities": false
+        }
+      }'
+```
+
+### Token UTXOs
+
+If you want to get the information about CashToken UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
+
+```shell script
+# tokenId can be omitted
+curl -X POST https://rest-unstable.mainnet.cash/wallet/get_token_utxos \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f"
+      }'
+```
+
+Response:
+
+```json
+{
+  "utxos": [
+    {
+      "txid": "cf0c0685cefd25329fb360ce21adec2257c414e41ad3fc9e91adb3db0b89a55d",
+      "vout": 0,
+      "satoshis": 1000,
+      "height": 0,
+      "token": {
+        "amount": 2,
+        "tokenId": "abe08e8936abecefec78fb8bd8461f23f533a1729c27194ba8272be0494f3d56",
+        "capability": "minting",
+        "commitment": "abcd"
+      }
+    }
+  ]
+}
+```
+
+If `tokenId` is undefined UTXOs of all token categories will be returned. If `tokenId` is set, only tokens of this category will be returned.
+
+### Token balances
+
+You can get all fungible token balances of your wallet or a balance of a specific token with the following methods:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/get_token_balance \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f"
+      }'
+```
+
+Response:
+
+```json
+{ "balance": 4 }
+```
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/get_all_token_balances \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"
+      }'
+```
+
+Response:
+
+```json
+{
+  "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f": 555,
+  "01092b7b61d8b377eb84ff0131d7c4146b51088bf246a01dd12a8029d1a2d17c": 666
+}
+```
+
+To get the total amount of NFT tokens use the following methods:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/get_nft_token_balance \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
+        "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f"
+      }'
+```
+
+Response:
+
+```json
+{ "balance": 4 }
+```
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/get_all_nft_token_balances \
+  -H "Content-Type: application/json" \
+  -d '{
+        "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB"
+      }'
+```
+
+Response:
+
+```json
+{
+  "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f": 2,
+  "01092b7b61d8b377eb84ff0131d7c4146b51088bf246a01dd12a8029d1a2d17c": 1
+}
+```
+
+## BCMR - BitcoinCash Metadata Registries
+
+We implement [BCMR](https://github.com/bitjson/chip-bcmr) CHIP to support on-chash CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
+
+To add metadata registry to the list of tracked ones use one of the following methods:
+
+1. Direct: use `/wallet/bcmr/add_registry` to add the [`Registry`](https://github.com/bitjson/chip-bcmr/blob/5b24b0ec93cf9316222ab2ea2e2ffe8a9f390b12/bcmr-v1.schema.ts#L103) object to the list of tracked
+2. Using HTTPS or IPFS endpoint: use `/wallet/bcmr/add_registry_from_uri` to download a JSON file containing the `Registry` and add it to the list of tracked, optionally enforcing the content hash verification.
+3. Using authchain resolution to optionally follow to the head of the auth chain and fetching data from HTTPS or IPFS Publication Outputs
+
+    const chain = (await request(app).post("/wallet/bcmr/add_registry_authchain").send({
+      transactionHash: response.txId,
+      followToHead: false    }));
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/bcmr/add_registry_authchain \
+  -H "Content-Type: application/json" \
+  -d '{
+        "transactionHash": "d275459ea2cdd7044cafcf81ad0875b7f080033922582009d07b821b907489bc",
+        "followToHead": false
+      }'
+```
+
+Response:
+
+```json
+[
+  {
+    "txHash": "d275459ea2cdd7044cafcf81ad0875b7f080033922582009d07b821b907489bc",
+    "contentHash": "658119177b9574133f4a9ea4ebb297661027ebc5dff269baabdb4ac2cc1f0c53",
+    "uri": "https://mainnet.cash/.well-known/bitcoin-cash-metadata-registry_v3.json"
+  }
+]
+```
+
+In this example we resolve the exact metadata registry stored in the transaction findable by its transaction hash `txHash`. If we'd wanted to resolve the latest version, we'd set `followToHead` to `true`.
+
+After adding the registry, we will have access to token info with `/wallet/bcmr/get_token_info`:
+
+```shell script
+curl -X POST https://rest-unstable.mainnet.cash/wallet/bcmr/get_token_info \
+  -H "Content-Type: application/json" \
+  -d '{
+        "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f",
+      }'
+```
+
+"/wallet/bcmr/get_token_info").send({
+      tokenId: "0000000000000000000000000000000000000000000000000000000000000000"
+    })
+Response:
+
+```json
+{
+  "tokenInfo": {
+    "name": "Test token registry",
+    "time": {
+      "begin": 1671284836967
+    },
+    "token": {
+      "category": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f",
+      "symbol": "TOK",
+      "decimals": 8
+    }
+  }
+}
+```
+
+Note, that token info resolution will prioritize the most recently added registries and return the info about first found token with matching `tokenId`.
+
+To get all tracked registries, use `/wallet/bcmr/get_registries`, to purge the list use `/wallet/bcmr/reset_registries`.
+
 ## Simple Ledger Protocol (SLP)
 
 We currently fully support the SLP type 1 tokens [specification](https://slp.dev/specs/slp-token-type-1/)

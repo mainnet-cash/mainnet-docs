@@ -438,6 +438,212 @@ await wallet.send([
 ]);
 ```
 
+## CashTokens
+
+Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BCMR](https://github.com/bitjson/chip-bcmr) - BitcoinCash Metadata Registries.
+
+These upgrades can be tested on a chipnet (special testnet which supports the latest CHIPs). They will also be activated on BCH mainnet after May23 network upgrade.
+
+N.B. To support CashTokens we had to upgrade our core dependency libauth to v2, which made us to convert mainnet.cash library to an ESM module.
+
+Unlike SLP tokens, CashTokens do not have thier own namespace of wallet type - all token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
+
+Furthermore, unlike SLP tokens, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
+
+Each token UTXO may or may not contain the following attributes:
+
+*  `amount: number;` - fungible token amount. N.B. After genesis the total amount of fungible tokens can not be increased. Max amount is `9223372036854775807`
+*  `tokenId: string;` - the category Id of the token, this is a 32 bytes hex encoded transaction hash which was spent in the token genesis process
+*  `commitment?: string;` - 0 to 40 bytes long hex encoded string representing the token commitment message. This can be a serial number of an NFT in the group or any other user defined data.
+*  `capability?: NFTCapability;` - Non-fungible token capability.
+    - `none`: token is immutable (can not change its commitment) and can not mint new NFTs
+    - `mutable`: token can be spent to create a singular new NFT token with different commitment and optionally `mutable` capability
+    - `minting`: token can be spent to create any amount of new NFT tokens with different commitment and any capability
+
+Also token carrying utxos do have a BCH value which can not be lower than 798 satoshi for p2pkh token outputs (dust limit), otherwise these inputs would be unspendable. For simplicity mainnet allows to omit the BCH value for token UTXOs. If new token UTXOs are created the value for them will be set to 1000 satoshi. If a singular token UTXO is spent to a single new UTXO its BCH value will be carried over to the new one.
+
+By the specification the token aware wallets should signal to the user that they can handle the CashTokens. `Wallet` class received new property `tokenaddr`, and new methods `getTokenDepositAddress` and `getTokenDepositQr` which should be used and presented to the end-user.
+
+### Token creation - Genesis
+
+It is very easy to create new token category:
+
+```js
+const genesisResponse = await wallet.tokenGenesis({
+      cashaddr: alice.cashaddr!,      // token UTXO recipient, if not specified will default to sender's address
+      amount: 5,                      // fungible token amount
+      commitment: "abcd",             // NFT Commitment message
+      capability: NFTCapability.none, // NFT capability
+      value: 1000,                    // Satoshi value
+    });
+const tokenId = genesisResponse.tokenIds![0];
+```
+
+### Looking up token information
+
+If you want to get the BCMR information about your token (given you have imported it), you can invoke `getTokenInfo` method.
+
+```js
+const info: IdentitySnapshot | undefined = wallet.getTokenInfo(tokenId);
+```
+
+Please refer to BCMR specification to learn more about identity snapshots and how to get the detailed token information.
+
+### Additional token creation - Minting
+
+If you decide to mint new NFT tokens or to mutate the existing token, you would need to use `tokenMint` method.
+
+In the following example we mint 2 new NFTS:
+
+```js
+// mint 2 NFTs, amount reducing
+const response = await wallet.tokenMint(
+  tokenId,
+  [
+    new TokenMintRequest({
+      cashaddr: wallet.cashaddr!,
+      commitment: "01",
+      capability: NFTCapability.none,
+      value: 1000,
+    }),
+    new TokenMintRequest({
+      cashaddr: wallet.cashaddr!,
+      commitment: "02",
+      capability: NFTCapability.mutable,
+      value: 1000,
+    }),
+  ],
+  true, // reduce FT amount
+);
+```
+
+The last boolean parameter might come handy in the case you want to track the amount of tokens left to be minted - for example you have created the token category with 1000 fungible tokens and if you will mint 2 new NFT tokens while this parameter being set to `true`, the minting token will have its FT amount reduced to 998. Note, that will not prevent you to mint more tokens when FT amount reaches 0.
+
+### Sending tokens
+
+Sending tokens around is easy and can be combined with sending BCH! You can include many token send requests in one call, even different token categories:
+
+```js
+const sendResponse = await wallet.send([
+  new TokenSendRequest({
+    cashaddr: alice.cashaddr!,
+    amount: 100,
+    tokenId: tokenId,
+    value: 1500,
+  }),
+  new TokenSendRequest({
+    cashaddr: bob.cashaddr!,
+    tokenId: tokenId2,
+    commitment: "abcd",
+    capability: NFTCapability.none,
+  }),
+  new SendRequest({
+    cashaddr: chaarlie.cashaddr!,
+    value: 100000,
+    unit: "satoshis",
+  }),
+]);
+```
+
+### Token burning
+
+To explicitly burn the CashTokens they must be sent to an OP_RETURN output. `tokenBurn` method does this:
+
+```js
+// burn 1 FT
+const burnResponse = await wallet.tokenBurn(
+  {
+    tokenId: tokenId,
+    amount: 1,
+    capability: NFTCapability.minting,
+    commitment: "abcd",
+  },
+  "burn", // optional OP_RETURN message
+);
+```
+
+If token has fungible amount, the burning mechanism will reduce the token amount. If no fungible amount is left, the NFT will be burnt, effectively destroying the token category.
+
+There is a way to implicitly burn fungible tokens without sending them to an OP_RETURN, just ensure that you send less tokens than you have, while setting the `checkTokenQuantities` of SendRequestOptions object to false:
+
+```js
+const sendAndBurnResponse = await wallet.send([...], { checkTokenQuantities: false });
+```
+
+### Token UTXOs
+
+If you want to get the information about CashToken UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
+
+```js
+const tokenId = undefined;
+const utxos = wallet.getTokenUtxos(tokenId);
+```
+
+If `tokenId` is undefined UTXOs of all token categories will be returned. If `tokenId` is set, only tokens of this category will be returned.
+
+### Token balances
+
+You can get all fungible token balances of your wallet or a balance of a specific token with the following methods:
+
+```js
+const tokenBalance = wallet.getTokenBalance(tokenId);
+const allBalances = wallet.getAllTokenBalances();
+```
+
+To get the total amount of NFT tokens use the following methods:
+
+```js
+const nftTokenBalance = wallet.getNftTokenBalance(tokenId);
+const allNftBalances = wallet.getAllNftTokenBalances();
+```
+
+### Watching/waiting for fungible token balance
+
+Similarly a to BCH transaction watching/waiting we provide the convenient methods to watch/wait for fungible token balance.
+
+```js
+const cancelFn = wallet.watchTokenBalance(tokenId, (balance) => {
+  ...
+});
+```
+
+You can wait for the wallet to reach a certain minimal fungible token balance:
+
+```js
+const actualBalance = await wallet.waitForBalance(tokenId, 10);
+```
+
+This will halt the program execution until the balance reaches the target value.
+
+## BCMR - BitcoinCash Metadata Registries
+
+We implement [BCMR](https://github.com/bitjson/chip-bcmr) CHIP to support on-chash CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
+
+To add metadata registry to the list of tracked ones use one of the following methods:
+
+1. Direct: use `BCMR.addMetadataRegistry` to add the [`Registry`](https://github.com/bitjson/chip-bcmr/blob/5b24b0ec93cf9316222ab2ea2e2ffe8a9f390b12/bcmr-v1.schema.ts#L103) object to the list of tracked
+2. Using HTTPS or IPFS endpoint: use `addMetadataRegistryFromUri` to download a JSON file containing the `Registry` and add it to the list of tracked, optionally enforcing the content hash verification.
+3. Using authchain resolution to optionally follow to the head of the auth chain and fetching data from HTTPS or IPFS Publication Outputs
+
+```js
+const authChain = await BCMR.addMetadataRegistryAuthChain({
+  transactionHash: txHash,
+  followToHead: false
+});
+```
+
+In this example we resolve the exact metadata registry stored in the transaction findable by its transaction hash `txHash`. If we'd wanted to resolve the latest version, we'd set `followToHead` to `true`.
+
+After adding the registry, we will have access to token info with either `wallet.getTokenInfo` or a static `BCMR.getTokenInfo`:
+
+```js
+const info: IdentitySnapshot | undefined = BCMR.getTokenInfo(tokenId);
+```
+
+Note, that token info resolution will prioritize the most recently added registries and return the info about first found token with matching `tokenId`.
+
+To get a copy of all tracked registries, use `getRegistries`, to purge the list use `resetRegistries`.
+
 ## Simple Ledger Protocol (SLP)
 
 We currently fully support the SLP type 1 tokens [specification](https://slp.dev/specs/slp-token-type-1/)
