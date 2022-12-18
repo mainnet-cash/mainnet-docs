@@ -446,6 +446,11 @@ These upgrades can be tested on a chipnet (special testnet which supports the la
 
 N.B. To support CashTokens we had to upgrade our core dependency libauth to v2, which made us to convert mainnet.cash library to an ESM module.
 
+Cashtokens are available on chipnet, to connect to chipnet in browser and node use the following snippet before creating testnet wallets.
+```js
+DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
+```
+
 Unlike SLP tokens, CashTokens do not have thier own namespace of wallet type - all token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
 Furthermore, unlike SLP tokens, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
