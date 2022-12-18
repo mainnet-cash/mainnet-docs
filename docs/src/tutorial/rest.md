@@ -756,7 +756,7 @@ Response:
 
 ## BCMR - BitcoinCash Metadata Registries
 
-We implement [BCMR](https://github.com/bitjson/chip-bcmr) CHIP to support on-chash CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
+We implement [BCMR](https://github.com/bitjson/chip-bcmr) CHIP to support on-chain CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
 
 To add metadata registry to the list of tracked ones use one of the following methods:
 
