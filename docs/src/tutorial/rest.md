@@ -449,6 +449,12 @@ See [WebSockets](#websocket-api-reference) and [WebHooks](#webhooks).
 
 ## CashTokens
 
+::: warning
+CashTokens support is still in early stage.
+
+CashTokens will be enabled on BCH main network only after May 2023 upgrade.
+:::
+
 Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BCMR](https://github.com/bitjson/chip-bcmr) - BitcoinCash Metadata Registries.
 
 These upgrades can be tested on a chipnet (special testnet which supports the latest CHIPs). They will also be activated on BCH mainnet after May23 network upgrade.
@@ -755,6 +761,12 @@ Response:
 ```
 
 ## BCMR - BitcoinCash Metadata Registries
+
+::: warning
+BCMR implementation in mainnet.cash is in alpha phase.
+
+BCMR CHIP might still be changed.
+:::
 
 We implement [BCMR](https://github.com/bitjson/chip-bcmr) CHIP to support on-chain CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
 

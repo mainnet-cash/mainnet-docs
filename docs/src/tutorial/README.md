@@ -440,6 +440,12 @@ await wallet.send([
 
 ## CashTokens
 
+::: warning
+CashTokens support is still in early stage.
+
+CashTokens will be enabled on BCH main network only after May 2023 upgrade.
+:::
+
 Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BCMR](https://github.com/bitjson/chip-bcmr) - BitcoinCash Metadata Registries.
 
 These upgrades can be tested on a chipnet (special testnet which supports the latest CHIPs). They will also be activated on BCH mainnet after May23 network upgrade.
@@ -622,7 +628,13 @@ This will halt the program execution until the balance reaches the target value.
 
 ## BCMR - BitcoinCash Metadata Registries
 
-We implement [BCMR](https://github.com/bitjson/chip-bcmr) CHIP to support on-chain CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
+::: warning
+BCMR implementation in mainnet.cash is in alpha phase.
+
+BCMR CHIP might still be changed.
+:::
+
+We implement [BCMR](https://github.com/bitjson/chip-bcmr/tree/5b24b0ec93cf9316222ab2ea2e2ffe8a9f390b12) CHIP to support on-chain CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
 
 To add metadata registry to the list of tracked ones use one of the following methods:
 
