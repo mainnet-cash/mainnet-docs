@@ -60,14 +60,14 @@ For networking, the package `electrum-cash` is configured to connect using webso
 Finally, solc compile is currently not available in the browser and there are a number of node related packages in ethers which may need to be shimmed.
 
 
-Below is a sample webpack configuration, only the fallbacks for the library used need to be included.
+Below is a sample webpack configuration, only the fallbacks for the library used need to be included. See full webpack config at: [https://github.com/mainnet-cash/mainnet-js/blob/master/packages/mainnet-js/webpack.config.cjs](https://github.com/mainnet-cash/mainnet-js/blob/master/packages/mainnet-js/webpack.config.cjs)
 
 
 ```js
 
 module.exports = {
     resolve:{
-        fallback:{
+        alias:{
 
             // mainnet-js
             "stream": require.resolve("stream-browserify"), // bip39
