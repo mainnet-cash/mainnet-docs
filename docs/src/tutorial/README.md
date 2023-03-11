@@ -37,12 +37,24 @@ If you are bundling a production webapp, see [detailed notes](./shipping-mainnet
 
 ### &lt;script> tag in HTML
 
-To get started using Bitcoin Cash on your site, include this tag in your `<head>` section:
+To get started using Bitcoin Cash on your site, include these tags in your `<head>` and `<body>` sections:
 
 ```html
-<script src="https://cdn.mainnet.cash/mainnet-1.0.15.js"
- integrity="sha384-6LwPxI+LM57V+9FhzunMs5bMcti7Y7pTr9Tbc6+vsdrONMZDBGIfTZGQwhk73TFM"
- crossorigin="anonymous"></script>
+<head>
+  <script src="https://cdn.mainnet.cash/mainnet-1.0.15.js"
+   integrity="sha384-6LwPxI+LM57V+9FhzunMs5bMcti7Y7pTr9Tbc6+vsdrONMZDBGIfTZGQwhk73TFM"
+   crossorigin="anonymous"></script>
+</head>
+<body>
+  <script>
+    document.addEventListener("DOMContentLoaded", async (event) => {
+      globalThis.exports = globalThis.exports || {};
+      Object.assign(globalThis, await __mainnetPromise);
+
+      // your code
+    });
+  </script>
+</body>
 ```
 
 <!--
