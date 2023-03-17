@@ -652,7 +652,7 @@ To add metadata registry to the list of tracked ones use one of the following me
 
 1. Direct: use `BCMR.addMetadataRegistry` to add the [`Registry`](https://github.com/bitjson/chip-bcmr/blob/5b24b0ec93cf9316222ab2ea2e2ffe8a9f390b12/bcmr-v1.schema.ts#L103) object to the list of tracked
 2. Using HTTPS or IPFS endpoint: use `addMetadataRegistryFromUri` to download a JSON file containing the `Registry` and add it to the list of tracked, optionally enforcing the content hash verification.
-3. Using authchain resolution to optionally follow to the head of the auth chain and fetching data from HTTPS or IPFS Publication Outputs
+3. Using authchain resolution to optionally follow to the head of the authchain and fetching data from HTTPS or IPFS Publication Outputs
 
 ```js
 const authChain = await BCMR.addMetadataRegistryAuthChain({
@@ -672,6 +672,32 @@ const info: IdentitySnapshot | undefined = BCMR.getTokenInfo(tokenId);
 Note, that token info resolution will prioritize the most recently added registries and return the info about first found token with matching `tokenId`.
 
 To get a copy of all tracked registries, use `getRegistries`, to purge the list use `resetRegistries`.
+
+### BCMR authchain resolution
+
+If you want to partially or fully resolve a BCMR authchain, you can use the following method:
+
+```js
+const authChain: AuthChainElement[] = await BCMR.buildAuthChain(options);
+```
+
+where AuthChainElement is defined as:
+```js
+interface AuthChainElement {
+  txHash: string;
+  contentHash: string;
+  uri: string;
+}
+```
+
+The options object allows you to specify the resolution process:
+
+* `transactionHash` is a required field, and specifies the hash of a transaction from which the resolution should start
+* `resolveBase` is a boolean flag which specifies if we should resolve all authchain elements towards the first element called "authbase"
+* `followToHead` is a boolean flag which specifies if we should resolve all authchain elements towards the last and most recent element called "authhead". Authhead always resides in UTXO set.
+
+So if you set both `reoslveBase` and `followToHead` to true, the full authchain will be resolved.
+
 
 ## Simple Ledger Protocol (SLP)
 
