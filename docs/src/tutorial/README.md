@@ -41,8 +41,8 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 
 ```html
 <head>
-  <script src="https://cdn.mainnet.cash/mainnet-1.1.4.js"
-   integrity="sha384-Unx5PC+N28nYV7/t4RKPxG3A+Lql7UHi2OiNvKCwS6ilbxQl1frc7cow12o3aP4V"
+  <script src="https://cdn.mainnet.cash/mainnet-1.1.5.js"
+   integrity="sha384-mHhOYVd+Fct+Z3xnUYq4mbfpsMS/6eLzpFoBvzH9RNe2XkNs9YMSAGtlv1Vd/6bH"
    crossorigin="anonymous"></script>
 </head>
 <body>
@@ -59,7 +59,7 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-1.1.4.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-1.1.5.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -968,7 +968,7 @@ To get started using CashScript Contracts on your site, include this tag in your
 
 ```html
 <script src="https://cdn.mainnet.cash/contract/contract-.js"
- integrity="sha384-Od7TNuF+0XtLTYRtjkPBmnRLtkVqzbJ3ChnnKYNm9vOokEQZozpjj/dbV6Ezf+Wv"
+ integrity="sha384-J4Gunrk6xo8GcPuPqm9GpAOqQ4oAuwW9a4aU9f0kzdhxBHrnly4l60h+SvjYIcFK"
  crossorigin="anonymous"></script>
 ```
 
