@@ -170,7 +170,7 @@ If the wallet entry does not exist in the DB, it will be created. If it does - i
 
 ### Watch-only wallets
 
-Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of adress' balances, subscribe to its incoming and outgoing transactions, etc.
+Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of address' balances, subscribe to its incoming and outgoing transactions, etc.
 
 They are constructed from a cashaddress as follows:
 
@@ -469,7 +469,7 @@ Cashtokens are available on chipnet, to connect to chipnet in browser and node u
 DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
 ```
 
-Unlike SLP tokens, CashTokens do not have thier own namespace of wallet type - all token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
+Unlike SLP tokens, CashTokens do not have their own namespace of wallet type - all token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
 Furthermore, unlike SLP tokens, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
 
@@ -561,7 +561,7 @@ const sendResponse = await wallet.send([
     capability: NFTCapability.none,
   }),
   new SendRequest({
-    cashaddr: chaarlie.cashaddr!,
+    cashaddr: charlie.cashaddr!,
     value: 100000,
     unit: "satoshis",
   }),
@@ -696,7 +696,7 @@ The options object allows you to specify the resolution process:
 * `resolveBase` is a boolean flag which specifies if we should resolve all authchain elements towards the first element called "authbase"
 * `followToHead` is a boolean flag which specifies if we should resolve all authchain elements towards the last and most recent element called "authhead". Authhead always resides in UTXO set.
 
-So if you set both `reoslveBase` and `followToHead` to true, the full authchain will be resolved.
+So if you set both `resolveBase` and `followToHead` to true, the full authchain will be resolved.
 
 
 ## Simple Ledger Protocol (SLP)
@@ -769,6 +769,7 @@ If you decide to increase the token circulation supply, you would need to `mint`
 
 In the following example we issue 50 more tokens we just created in genesis:
 
+<!-- cSpell:disable -->
 ```js
 const mintOptions = {
   value: "50",
@@ -777,6 +778,7 @@ const mintOptions = {
   tokenReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
   batonReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
 }
+<!-- cSpell:enable -->
 
 const {txId, balance} = await wallet.slp.mint(mintOptions);
 ```
@@ -1303,7 +1305,7 @@ So a common way to break the escrow transaction flow is to neglect the fees, whi
 
 Let's create our contract parties again. 
 
-You can do this by importing mainnet into nodejs, using a live coding tool or the console of web browser using `yarn relaod` at localhost:8080.
+You can do this by importing mainnet into nodejs, using a live coding tool or the console of web browser using `yarn reload` at localhost:8080.
 
 ```js
 seller = await RegTestWallet.newRandom()
@@ -1527,6 +1529,7 @@ If you wanted to check different xPubKey paths for funds,
 await wallet.getXPubKeys()
 ```
 
+<!-- cSpell:disable -->
 ```json
 [
   {
@@ -1548,14 +1551,15 @@ await wallet.getXPubKeys()
   }
 ]
 ```
-
+<!-- cSpell:enable -->
 
 To derive the public addresses from a given xpubkey, a `getAddrsByXpubKey()` utility.
 
-
+<!-- cSpell:disable -->
 ```js
 await Mainnet.getAddrsByXpubKey("tpubDDfazrbXYF84Xxq7XqnakjAwVyCFVUGEWrsuQY3VqzpV8QgH2X2cczoZbEAyMdRmcra4nLhf67vEZ1jSnQ2KKcq5USoTGtFGaVTsXx7XsG7","0/0",5)
 ```
+
 
 ```json
 [
@@ -1566,10 +1570,99 @@ await Mainnet.getAddrsByXpubKey("tpubDDfazrbXYF84Xxq7XqnakjAwVyCFVUGEWrsuQY3Vqzp
   "bchtest:qqgd46e75y3flz6vy3vn0tfrnkzmjtnw5v42573hs7"
 ]
 ```
+<!-- cSpell:enable -->
 
 So the above addresses correspond to the cashaddrs for the paths `m/44'/0'/0'/0/0-4`.
 
 This will allow you to check for the existence of funds on alternate child or parent derivation paths, however full hierarchical deterministic (HD) wallets are not supported at this time.
+
+## History
+
+Suppose your app or use case needed a list of transactions associated with an address, this is a bit more complicated than it sounds because an address may send change back to itself when sending funds, it may receive inputs from multiple outputs at once, or send funds to multiple addresses at once, etc. 
+
+The `getHistory` function aims to simplify this for app developers by providing a list of all material changes in the balance of an address, in a linear format where every input and output are itemized to show a running tabulation. 
+
+So for the simple case of a watch only wallet: 
+
+<!-- cSpell:disable -->
+```javascript
+let eaterWallet = Wallet.watchOnly("qp6e6enhpy0fwwu7nkvlr8rgl06ru0c9lywalz8st5")
+// getHistory(unit, start, count, collapseChange)
+await eaterWallet.getHistory(
+  'sat', // unit
+  0,     // start in reverse chronological order, most recent first
+  2,     // number of transactions to return
+  true   // collapse "change" returned back to the address
+  )
+```
+<!-- cSpell:enable -->
+
+The above call would return the last two transactions received by the address in question.
+
+<!-- cSpell:disable -->
+```json
+[
+    {
+        "from": "a35a0ef10445acb5686d04ee6f8bbcc203c973a6cf064145961eca2428c248b8:o:1;3c76effe9efaceca5845ef1edc3c6aff0746d94aef3559b858cff89fbad280ff:o:3",
+        "to": "bitcoincash:qp6e6enhpy0fwwu7nkvlr8rgl06ru0c9lywalz8st5",
+        "unit": "sat",
+        "index": 1,
+        "blockheight": 775276,
+        "txn": "e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200",
+        "txId": "e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200:o:1",
+        "value": 546,
+        "fee": 0,
+        "balance": 1313652003
+    },
+    {
+        "from": "e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200:o:2;e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200:o:3",
+        "to": "bitcoincash:qp6e6enhpy0fwwu7nkvlr8rgl06ru0c9lywalz8st5",
+        "unit": "sat",
+        "index": 1,
+        "blockheight": 775276,
+        "txn": "578bbd76a87eed1d468c033efdf32d330f8fa854048d1b9768064384603a2963",
+        "txId": "578bbd76a87eed1d468c033efdf32d330f8fa854048d1b9768064384603a2963:o:1",
+        "value": 546,
+        "fee": 0,
+        "balance": 1313651457
+    }
+]
+```
+<!-- cSpell:enable -->
+
+Alternatively, to get history formatted similar to the ElectrumX protocol, the raw history of transactions can be accessed with `getRawHistory()`
+
+```javascript
+await eater.getRawHistory()
+```
+
+The above call will return the full history, as provided by the indexer, in **chronological order**, oldest **first**:
+
+<!-- cSpell:disable -->
+```json
+[
+    {
+        "height": 132184,
+        "tx_hash": "369d241af595fc253479abe394e2f21fda05820a0416942f63266dd793035cf1"
+    },
+    {
+        "height": 132187,
+        "tx_hash": "456b21f80179f59f519ff170afd390a4474610f4a9de7368fb3a778a7f84939f"
+    },
+    // .... [2-535]
+    {
+        "height": 775276,
+        "tx_hash": "578bbd76a87eed1d468c033efdf32d330f8fa854048d1b9768064384603a2963"
+    },
+    {
+        "height": 775276,
+        "tx_hash": "e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200"
+    }
+]
+```
+<!-- cSpell:enable -->
+
+With the `getRawHistory` version of the call, it's possible to parse (or cache) transactions locally with your own logic and present it to users as you see fit. 
 
 ## Signed Messages
 
@@ -1581,6 +1674,7 @@ Full-nodes and SPV wallets often include this feature as standard.
 
 Let's try signing with an example from a common test case:
 
+<!-- cSpell:disable -->
 ```js
 message = "Chancellor on brink of second bailout for banks"
 francisWallet = await Wallet.fromWIF(
@@ -1597,7 +1691,11 @@ signature = (await francisWallet.sign(message)).signature;
 
 sigResult = await francisWallet.sign(message);
 ```
+<!-- cSpell:enable -->
+
 Where the full `sigResult` result is:
+
+<!-- cSpell:disable -->
 ```json
 
 {
@@ -1614,6 +1712,7 @@ Where the full `sigResult` result is:
   "signature": "H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
 }
 ```
+<!-- cSpell:enable -->
 
 ::: danger Please be aware
  The above contains both ECDSA and Schnorr signatures. If they had been created using the same random nonce, an attacker could derive the private key. To avoid this risk, the underlying library ([libauth](https://libauth.org/interfaces/secp256k1.html#signmessagehashschnorr)) uses nonces for Schorr signatures with the additional data field set to `Schnorr+SHA256`. Such measures are an important security requirement for any financial software producing both types of signatures. 

@@ -32,6 +32,7 @@ See also: Full [REST server API reference](https://rest-unstable.mainnet.cash/ap
 
 Response:
 
+<!-- cSpell:disable -->
 ```json
 {
   "cashaddr": "bchtest:qrau3n8tzcv2a4yqsr603unhxx4vp9ph0yg2g9449d",
@@ -39,6 +40,7 @@ Response:
   "network": "testnet"
 }
 ```
+<!-- cSpell:enable -->
 
 This creates a **TestNet** wallet.  This has the cashaddress of the wallet, where you can send money, and the `walletId`.
 Note the `walletId` - we're going to need it later. This wallet will not be persisted. See below for persistent wallets.
@@ -75,6 +77,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/create \
 
 Response:
 
+<!-- cSpell:disable -->
 ```json
 {
   "name": "",
@@ -83,6 +86,7 @@ Response:
   "network": "mainnet"
 }
 ```
+<!-- cSpell:enable -->
 
 Seed phrase wallets use the derivation path `m/44'/0'/0'/0/0` by default (Bitcoin.com wallet compatibility)
 
@@ -170,7 +174,7 @@ If the wallet entry does not exist in the DB, it will be created. If it does - i
 
 ### Watch-only wallets
 
-Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of adress' balances, subscribe to its incoming and outgoing transactions, etc.
+Watch-only wallets do not have private keys and unable to send funds, however they are very useful to keep track of address' balances, subscribe to its incoming and outgoing transactions, etc.
 
 They are constructed from a cashaddress by building a `walletId` like this:
 
@@ -2081,6 +2085,61 @@ returns something like:
 ...
 ```
 
+## History
+
+Let's say your app or logic wants to show the user a history of their transactions. 
+
+The  `get_history` endpoint provides an interface to return transactions in reverse cronological order (most recent first) for a given wallet.
+
+Take for example the so called "Bitcoin Eater address" (1BitcoinEaterAddressDontSendf59kuE). This address corresponds to the cash address:
+`qp6e6enhpy0fwwu7nkvlr8rgl06ru0c9lywalz8st5`
+
+To get the last two transactions at the time of writing, a POST call to the `wallet/get_history` endpoint...
+
+```json
+{
+  "walletId": "watch:mainnet:qp6e6enhpy0fwwu7nkvlr8rgl06ru0c9lywalz8st5",
+  "unit": "sat",
+  "start": 0,
+  "count": 2,
+  "collapseChange": true
+}
+```
+
+would result in the last two transactions, starting from 0 (now):
+
+```json
+{
+  "transactions": [
+    {
+      "from": "a35a0ef10445acb5686d04ee6f8bbcc203c973a6cf064145961eca2428c248b8:o:1;3c76effe9efaceca5845ef1edc3c6aff0746d94aef3559b858cff89fbad280ff:o:3",
+      "to": "bitcoincash:qp6e6enhpy0fwwu7nkvlr8rgl06ru0c9lywalz8st5",
+      "unit": "sat",
+      "index": 1,
+      "blockheight": 775276,
+      "txn": "e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200",
+      "txId": "e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200:o:1",
+      "value": 546,
+      "fee": 0,
+      "balance": 1313652003
+    },
+    {
+      "from": "e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200:o:2;e4a41792b8ea19a114e031c87fb8cedffc989a0f58cb4a0d387e27c0b00f0200:o:3",
+      "to": "bitcoincash:qp6e6enhpy0fwwu7nkvlr8rgl06ru0c9lywalz8st5",
+      "unit": "sat",
+      "index": 1,
+      "blockheight": 775276,
+      "txn": "578bbd76a87eed1d468c033efdf32d330f8fa854048d1b9768064384603a2963",
+      "txId": "578bbd76a87eed1d468c033efdf32d330f8fa854048d1b9768064384603a2963:o:1",
+      "value": 546,
+      "fee": 0,
+      "balance": 1313651457
+    }
+  ]
+}
+```
+
+A running balance of the number of sats is also provided in the unit specified.
 
 ## Signed Messages
 
@@ -2457,3 +2516,6 @@ If `tokenId` is supplied, the response will arrive only for the transactions wit
 ```
 
 Response follows this [schema](https://slp.dev/tooling/slpdb/#mongodb-collections-data-schema)
+
+
+asdf 
