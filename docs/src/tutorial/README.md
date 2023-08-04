@@ -1804,6 +1804,13 @@ An open Postgres server is also available on port `15432`
 
 A wallet is configured with the rewards from the first 215 blocks of the regtest network, you can get an instance of the wallet with this code:
 
+```javascript
+//
+// configured in your testing environment ...
+// ALICE_ID="wif:regtest:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
+//
+const alice = await RegTestWallet.fromId(process.env["ALICE_ID"]!);
+```
 
 ## WebSockets
 
