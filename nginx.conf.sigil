@@ -1,8 +1,10 @@
 server {
+  # 1
   server_name mainnet.cash;
   access_log  /var/log/nginx/mainnet.cash-access.log;
   error_log   /var/log/nginx/mainnet.cash-error.log;
 
+  # 2
   location    / {
 
     gzip on;
@@ -63,7 +65,7 @@ upstream {{ $.APP }}-{{ $upstream_port }} {
 }
 {{ end }}{{ end }}
 
-
+# 3
 server {
     if ($host = mainnet.cash) {
         return 301 https://$host$request_uri;
