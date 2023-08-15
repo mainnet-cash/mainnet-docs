@@ -1,5 +1,7 @@
 FROM node:14.21.3
 
+ADD nginx.conf.sigil
+
 WORKDIR /app/docs
 COPY docs/package.json .
 COPY docs/yarn.lock .
