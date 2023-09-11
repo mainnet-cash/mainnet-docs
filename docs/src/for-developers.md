@@ -7,8 +7,6 @@
     - [BCH TestNet faucet](https://faucet.fullstack.cash/)
 - [https://bitsocket2.fountainhead.cash/channel](https://bitsocket2.fountainhead.cash/channel) - Public BitSocket - subscribe to Bitcoin Cash balances and other real-time queries
 - [Double spend proofs via REST](https://dsproof.devops.cash/)
-- [SLP tokens explorer](https://simpleledger.info/) 
-    - [How Bitcoin Cash SLP tokens work](https://read.cash/@Read.Cash/how-do-slp-tokens-on-bitcoin-cash-work-74805db3)
 - [Bitcoin Cash mempool explorer](https://jochen-hoenicke.de/queue/#3,1y) 
 - [CashFusion stats](https://stats.devzero.be/#/) 
     - [What is CashFusion on Bitcoin Cash?](https://read.cash/@Read.Cash/cashfusion-on-bitcoin-cash-what-it-is-and-lets-try-to-crack-it-e20462a5)

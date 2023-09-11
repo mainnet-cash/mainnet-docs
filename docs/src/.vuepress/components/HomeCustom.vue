@@ -29,14 +29,6 @@
             Enterprise wallet<br>on your own server
           </p>
         </div>
-        <div style="margin: 0 10px 0 10px;">
-          <a href="/tutorial/smartbch.html" class="nav-link action-button">
-            SmartBCH →
-          </a>
-          <p style="font-size: 90%;">
-            Ethereum(EVM)-compatible<br>Bitcoin Cash side-chain
-          </p>
-        </div>
       </div>
 
       <div style="display: flex; justify-content: space-between; width: 10em; margin: 0 auto; font-size: 70%;">

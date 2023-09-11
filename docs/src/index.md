@@ -11,9 +11,6 @@ features:
 - title: Includes CashScript
   details: High-level Bitcoin Cash contracts programming language
   url: /tutorial/#generic-cashscript
-- title: SLP tokens, including NFT (collectibles)
-  details: Mint your own tokens and distribute them
-  url: /tutorial/#simple-ledger-protocol-slp
 - title: Automatic currency conversion
   details: Send $0.10 at the current exchange rate just as easy as 0.1 BCH
   url: /tutorial/#utilities
@@ -29,9 +26,6 @@ features:
 - title: Escrow contracts
   details: For non-custodial marketplaces
   url: /tutorial/#escrow-contracts
-- title: SmartBCH support
-  details: EVM(Ethereum)-compatible side-chain that uses Bitcoin Cash using the same interface
-  url: /tutorial/smartbch.html
 - title: Instant cheap transactions
   details: Bitcoin Cash network is production ready with less than 1 cent transaction fees and hundreds of thousands of transactions per day
 footer: Made by Mainnet developers with ❤️
