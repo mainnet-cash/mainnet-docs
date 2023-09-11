@@ -466,9 +466,9 @@ Cashtokens are available on chipnet, to connect to chipnet in REST server set th
 export ELECTRUM_TESTNET=wss://chipnet.imaginary.cash:50004
 ```
 
-Unlike SLP tokens, CashTokens do not have thier own namespace of wallet type - all token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
+All token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
-Furthermore, unlike SLP tokens, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
+Both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
 
 Each token UTXO may or may not contain the following attributes:
 
