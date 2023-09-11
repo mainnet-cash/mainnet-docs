@@ -112,20 +112,6 @@ The following variables are available to configure the REST server:
 | `DATABASE_SSL_KEY` | Base64 encoded certificate key as a string | `undefined` |
 | `DATABASE_SSL_CERT` | Base64 encoded certificate as a string | `undefined` |
 | `API_KEY` | API Key | `undefined` |
-| `SLP_PROVIDER` | SLP provider | `undefined` (implied default `slpdb`) |
-| `SLPDB_MAINNET_DATA` | SLP provider data endpoint | `undefined` (default https://slpdb.fountainhead.cash) |
-| `SLPDB_MAINNET_EVENTS` | SLP provider event endpoint | `undefined` (default https://slpsocket.fountainhead.cash) |
-| `GSPP_MAINNET_DATA` | SLP provider data endpoint | `undefined` (default https://gs.fountainhead.cash) |
-| `GSPP_MAINNET_EVENTS` | SLP provider event endpoint | `undefined` (default https://slpsocket.fountainhead.cash) |
-| `SLPDB_TESTNET_DATA` | SLP provider data endpoint | `undefined` (default https://slpdb-testnet.fountainhead.cash) |
-| `SLPDB_TESTNET_EVENTS` | SLP provider event endpoint | `undefined` (default https://slpsocket-testnet.fountainhead.cash) |
-| `GSPP_TESTNET_DATA` | SLP provider data endpoint | `undefined` (default https://gs-testnet.fountainhead.cash) |
-| `GSPP_TESTNET_EVENTS` | SLP provider event endpoint | `undefined` (default https://slpsocket-testnet.fountainhead.cash) |
-| `SLPDB_REGTEST_DATA` | SLP provider data endpoint | `undefined` (default http://localhost:12300) |
-| `SLPDB_REGTEST_EVENTS` | SLP provider event endpoint | `undefined` (default http://localhost:12301) |
-| `GSPP_REGTEST_DATA` | SLP provider data endpoint | `undefined` (default http://localhost:12400) |
-| `GSPP_REGTEST_EVENTS` | SLP provider event endpoint | `undefined` (default http://localhost:12401) |
-
 
 The node package also has the following variables to control which electrum cash servers it connects to and how:
 

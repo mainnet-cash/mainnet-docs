@@ -233,17 +233,14 @@ const txData = await wallet.send([seller.getDepositAddress(), 0.01, 'usd']);
 Note that you can send to many addresses at once.
 
 If your address holds <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">SLP tokens</span>,
-you have to use the `wallet.slpAware().send([...])` method to prevent accidental token burning.
-SLP checks are a bit slow, so they are opt-in.
-
-A faster way to be SLP aware is `wallet.slpSemiAware()` modifier. It skips all UTXOs with 546 sats when counting balance and sending funds. Also it is blazing fast.
+you have to use the `wallet.slpSemiAware().send([...])` method to prevent accidental token burning.
+It skips all UTXOs with 546 sats when counting balance and sending funds.
 
 #### Options
 
 There is also an `options` parameter that specifies how money is spent.
 
 * `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
-* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs; relies on an external SLP indexer to be available.
 * `slpSemiAware` is a boolean flag (defaulting to `false`) which requires an UTXO to have more than 546 sats to be spendable and counted in the balance. It protects you from spending SLP-like UTXOs without using an external SLP indexer.
 * `changeAddress` cash address to receive change to
 * `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
@@ -303,7 +300,7 @@ const txData = await seller.sendMax(wallet.getDepositAddress());
 
 If you want to know the maximum amount of available funds to send, e.g. your balance minus the network fees, you can use:
 ```js
-const sendRequestOptions = { slpAware: true, utxoIds: [] };
+const sendRequestOptions = { slpSemiAware: true, utxoIds: [] };
 const options = { outputCount: 1, options: sendRequestOptions };
 const maxAmount = await wallet.getMaxAmountToSend(options);
 ```
@@ -699,233 +696,11 @@ The options object allows you to specify the resolution process:
 So if you set both `resolveBase` and `followToHead` to true, the full authchain will be resolved.
 
 
-## Simple Ledger Protocol (SLP)
-
-We currently fully support the SLP type 1 tokens [specification](https://slp.dev/specs/slp-token-type-1/)
-
-The interfaces were designed to be largely similar to those of BCH wallets.
-
-Creating an SLP enabled wallet is similar to a BCH one, just add an `.slp` static accessor after the wallet class you want to use:
-
-```js
-const wallet = await TestNetWallet.slp.newRandom();
-```
-
-The SLP wallets are using the `m/44'/245'/0'/0/0` BIP44 derivation path unlike normal BCH wallets which use `m/44'/0'/0'/0/0`. This is done to lower the chances of accidental token burns.
-
-If you want to instantiate an SLP wallet which will use a different derivation path (assuming you already have your BIP39 seed phrase):
-
-```js
-const wallet = await Wallet.slp.fromSeed("diary caution almost ...", "m/44'/123'/0'/0/0");
-```
-
-Note, that SLP-enabled wallets are by default SLP aware and token burn checks are ensured when spending UTXOs.
-
-The SLP functions are then available via Wallet.slp accessor:
-
-```js
-const slpAddress = wallet.slp.getDepositAddress();
-
-const qrCode = wallet.slp.getDepositQr();
-```
-
-Note, that working with SLP tokens requires a certain amount of BCH available in your wallet so that you can pay miners for the SLP transactions.
-
-### Token creation - Genesis
-
-To create your own token you should prepare and broadcast a special genesis transaction containing all the information about the token being created: token name, ticker, decimals - number of significant digits after comma, initial token amount, url you want to associate with token. Some of these properties are optional.
-
-With the `endBaton` parameter you can decide to keep the possibility of additional token creation, which is governed by so called minting baton or immediately discard this baton to make the token circulation amount to be fixed.
-
-The transaction id in which the token is created will become its permanent and unique identifier.
-
-Note, that there might be many tokens with the same name. Remember, that only 64 character long string-ids do identify your token uniquely und unambiguously.
-
-In the following example 10000.00 MNC tokens will be created.
-
-```js
-const genesisOptions = {
-  name: "Mainnet coin",
-  ticker: "MNC",
-  decimals: 2,
-  initialAmount: 10000,
-  documentUrl: "https://mainnet.cash",
-  endBaton: false
-};
-const {tokenId} =  await wallet.slp.genesis(genesisOptions)
-```
-
-### Looking up token information
-
-If you want to get the genesis information of some token, you can simply call getTokenInfo:
-
-```js
-const info = await wallet.slp.getTokenInfo(tokenId);
-```
-
-### Additional token creation - Minting
-
-If you decide to increase the token circulation supply, you would need to `mint` more tokens. You are required to have the ownership of the minting baton to do so. Similarly to genesis, you can keep the baton or discard it.
-
-In the following example we issue 50 more tokens we just created in genesis:
-
-<!-- cSpell:disable -->
-```js
-const mintOptions = {
-  value: "50",
-  tokenId: tokenId,
-  endBaton: false,
-  tokenReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  batonReceiverSlpAddr: "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
-}
-<!-- cSpell:enable -->
-
-const {txId, balance} = await wallet.slp.mint(mintOptions);
-```
-
-Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the minting baton to other authority.
-
-### Sending tokens
-
-Sending tokens around is easy and is very similar to sending BCH. You can include many send requests in one call too!
-
-```js
-const {txId, balance} = await wallet.slp.send([
-  {
-    slpaddr: bobWallet.slp.slpaddr,
-    value: 5,
-    tokenId: tokenId
-  }
-]);
-```
-
-Or you can send all tokens available with a simple sendMax method
-
-```js
-const result = await wallet.slp.sendMax(otherWallet.slp.slpaddr, tokenId);
-```
-
-Note, you can not send several different tokens in one go.
-
-
-### Token balances
-
-You can get all token balances of your wallet or a balance of a specific token with the following methods:
-
-```js
-const tokenBalance = wallet.slp.getBalance(tokenId);
-const allBalances = wallet.slp.getAllBalances();
-```
-
-### SLP address UTXOs
-
-If you want to get the information about SLP UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
-
-```js
-const utxos = wallet.slp.getFormattedSlpUtxos();
-```
-
-### Watching/waiting for transactions
-
-You can set up a hook to monitor SLP transactions with the following:
-
-```js
-const cancelFn = wallet.slp.watchTransactions((tx) => {
-  ...
-}, tokenId);
-```
-
-Leave out the tokenId to monitor all token transactions.
-
-Call the `cancelFn()` to unsubscribe from receiving callback calls.
-
-If you want just to wait for the next transaction you can use the following call:
-
-```js
-const tx = await wallet.slp.waitForTransaction(tokenId);
-```
-
-This will halt the program execution until the transaction arrives.
-
-### Watching/waiting for balance
-
-Similarly a to transaction watching/waiting we provide the convenient methods to watch/wait for balance.
-
-```js
-const cancelFn = wallet.slp.watchBalance((balance) => {
-  ...
-}, tokenId);
-```
-
-You can wait for the SLP wallet to reach a certain minimal token balance:
-
-```js
-const actualBalance = await wallet.slp.waitForBalance(10, tokenId);
-```
-
-This will halt the program execution until the balance reaches the target value.
-
-### Non-fungible tokens (NFT)
-
-NFT1 is a simple extension to the SLP token type 1 protocol which allows many NFT tokens to be grouped together using a single ID. Having the ability to group NFTs in a provable manner opens the doors for many more token applications, and makes SLP more similar to other NFT protocols (e.g., ERC-721). NFT1 uses the same validation rules as SLP token type 1 with a few additional constraints. [See reference](https://slp.dev/specs/slp-nft-1/#simple-nft-vs-nft1-protocol). Non-fungible tokens can be produced by simply minting a non-divisible token supply of 1 without a minting baton.
-
-All operations apart from genesis and minting, which are used for SLP tokens Type1, support the NFT tokens and are used the same way with same interfaces.
-
-#### NFT Parent Genesis
-
-To create the NFT parent group use the following code snippet
-
-```js
-const genesisOptions = {
-  name: "Mainnet NFT Parent",
-  ticker: "MNC_NFTP",
-  decimals: 0,
-  initialAmount: 10000,
-  documentUrl: "https://mainnet.cash",
-  endBaton: false
-};
-const genesisResult =  await wallet.slp.nftParentGenesis(genesisOptions);
-const parentTokenId = genesisResult.tokenId;
-```
-
-Note: these tokens are transferrable and mintable. Decimal places of 0 is advised.
-
-#### NFT Child Genesis
-
-NFT child tokens are unique and one of a kind. To create an NFT child token use the following code snippet
-
-```js
-const genesisOptions = {
-  name: "Mainnet NFT Child",
-  ticker: "MNC_NFTC",
-  decimals: 0,
-  initialAmount: 1,
-  documentUrl: "https://mainnet.cash",
-  endBaton: true,
-  parentTokenId: parentTokenId
-};
-const {tokenId} =  await wallet.slp.nftChildGenesis(genesisOptions);
-```
-
-In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.
-
-Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overridden: `endBaton` will be set to `true`, `initialAmount: 1`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
-
-#### List of your NFTs
-
-See [Token Balances](#token-balances)
-
-### Configuring SLP provider and endpoints
-
-You can switch between the default SLPDB and experimental Graph Search++ SLP providers by changing the static property `Wallet.slp.defaultProvider`. Valid values are `slpdb` and `gspp`. All other values will be not recognized and will default to SLPDB provider. The changes to this property will take effect globally next time you create a new wallet. If you want to change the provider for a single wallet only, you can do `wallet.slp.setProvider(...)`.
-
-You can change SLP provider data source and event source endpoints by changing static properties `SlpDbProvider.defaultServers` and `GsppProvider.defaultServers`. The changes will take effect globally next time you create a new wallet. If you want to change the endpoints for a single wallet only, you can do `wallet.slp.provider.servers = ...`.
-
 ## TestNet faucet
 
-You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
+You can have some TestNet satoshi for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
 
-Your address will be refilled up to 10000 TestNet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+Your address will be refilled up to 10000 TestNet satoshi upon a call. There are request rate limiters set up to prevent abuse.
 
 We've integrated the faucet into the library so that you can do easy calls like the following:
 
@@ -933,14 +708,6 @@ We've integrated the faucet into the library so that you can do easy calls like 
 const txid = await wallet.getTestnetSatoshis();
 ...
 const sendResponse = await wallet.returnTestnetSatoshis();
-```
-
-Same for SLP:
-
-```js
-const txid = await wallet.getTestnetSlp(tokenId);
-...
-const slpSendResponse = await wallet.returnTestnetSlp(tokenId);
 ```
 
 ## Escrow contracts
@@ -951,7 +718,7 @@ Alpha release
 
 ### Getting the mainnet-cash Contract package
 
-To keep the size of the packages small, both CashScript contract and Ethereum style functionality have been broken out into separate add-on packages (@mainnet-cash/contract & @mainnet-cash/smartbch). 
+To keep the size of the packages small, both CashScript contract and Ethereum style functionality have been broken out into separate add-on packages (@mainnet-cash/contract). 
 
 #### Via npm / yarn
 

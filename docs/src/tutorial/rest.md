@@ -259,7 +259,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
       }
     ],
     "options": {
-      "slpAware": true
+      "slpSemiAware": true
     }
   }'
 ```
@@ -280,7 +280,6 @@ Response:
 There is also an `options` parameter that specifies how money is spent.
 
 * `utxoIds` holds an array of strings and controls which UTXOs should be spent in this operation. Format is `["txid:vout",...]` , e.g., `["1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0"]`
-* `slpAware` is a boolean flag (defaulting to `false`) and indicate that operation should be SLP token aware and not attempt to spend SLP UTXOs; relies on an external SLP indexer to be available.
 * `slpSemiAware` is a boolean flag (defaulting to `false`) which requires an UTXO to have more than 546 sats to be spendable and counted in the balance. It protects you from spending SLP-like UTXOs without using an external SLP indexer.
 * `changeAddress` cash address to receive change to
 * `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
@@ -296,10 +295,7 @@ There is also an `options` parameter that specifies how money is spent.
   - `changeThenAny` - Use change then any output strategy or error. 
 
 
-<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpAware": true` to your request `options` to prevent accidental token burning.
-SLP checks are a bit slow, so they are opt-in.
-
-A faster way to be SLP aware is `"slpSemiAware": true` modifier. It skips all UTXOs with 546 sats when counting balance and sending funds. Also it is blazing fast.
+<span style="background-color: #fffdbf; padding: 0 5px 0 5px;">If your address holds SLP tokens</span>, you have to add `"slpSemiAware": true` to your request `options` to prevent accidental token burning. It skips all UTXOs with 546 sats when counting balance and sending funds.
 
 You get the transaction ID (txid) that [you can see on the TestNet block explorer](https://www.blockchain.com/bch-testnet/tx/316f923a1f4c47ac6562779fe6870943eec4f98a622a931f2cc1acd0790ebd69)
 and the balance left in the original wallet.
@@ -842,401 +838,11 @@ Note, that token info resolution will prioritize the most recently added registr
 
 To get all tracked registries, use `/wallet/bcmr/get_registries`, to purge the list use `/wallet/bcmr/reset_registries`.
 
-## Simple Ledger Protocol (SLP)
-
-We currently fully support the SLP type 1 tokens [specification](https://slp.dev/specs/slp-token-type-1/)
-
-The interfaces were designed to be largely similar to those of BCH wallets.
-
-<!-- SLP methods can use the `walletId` created in `wallet/create` calls. -->
-
-Creating an SLP enabled wallet is similar to a BCH one, just use the `wallet/slp/create` endpoint.
-
-The SLP wallets are using the `m/44'/245'/0'/0/0` BIP44 derivation path unlike normal BCH wallets which use `m/44'/0'/0'/0/0`. This is done to lower the chances of accidental token burns.
-
-If you want to instantiate an SLP wallet which will use a different derivation path (assuming you already have your BIP39 seed phrase) you should construct the `walletId` parameter as follows
-
-```json
-{
-  walletId: "seed:mainnet:diary caution almost ...:m/44'/123'/0'/0/0"
-}
-```
-
-Note, that unless you are using the `walletId` from `wallet/slp/create` (example is a `wif` wallet) the SLP awareness is not guaranteed. This means that you have to provide `"slpAware": true` or `"slpSemiAware": true`to your `options` parameter in `wallet/send` and `wallet/send_max` endpoints.
-
-Note, that REST server uses strings for the SLP amounts in order not to lose precision or have floating point issues.
-
-### Token creation - Genesis
-
-To create your own token you should prepare and broadcast a special genesis transaction containing all the information about the token being created: token name, ticker, decimals - number of significant digits after comma, initial token amount, url you want to associate with token. Some of these properties are optional.
-
-With the `endBaton` parameter you can decide to keep the possibility of additional token creation, which is governed by so called minting baton or immediately discard this baton to make the token circulation amount to be fixed.
-
-The transaction id in which the token is created will become its permanent and unique identifier.
-
-Note, that there might be many tokens with the same name. Remember, that only 64 character long string-ids do identify your token uniquely und unambiguously.
-
-In the following example 10000.00 MNC tokens will be created.
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/genesis \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "name": "Mainnet coin",
-  "ticker": "MNC",
-  "initialAmount": "10000",
-  "decimals": 2,
-  "documentUrl": "https://mainnet.cash",
-  "documentHash": "db4451f11eda33950670aaf59e704da90117ff7057283b032cfaec7779313916",
-  "endBaton": false
-}'
-```
-
-Response:
-
-```json
-{
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
-  "balances": {
-    "value": "10000",
-    "ticker": "MNC",
-    "name": "Mainnet coin",
-    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-}
-```
-
-### Looking up token information
-
-If you want to get the genesis information of some token, you can simply call `wallet/slp/token_info`:
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/token_info \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}'
-```
-
-Response:
-
-```json
-{
-  "name": "Mainnet coin",
-  "ticker": "MNC",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
-  "initialAmount": "10000",
-  "decimals": 2,
-  "documentUrl": "https://mainnet.cash",
-  "documentHash": "db4451f11eda33950670aaf59e704da90117ff7057283b032cfaec7779313916"
-}
-```
-
-
-### Additional token creation - Minting
-
-If you decide to increase the token circulation supply, you would need to `mint` more tokens. You are required to have the ownership of the minting baton to do so. Similarly to genesis, you can keep the baton or discard it.
-
-In the following example we issue 50 more tokens we just created in genesis:
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/mint \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "value": "50",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
-  "endBaton": false,
-  "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
-}'
-```
-
-Optional `tokenReceiverSlpAddr` and `batonReceiverSlpAddr` allow to specify the receiver of tokens and minting baton. This is how you can pass the minting baton to other authority.
-
-Response:
-
-```json
-{
-  "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15",
-  "balances": {
-    "value": "10050",
-    "ticker": "MNC",
-    "name": "Mainnet coin",
-    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-}
-```
-
-### Sending tokens
-
-Sending tokens around is easy and is very similar to sending BCH. You can include many send requests in one call too!
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/send \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "to": [
-    {
-      "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-      "value": 100,
-      "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-    }
-  ]
-}'
-```
-
-Response:
-
-```json
-{
-  "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
-  "balance": {
-    "value": "19900",
-    "ticker": "MNC",
-    "name": "Mainnet coin",
-    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-}
-```
-
-Or you can send all tokens available with a simple `wallet/slp/send_max` method
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/send_max \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}'
-```
-
-Response:
-
-```json
-{
-  "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
-  "balance": {
-    "value": "0",
-    "ticker": "MNC",
-    "name": "Mainnet coin",
-    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-}
-```
-
-Note, you can not send several different tokens in one go.
-
-
-### Token balances
-
-You can get all token balances of your wallet or a balance of a specific token with the following methods:
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/balance \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}'
-```
-
-Response:
-
-```json
-{
-  "value": "1000",
-  "ticker": "MNC",
-  "name": "Mainnet coin",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}
-```
-
-All balances:
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/all_balances \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
-}'
-```
-
-Response:
-
-```json
-[
-  {
-    "value": "1000",
-    "ticker": "MNC",
-    "name": "Mainnet coin",
-    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-]
-```
-
-### SLP address UTXOs
-
-If you want to get the information about SLP UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/utxo \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
-}'
-```
-
-Response:
-
-```json
-[
-  {
-    "index": 0,
-    "txId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f",
-    "satoshis": 546,
-    "utxoId": "1e6442a0d3548bb4f917721184ac1cb163ddf324e2c09f55c46ff0ba521cb89f:0",
-    "value": "10000",
-    "decimals": 2,
-    "ticker": "MNC",
-    "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-]
-```
-
-### SLP deposit address
-
-You can get the token deposit address in cashaddress format: `simpleledger:qq...`, `slptest:qq...` or `slpreg:qq...` for MainNet, TestNet and RegTest networks, respectively
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_address \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
-}'
-```
-
-Response:
-
-```json
-{
-  "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
-}
-```
-
-### SLP deposit QR code
-
-You can get the deposit address embedded in a QR code image. The response is ready to be used in HTML `src`, `title` and `alt` attributes of an `img` node.
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/deposit_qr \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6"
-}'
-```
-
-Response:
-
-```json
-{
-  "src": "data:image/svg+xml;base64,PD94bWwgdm... ==**",
-  "title": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "alt": "A Bitcoin Cash Simple Ledger Protocol QR Code"
-}
-```
-
-### Non-fungible tokens (NFT)
-
-NFT1 is a simple extension to the SLP token type 1 protocol which allows many NFT tokens to be grouped together using a single ID. Having the ability to group NFTs in a provable manner opens the doors for many more token applications, and makes SLP more similar to other NFT protocols (e.g., ERC-721). NFT1 uses the same validation rules as SLP token type 1 with a few additional constraints. [See reference](https://slp.dev/specs/slp-nft-1/#simple-nft-vs-nft1-protocol). Non-fungible tokens can be produced by simply minting a non-divisible token supply of 1 without a minting baton.
-
-All operations apart from genesis and minting, which are used for SLP tokens Type1, support the NFT tokens and are used the same way with same interfaces.
-
-#### NFT Parent Genesis
-
-To create the NFT parent group use the following code snippet
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/nft_parent_genesis \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "name": "Mainnet NFT Parent",
-  "ticker": "MNC_NFTP",
-  "initialAmount": "10000",
-  "decimals": 0,
-  "documentUrl": "https://mainnet.cash",
-  "documentHash": "db4451f11eda33950670aaf59e704da90117ff7057283b032cfaec7779313916",
-  "endBaton": false,
-  "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866"
-}'
-```
-
-Response:
-
-```json
-{
-  "tokenId": "90a0bac9a1e3c0dfb40b8b8cb2ab04db91b57e5f2b43251e55c080d2f7c4a668",
-  "balance": {
-    "value": "10000",
-    "ticker": "MNC_NFTP",
-    "name": "Mainnet NFT Parent",
-    "tokenId": "90a0bac9a1e3c0dfb40b8b8cb2ab04db91b57e5f2b43251e55c080d2f7c4a668",
-    "type": 129
-  }
-}
-```
-Note: these tokens are transferrable and mintable. Decimal places of 0 is adviced.
-
-#### NFT Child Genesis
-
-NFT child tokens are unique and one of a kind. To create an NFT child token use the following code snippet
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/wallet/slp/nft_child_genesis \
-  -H "Content-Type: application/json" \
-  -d '{
-  "walletId": "wif:testnet:cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6",
-  "name": "Mainnet NFT Child",
-  "ticker": "MNC_NFTC",
-  "initialAmount": "1",
-  "decimals": 0,
-  "documentUrl": "https://mainnet.cash",
-  "endBaton": false,
-  "tokenReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "batonReceiverSlpAddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "parentTokenId": "90a0bac9a1e3c0dfb40b8b8cb2ab04db91b57e5f2b43251e55c080d2f7c4a668"
-}'
-```
-
-Response:
-
-```json
-{
-  "tokenId": "ae332fa2dba4dd943f86d9f2b1ed7a3bcb40a7f30b9b7736e4ee9acabb1f0908",
-  "balance": {
-    "value": "1",
-    "ticker": "MNC_NFTC",
-    "name": "Mainnet NFT Child",
-    "tokenId": "ae332fa2dba4dd943f86d9f2b1ed7a3bcb40a7f30b9b7736e4ee9acabb1f0908",
-    "type": 65
-  }
-}
-```
-In the process of the child genesis, a parent token of quantity 1 will be spent, so ensure you possess some. If you have more than 1 (n), the tokens will be split into (n-1) and 1.
-
-Note: these tokens are transferrable but not mintable. Regardless of options supplied, the following options will be overriden: `endBaton` will be set to `true`, `initialAmount: 1`, `decimals: 0`. Otherwise they will be considered as invalid by the SLP validators.
-
 ## TestNet faucet
 
-You can have some TestNet satoshi or SLP tokens for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
+You can have some TestNet satoshi for your convenience. Visit our ~~faucet~~ refilling station at [https://rest-unstable.mainnet.cash/faucet.html](https://rest-unstable.mainnet.cash/faucet.html)
 
-Your address will be refilled up to 10000 TestNet satoshi or up to 10 SLP tokens upon a call. There are request rate limiters set up to prevent abuse.
+Your address will be refilled up to 10000 TestNet satoshi upon a call. There are request rate limiters set up to prevent abuse.
 
 We've integrated the faucet into the library so that you can do easy calls like the following.
 
@@ -1255,25 +861,6 @@ Response:
 ```json
 {
   "txId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}
-```
-
-### Get TestNet SLP tokens
-
-```shell script
-curl -X POST https://rest-unstable.mainnet.cash/faucet/get_testnet_slp \
-  -H "Content-Type: application/json" \
-  -d '{
-  "slpaddr": "slptest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq32uar866",
-  "tokenId": "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}'
-```
-
-Response:
-
-```json
-{
-  "txId": "dc38ee5d4233163e69144e4ec6e49257d41f5605e297d05c0af8f1d81ae1a387"
 }
 ```
 
@@ -1546,7 +1133,6 @@ This returns an unnamed wallet we'll use as the buyer's wallet:
 {
   "name": "",
   "cashaddr": "bchreg:qzwvqdl8sy5czu3hk548zrg7rc9kxz89eqcceq4j9k",
-  "slpaddr": "slptest:qzwvqdl8sy5czu3hk548zrg7rc9kxz89eqesg6vk5d",
   "walletId": "seed:regtest:priority obey finish winter setup group picture regret dream home smile electric:m/44'/0'/0'/0/0",
   "seed": "priority obey finish winter setup group picture regret dream home smile electric",
   "derivationPath": "m/44'/0'/0'/0/0",
@@ -2295,8 +1881,6 @@ The endpoint you specify in the `url` parameter will be called with HTTP POST me
 
 Webhooks can be set up to fire once and expire if the `recurrence` parameter is set to `once` or continuously until they expire by the timeout.
 
-We also support SLP-enabled webhooks to monitor token balance or token transactions. When using SLP webhooks you have to pass `tokenId` parameter. `cashaddr` param can be either cash address or SLP address, the necessary conversions will happen under the hood.
-
 See full webhook REST documentation in the [Swagger UI](https://rest-unstable.mainnet.cash/api-docs/#/webhook/watchAddress).
 
 When deploying your own mainnet.cash REST server you cat set webhook specific parameters like postgres `DATABASE_URL` or `WEBHOOK_EXPIRE_TIMEOUT_SECONDS`. See related documentation [here](https://github.com/mainnet-cash/mainnet-js/blob/master/generated/serve/docker/README.md).
@@ -2445,77 +2029,3 @@ Response: Block header as per [specification](https://electrum-cash-protocol.rea
   hex: "000000209107e04f2eee18fa36c70f00cdb8a9e35c669a7d5ada13c945a130db2389bc116cc61e2d285d78c5a8b62e6df23037c9fbfea2b58df6e649c0a1e7d7a8f94393fe760c60ffff7f2000000000"
 }
 ```
-
-#### slpWatchBalance
-
-Receive notification upon the address' SLP balance change. Responds recurrently.
-
-If `tokenId` is supplied, the response will be narrowed down to only this token.
-
-Request:
-```json
-{
-  method: "slpWatchBalance",
-  data: {
-    cashaddr: "simpleledger:qzxzl07tth5qx4shphrpzz38wnstwac5ksvgnp3ya0",
-    tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-}
-```
-
-Response:
-```json
-{
-  value: "10000",
-  ticker: "MNC",
-  name: "Mainnet coin"
-  tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}
-```
-
-#### slpWaitForBalance
-
-Wait for the SLP wallet to reach a certain minimal token balance. Returns actual wallet balance. Responds once.
-
-Request:
-```json
-{
-  method: "slpWaitForBalance",
-  data: {
-    cashaddr: "simpleledger:qzxzl07tth5qx4shphrpzz38wnstwac5ksvgnp3ya0",
-    value: "1000",
-    tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-}
-```
-
-Response:
-```json
-{
-  value: "10000",
-  ticker: "MNC",
-  name: "Mainnet coin"
-  tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-}
-```
-
-#### slpWaitForTransaction
-
-Wait for the next SLP transaction to happen. Responds once.
-
-If `tokenId` is supplied, the response will arrive only for the transactions with this tokenId.
-
-```json
-{
-  method: "slpWaitForTransaction",
-  data: {
-    cashaddr: "simpleledger:qzxzl07tth5qx4shphrpzz38wnstwac5ksvgnp3ya0",
-    tokenId: "132731d90ac4c88a79d55eae2ad92709b415de886329e958cf35fdd81ba34c15"
-  }
-}
-```
-
-Response follows this [schema](https://slp.dev/tooling/slpdb/#mongodb-collections-data-schema)
-
-
-asdf 

@@ -24,28 +24,16 @@ And create a new wallet like so:
 
 The core crypto library uses about one megabyte (1MB) unpacked. Mainnet-js core can also include an indexeddb database wrapper, networking for utilities, tools for bip39 mnemonic phrases, etc. 
 
-## Recommended usage 
+## Recommended usage
 
-Without any special configuration, a single bundle shipped with the entire mainnet-js library (with addons) would not be practical for the web (+27 mb with SmartBCH). 
+Without any special configuration, a single bundle shipped with the entire mainnet-js library (with addons) would not be practical for the web.
 
-However, mainnet-js supports tree-shaking and code splitting, but this must be turned on in the bundle configuration of the webapp using it. 
+However, mainnet-js supports tree-shaking and code splitting, but this must be turned on in the bundle configuration of the webapp using it.
 
 
 See the [webpack](https://webpack.js.org/guides/tree-shaking/) or [rollup](https://rollupjs.org/guide/en/#tree-shaking) documentation regarding this.
 
 Efficient caching, tree-shaking and code splitting, can help alleviate chunk sizes for users with limited connectivity.
-
-## Note about using smartbch
-
-Check the console of your application to assure that a insecure random source is not being used, if not in a browser. 
-
-You may have to call ethers browser shims before loading `@mainnet-cash/smartbch` to shim objects not available in your environment.
-
-```js
-import "@ethersproject/shims"
-```
-
-Check the [ethers cookbook](https://docs.ethers.io/v5/cookbook/react-native/#cookbook-reactnative-shims) for more details.
 
 ## Configuring Webpack
 
@@ -81,12 +69,6 @@ module.exports = {
             "https":false, // cashscript/bitcoind-rpc
             "http":false,  // cashscript/bitcoind-rpc
             //"fs":false,  // cashscript/utils
-
-            // @mainnet-cash/smartbch
-            "require-from-string":false,
-            "module":false,
-            "path":false,
-            "child_process":false
         }
     }
 }
