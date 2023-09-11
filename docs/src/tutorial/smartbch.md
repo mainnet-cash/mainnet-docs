@@ -46,7 +46,7 @@ To get started using Bitcoin Cash on your site, include this tag in your `<head>
 
 ```html
 <script src="https://cdn.mainnet.cash/smartbch/smartbch-.js"
- integrity="sha384-2rHb3Ad0asUHmx7dJcWspyfebpOnYhpG0b7Zg5biAxTJAzlOGXSJJ855NlvK/FYl"
+ integrity="sha384-1wxlEZzBimaCnZO0+P5kcwMhK+HbGX7zKfoZHOOieel8gNbE25pfxMMMJz7iL+yC"
  crossorigin="anonymous"></script>
 ```
 
