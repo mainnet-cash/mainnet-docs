@@ -41,8 +41,8 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 
 ```html
 <head>
-  <script src="https://cdn.mainnet.cash/mainnet-2.1.0.js"
-   integrity="sha384-IQuUDw01EilfqeTX0uMIcHcFphl4j/BuX7zWI6nBfRAPIHYH8kQX1uvzc1oEBKBf"
+  <script src="https://cdn.mainnet.cash/mainnet-2.1.1.js"
+   integrity="sha384-oq+nUwyUuG7UW8+jMEG2P3nTbw26mxufgombbOpqBDw8g8PfS+JAbj9MPtdk5n85"
    crossorigin="anonymous"></script>
 </head>
 <body>
@@ -181,7 +181,7 @@ Since mainnet.cash v2.1.0 the wallet's storage providers became a plugin and wer
 In browsers:
 ```js
 <head>
-  <script src="http://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-2.1.0.js"
+  <script src="http://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-2.1.1.js"
    integrity="sha384-ZAC1G32vViEOS+7x++K9fo4Jo9Cdmn4Fuz8CvHojL5qI9eg9DreC4tn0rdIOpY9Y"
    crossorigin="anonymous"></script>
 </head>
@@ -768,8 +768,8 @@ yarn add @mainnet-cash/contract
 To get started using CashScript Contracts on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/contract/contract-2.1.0.js"
- integrity="sha384-XR7iE+HJP5JYFMjiXYDQk2TLK/Jba8JVTkzhx22ghcx8/O65jtdCR43ypyM+6qfG"
+<script src="https://cdn.mainnet.cash/contract/contract-2.1.1.js"
+ integrity="sha384-NuMbiiUNfUzuXUl/oRzayY925F1LqNL1Ouxrz4vG4jEFQCB83ezRSl6sKrdEQ3k3"
  crossorigin="anonymous"></script>
 ```
 
