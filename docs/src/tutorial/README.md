@@ -181,7 +181,7 @@ Since mainnet.cash v2.1.0 the wallet's storage providers became a plugin and wer
 In browsers:
 ```js
 <head>
-  <script src="http://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-2.1.1.js"
+  <script src="https://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-2.1.1.js"
    integrity="sha384-ZAC1G32vViEOS+7x++K9fo4Jo9Cdmn4Fuz8CvHojL5qI9eg9DreC4tn0rdIOpY9Y"
    crossorigin="anonymous"></script>
 </head>
