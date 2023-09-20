@@ -481,22 +481,9 @@ await wallet.send([
 
 ## CashTokens
 
-::: warning
-CashTokens support is still in early stage.
-
-CashTokens will be enabled on BCH main network only after May 2023 upgrade.
-:::
-
 Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BCMR](https://github.com/bitjson/chip-bcmr) - BitcoinCash Metadata Registries.
 
-These upgrades can be tested on a chipnet (special testnet which supports the latest CHIPs). They will also be activated on BCH mainnet after May23 network upgrade.
-
 N.B. To support CashTokens we had to upgrade our core dependency libauth to v2, which made us to convert mainnet.cash library to an ESM module.
-
-Cashtokens are available on chipnet, to connect to chipnet in browser and node use the following snippet before creating testnet wallets.
-```js
-DefaultProvider.servers.testnet = ["wss://chipnet.imaginary.cash:50004"]
-```
 
 All token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
