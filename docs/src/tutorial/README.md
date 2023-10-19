@@ -41,7 +41,7 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 
 ```html
 <head>
-  <script src="https://cdn.mainnet.cash/mainnet-.js"
+  <script src="https://cdn.mainnet.cash/mainnet-2.2.5.js"
    integrity="sha384-RrFMKtXQroWNZV6mP8XFAV2FOIFsEPSAfzd5e7V1H1qSnLg8wwO2bkLb5URNOv+k"
    crossorigin="anonymous"></script>
 </head>
@@ -59,7 +59,7 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-2.2.5.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -181,7 +181,7 @@ Since mainnet.cash v2.1.0 the wallet's storage providers became a plugin and wer
 In browsers:
 ```js
 <head>
-  <script src="https://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-.js"
+  <script src="https://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-2.2.5.js"
    integrity="sha384-qqVFgmZr8EaZywDSVt4zYf435HWx1HNwmQlqIvIoMDLI/4shAMmHrr/FQooKY75N"
    crossorigin="anonymous"></script>
 </head>
@@ -755,14 +755,14 @@ yarn add @mainnet-cash/contract
 To get started using CashScript Contracts on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/contract/contract-.js"
+<script src="https://cdn.mainnet.cash/contract/contract-2.2.5.js"
  integrity="sha384-0+mqq/sJ3NSWb6rJWjkNirr8TvHU3dEJyHvHmm1ZfNVytR32mGDZnh+2EiDQUcvc"
  crossorigin="anonymous"></script>
 ```
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/contract-0.4.1.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/contract-2.2.5.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 This will enable code required for Cashscript in the global scope of your browser.
