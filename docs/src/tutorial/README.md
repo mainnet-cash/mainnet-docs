@@ -481,9 +481,16 @@ await wallet.send([
 
 ## CashTokens
 
-Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BCMR](https://github.com/bitjson/chip-bcmr) - BitcoinCash Metadata Registries.
+Since release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BitcoinCash Metadata Registries (BCMR)](https://github.com/bitjson/chip-bcmr).
 
-N.B. To support CashTokens we had to upgrade our core dependency libauth to v2, which made us to convert mainnet.cash library to an ESM module.
+::: tip  Javascript builders take note.
+
+To support CashTokens mainnet-js upgraded to libauth **^v2**, which required converting the library as an ESM module.
+
+There are minimal, react and vue sample configurations for numerous web apps in the [demo directory](https://github.com/mainnet-cash/mainnet-js/tree/master/demo) on github.
+
+:::
+
 
 All token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
@@ -526,7 +533,7 @@ If you want to get the BCMR information about your token (given you have importe
 const info: IdentitySnapshot | undefined = wallet.getTokenInfo(tokenId);
 ```
 
-Please refer to BCMR specification to learn more about identity snapshots and how to get the detailed token information.
+Please refer to the [BCMR specification](https://github.com/bitjson/chip-bcmr) to learn more about identity snapshots and how to get the detailed token information.
 
 ### Additional token creation - Minting
 
