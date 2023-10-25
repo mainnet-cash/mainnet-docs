@@ -16,7 +16,7 @@ The [Adaptive Blocksize Limit Algorithm](https://gitlab.com/0353F40E/ebaa) is a 
 
 This upgrade is a consensus level change that should fix a focal point that was previously used to repeatedly divide the bitcoin community in to smaller and smaller factions. 
 
-No code changes should be necessary with this proposal users of mainnet.cash.
+No code changes should be necessary with this proposal for users of mainnet.cash.
 
 The independent developers maintaining mainnet.cash support the Adaptive Blocksize Limit Algorithm for Bitcoin Cash CHIP for the May 2024 upgrade. 
 
