@@ -481,11 +481,11 @@ await wallet.send([
 
 ## CashTokens
 
-Since release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BitcoinCash Metadata Registries (BCMR)](https://github.com/bitjson/chip-bcmr).
+Since release 1.0.0, mainnet-js supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BitcoinCash Metadata Registries (BCMR)](https://github.com/bitjson/chip-bcmr).
 
 ::: tip  Javascript builders take note.
 
-To support CashTokens mainnet-js upgraded to libauth **^v2**, which required converting the library as an ESM module.
+To support CashTokens, mainnet-js upgraded to libauth **^v2**, which required converting the library as an ESM module.
 
 There are minimal, react and vue sample configurations for numerous web apps in the [demo directory](https://github.com/mainnet-cash/mainnet-js/tree/master/demo) on github.
 
@@ -796,14 +796,14 @@ let escrow = new EscrowContract({
   arbiterAddr: arbiter.getDepositAddress(),
   buyerAddr: buyer.getDepositAddress(),
   sellerAddr: seller.getDepositAddress(),
-  amount: 5000
+  amount: 5000n
 });
 ```
 
 You can now send money to the contract:
 
 ```js
-await buyer.send([ [ escrow.getAddress(), 8700, "satoshis" ], ]);
+await buyer.send([ [ escrow.getAddress(), 8700n, "satoshis" ], ]);
 ``` 
 
 Check the balance of the contract (in satoshis):
@@ -1030,7 +1030,7 @@ const charlieAddr = charlie.getDepositAddress()
 
 // The function may be called by passing the arguments to the function
 // specifying a `to` destination and a CashScript function method, i.e. send
-let txn = await transferFn(sig).to(charlieAddr, 7000).send();  
+let txn = await transferFn(sig).to(charlieAddr, 7000n).send();  
 ```
 
 Wallets have the following convenience methods for passing data to CashScript:

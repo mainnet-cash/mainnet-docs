@@ -8,6 +8,18 @@ More discussion on [Bitcoin Cash Research](https://bitcoincashresearch.org/t/chi
 
 As part of this process, stakeholders participate in the agreement building process with public statements.
 
+### Mainnet.cash supports CHIP-2023-04 Adaptive Blocksize Limit Algorithm 
+
+*2023-10-25*
+
+The [Adaptive Blocksize Limit Algorithm](https://gitlab.com/0353F40E/ebaa) is a proposal to make the maximum blocksize dynamically adjust up and down with network usage. 
+
+This upgrade is a consensus level change that should fix a focal point that was previously used to repeatedly divide the bitcoin community in to smaller and smaller factions. 
+
+No code changes should be necessary with this proposal users of mainnet.cash.
+
+The independent developers maintaining mainnet.cash support the Adaptive Blocksize Limit Algorithm for Bitcoin Cash CHIP for the May 2024 upgrade. 
+
 ### Mainnet.cash supports CHIP-2022-02-CashTokens
 
 *2022-11-09*

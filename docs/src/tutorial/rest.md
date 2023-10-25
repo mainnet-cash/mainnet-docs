@@ -451,8 +451,6 @@ See [WebSockets](#websocket-api-reference) and [WebHooks](#webhooks).
 
 Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/bitjson/cashtokens#readme) and [BCMR](https://github.com/bitjson/chip-bcmr) - BitcoinCash Metadata Registries.
 
-N.B. To support CashTokens we had to upgrade our core dependency libauth to v2, which made us to convert mainnet.cash library to an ESM module.
-
 All token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
 Both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
