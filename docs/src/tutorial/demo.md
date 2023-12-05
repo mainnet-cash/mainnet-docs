@@ -2,7 +2,7 @@
 
 
 
-Mathieu Geukens [MrZwets](https://github.com/mr-zwets/) has developed a 
+Mathieu Geukens [(MrZwets)](https://github.com/mr-zwets/) has developed a 
  [series](https://www.youtube.com/watch?v=vpBNt-Ids7U&list=PL6IWHNFTaMnwEvvV3iPcVqyLgdt0cI1mb) of tutorials showing how to develop a web application with mainnet-js and vue.
 
 
