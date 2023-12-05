@@ -453,11 +453,11 @@ Since the release 1.0.0, mainnet.cash supports [CashTokens](https://github.com/b
 
 All token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
-Both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
+Both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0n.
 
 Each token UTXO may or may not contain the following attributes:
 
-*  `amount: number;` - fungible token amount. N.B. After genesis the total amount of fungible tokens can not be increased. Max amount is `9223372036854775807`
+*  `amount: bigint;` - fungible token amount. N.B. After genesis the total amount of fungible tokens can not be increased. Max amount is `9223372036854775807`
 *  `tokenId: string;` - the category Id of the token, this is a 32 bytes hex encoded transaction hash which was spent in the token genesis process
 *  `commitment?: string;` - 0 to 40 bytes long hex encoded string representing the token commitment message. This can be a serial number of an NFT in the group or any other user defined data.
 *  `capability?: NFTCapability;` - Non-fungible token capability.
@@ -479,7 +479,7 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/token_genesis \
   -d '{
         "walletId": "wif:testnet:cRqxZECspKgkuBbdCnnWrRsMsYLUeTWULYRRW3VgHKedSMbM6SXB",
         "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8",
-        "amount": 5,
+        "amount": 5n,
         "commitment": "abcd",
         "capability": "none",
         "value": 1000,
@@ -561,13 +561,13 @@ curl -X POST https://rest-unstable.mainnet.cash/wallet/send \
           "cashaddr": "bchtest:qqm4gsaa2gvk7flvsvj7f0w4rlq32vqhkq27mxesg8",
           "amount": 100,
           "tokenId": "219f792ebf5019ad82ceb911dd7fc35fee862bf9db56e2324d6d23634a176f1f",
-          "value": 1000,
+          "value": 1000n,
         }, {
           "cashaddr": "bchtest:qrnluuge56ahxsy6pplq43rva7k6s9dknu4p5278ah",
           "tokenId": "01092b7b61d8b377eb84ff0131d7c4146b51088bf246a01dd12a8029d1a2d17c",
           "commitment": "abcd",
           "capability": "none",
-          "value": 1000,
+          "value": 1000n,
         }, {
           "cashaddr": "bchtest:qzspcywxmm4fqhf9kjrknrc3grsv2vukeqyjqla0nt",
           "value": 100000,

@@ -494,11 +494,11 @@ There are minimal, react and vue sample configurations for numerous web apps in 
 
 All token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
-Furthermore, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0.
+Furthermore, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0n.
 
 Each token UTXO may or may not contain the following attributes:
 
-*  `amount: number;` - fungible token amount. N.B. After genesis the total amount of fungible tokens can not be increased. Max amount is `9223372036854775807`
+*  `amount: bigint;` - fungible token amount. [Note: After genesis the total amount of fungible tokens can not be increased. Max amount is `9223372036854775807`]
 *  `tokenId: string;` - the category Id of the token, this is a 32 bytes hex encoded transaction hash which was spent in the token genesis process
 *  `commitment?: string;` - 0 to 40 bytes long hex encoded string representing the token commitment message. This can be a serial number of an NFT in the group or any other user defined data.
 *  `capability?: NFTCapability;` - Non-fungible token capability.
@@ -517,7 +517,7 @@ It is very easy to create new token category:
 ```js
 const genesisResponse = await wallet.tokenGenesis({
       cashaddr: alice.cashaddr!,      // token UTXO recipient, if not specified will default to sender's address
-      amount: 5,                      // fungible token amount
+      amount: 5n,                      // fungible token amount
       commitment: "abcd",             // NFT Commitment message
       capability: NFTCapability.none, // NFT capability
       value: 1000,                    // Satoshi value
@@ -573,7 +573,7 @@ Sending tokens around is easy and can be combined with sending BCH! You can incl
 const sendResponse = await wallet.send([
   new TokenSendRequest({
     cashaddr: alice.cashaddr!,
-    amount: 100,
+    amount: 100n,
     tokenId: tokenId,
     value: 1500,
   }),
@@ -600,7 +600,7 @@ To explicitly burn the CashTokens they must be sent to an OP_RETURN output. `tok
 const burnResponse = await wallet.tokenBurn(
   {
     tokenId: tokenId,
-    amount: 1,
+    amount: 1n,
     capability: NFTCapability.minting,
     commitment: "abcd",
   },

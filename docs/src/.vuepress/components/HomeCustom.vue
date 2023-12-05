@@ -29,6 +29,14 @@
             Enterprise wallet<br>on your own server
           </p>
         </div>
+        <div style="margin: 0 20px 0 10px;">
+          <a href="/tutorial/demo.html" class="nav-link action-button">
+            Videos →
+          </a>
+          <p style="font-size: 90%;">
+            Let's build<br> a web app
+          </p>
+        </div>
       </div>
 
       <div style="display: flex; justify-content: space-between; width: 10em; margin: 0 auto; font-size: 70%;">

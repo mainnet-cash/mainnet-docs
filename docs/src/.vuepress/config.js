@@ -54,6 +54,7 @@ module.exports = {
                 children: [
                     '/tutorial/',
                     '/tutorial/rest.html',
+                    '/tutorial/demo.html',
                     '/tutorial/other-languages.html',
                     '/tutorial/running-rest.html',
                     '/tutorial/shipping-mainnet.html',
