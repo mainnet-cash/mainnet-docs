@@ -12,28 +12,19 @@ This is a list of finished products that are "Bitcoin Cash first"
 
 **[read.cash](https://read.cash/)** - publish your articles, get upvotes in Bitcoin Cash
 
-**[noise.cash](https://read.cash/)** - post short messages, get tips in Bitcoin Cash
+**[noise.cash](https://noise.cash/)** - post short messages, get tips in Bitcoin Cash
 
 **[bitcartcc.com](https://bitcartcc.com/)** - create your Bitcoin Cash store (hosted or self-hosted, [read more](https://read.cash/@BitcartCC/btcpay-didnt-want-to-support-bitcoin-cash-weve-got-bitcartcc-1fcb3687))
 
 **[tipbitcoin.cash](https://tipbitcoin.cash/)** - tipping Bitcoin Cash for Twitch users
 
-**[bitbirdy.com](https://bitbirdy.com/pages/about)** - Bath & Beauty, Beard & Skincare, BitBirdy Swag, Home Goods, Jewelry & Watches, Kitchen, Novelty, Sports & Outdoor, Tech Gadgets, Travel Gear
-
 **[tips.bitcoin.com](https://tips.bitcoin.com/en/)** - printable expiring Bitcoin Cash tips
 
-**[Marco Coino](https://play.google.com/store/apps/details?id=nz.co.coinline.marcocoino&hl=en), [where2.cash](https://where2.cash/)** - maps of merchants accepting Bitcoin Cash
-
+**[where2.cash](https://where2.cash/)** - maps of merchants accepting Bitcoin Cash
 
 **[fullstack.cash](http://fullstack.cash/)** - BCH Blockchain-as-a-service
 
-**[explore.fullstack.cash](https://explore.fullstack.cash/)** - Web-based UI for interacting with the BCH-api REST API
-
-**[TXstreet](https://txstreet.com/)** - visualization of Bitcoin Cash blocks (vs Bitcoin BTC blocks)
-
-**[CashID](https://cashid.info/)** - identity protocol ("Login using Bitcoin Cash") with identity manager app (beta)
-
-**[donatebutton.cash](https://donatebutton.cash/)** - generate a button for your site for users to donate Bitcoin Cash
+**[txcity](https://txcity.io/v/bch-btc/launch)** - visualization of Bitcoin Cash blocks (vs Bitcoin BTC blocks)
 
 **[CashAddress.org](https://cashaddress.org/)** - generate Bitcoin Cash wallets
 
@@ -49,11 +40,9 @@ This is a list of finished products that are "Bitcoin Cash first"
 
 **[CashGames.bitcoin.com](https://cashgames.bitcoin.com/)** - online gambling using Bitcoin Cash
 
-**[AcceptBitcoin.Cash](https://acceptbitcoin.cash/), [GreenPages.cash](http://greenpages.cash/), [Cryptwerk.com/pay-with/bch](https://cryptwerk.com/pay-with/bch/)** - big lists of merchants accepting BCH
+**[AcceptBitcoin.Cash](https://acceptbitcoin.cash/), [Cryptwerk.com/pay-with/bch](https://cryptwerk.com/pay-with/bch/)** - big lists of merchants accepting BCH
 
 **[SatoshiDice.com](https://satoshidice.com/)** - online gambling using Bitcoin Cash
-
-**[BitcoinCashNotes](https://bitcoincashnotes.com/)** - paper wallets
 
 **[googol.cash](https://googol.cash/)** - earn Bitcoin Cash translating things or pay with Bitcoin Cash to get something translated ([read more](https://read.cash/@ClearSky/my-adventure-to-push-adoption-googolcash-in-beta-targeting-the-freelancing-community-26d5ebbd))
 
