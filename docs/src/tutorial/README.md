@@ -364,11 +364,11 @@ document.querySelector('#deposit').src = wallet.getDepositQr().src;
 You can watch for incoming wallet transaction with `watchAddress` and `watchAddressTransactions` methods with the difference that the former will monitor transaction hashes and the latter will receive the decoded transactions in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get). Both methods return an async function which when evaluated will cancel watching.
 
 ```js
-wallet.watchAddress((txHash) => {
+await wallet.watchAddress((txHash) => {
   console.log(txHash);
 });
 
-const cancelWatch = wallet.watchAddressTransactions((tx) => {
+const cancelWatch = await wallet.watchAddressTransactions((tx) => {
   if (tx.hash === someHash) {
     await cancelWatch();
   }
@@ -401,7 +401,7 @@ If you are willing to ~~spy on~~ monitor transactions of an address you do not o
 You can watch for wallet balance changes with `watchBalance` method (which also returns a cancellation function). The balance object sent to the callback has the same type as returned from `getBalance` method.
 
 ```js
-const cancelWatch = wallet.watchBalance((balance) => {
+const cancelWatch = await wallet.watchBalance((balance) => {
   console.log(balance);
   await cancelWatch();
 });
@@ -410,7 +410,7 @@ const cancelWatch = wallet.watchBalance((balance) => {
 You can watch for wallet balance changes which are also sensitive to BCH/USD rate changes. The callback will be fired even if there are no actual transactions happening. You can change the polling interval by setting `usdPriceRefreshInterval` parameter, which defaults to 30000 milliseconds.
 
 ```js
-const cancelWatch = wallet.watchBalanceUsd((balance) => {
+const cancelWatch = await wallet.watchBalanceUsd((balance) => {
   console.log(balance);
   await cancelWatch();
 }, 5000);
@@ -429,7 +429,7 @@ The `balance` variable contains the actual balance of the wallet.
 You can watch for incoming blocks with `watchBlocks` method:
 
 ```js
-const cancelWatch = wallet.watchBlocks((block) => {
+const cancelWatch = await wallet.watchBlocks((block) => {
   console.log(block);
   await cancelWatch();
 });
@@ -648,7 +648,7 @@ const allNftBalances = wallet.getAllNftTokenBalances();
 Similarly a to BCH transaction watching/waiting we provide the convenient methods to watch/wait for fungible token balance.
 
 ```js
-const cancelFn = wallet.watchTokenBalance(tokenId, (balance) => {
+const cancelFn = await wallet.watchTokenBalance(tokenId, (balance) => {
   ...
 });
 ```
