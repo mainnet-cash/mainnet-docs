@@ -58,17 +58,10 @@ module.exports = {
         alias:{
 
             // mainnet-js
-            "stream": require.resolve("stream-browserify"), // bip39
-            "crypto": require.resolve('crypto-browserify'), // bip39
-            "net":false, // electrum-cash tcp connections
-            "tls":false, // electrum-cash tcp connections
-            "fs":false,  // qrcode-svg.save
+            "child_process": false,
 
             // @mainnet-cash/contract
-            "url":false,   // cashscript/bitcoind-rpc
-            "https":false, // cashscript/bitcoind-rpc
-            "http":false,  // cashscript/bitcoind-rpc
-            //"fs":false,  // cashscript/utils
+            "fs": false,  // cashscript/utils
         }
     }
 }
