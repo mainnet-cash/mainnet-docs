@@ -343,20 +343,51 @@ This method returns a balance response object. The `options` object allows for f
 
 ### QR codes
 
+As of mainnet-js version 2.7.0 the built-in support for QR Code rendering was removed. Users are advised to chose the library they like most.
+
+We put here a code snippet which uses the formerly supported `qrcode-svg` package to produce the code.
+
+```typescript
+import QRCode from "qrcode-svg";
+
+/**
+ * qrAddress returns a qr code for a given cashaddress as raw utf-8 svg
+ * @param  {string} address
+ * @param  {} size=256 The width and height of the returned image
+ * @returns Image
+ */
+export function qrAddress(address: string, size = 256) {
+  const svg = new QRCode({
+    content: address,
+    width: size,
+    height: size,
+  }).svg();
+
+  const svgB64 = btoa(svg);
+  return {
+    src: `data:image/svg+xml;base64,${svgB64}`,
+    title: address,
+    alt: "a Bitcoin Cash address QR Code",
+  };
+}
+```
+
+Then:
+
 Let's say you want to display a QR code for you user to pay you money and show an alert when money arrives?
 
 Let's display a QR code first. Create a placeholder first:
 
 ```html
 <p style="text-align: center;">
-    <img src="https://cdn.mainnet.cash/wait.svg" style="width: 15em;" id="deposit">
+  <img src="https://cdn.mainnet.cash/wait.svg" style="width: 15em;" id="deposit">
 </p>
 ```
 
 Then you can replace it with an actual QR code of the deposit address:
 
 ```js
-document.querySelector('#deposit').src = wallet.getDepositQr().src;
+document.querySelector('#deposit').src = qrAddress(wallet.getDepositAddress()).src;
 ```
 
 ### Watching/Waiting for transaction
