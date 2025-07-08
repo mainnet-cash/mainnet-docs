@@ -41,8 +41,8 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 
 ```html
 <head>
-  <script src="https://cdn.mainnet.cash/mainnet-2.7.3.js"
-   integrity="sha384-rlyYLKSfzTQzTgCXnQREdnurBdVWV1FUPbmq5U35OjfLyp2BkeXUsqboScqhHiPN"
+  <script src="https://cdn.mainnet.cash/mainnet-2.7.4.js"
+   integrity="sha384-FKH2HgEoM1XmY6Zj2NLaXB2Trx0CSkDQwGt75IsqmEVht2arBvfGBAIy9L9IPsL8"
    crossorigin="anonymous"></script>
 </head>
 <body>
@@ -59,7 +59,7 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 
 <!--
 you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/mainnet-2.7.3.js | openssl dgst -sha384 -binary | openssl base64 -A`
+echo sha384-`curl https://cdn.mainnet.cash/mainnet-2.7.4.js | openssl dgst -sha384 -binary | openssl base64 -A`
 -->
 
 Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
@@ -181,7 +181,7 @@ Since mainnet.cash v2.1.0 the wallet's storage providers became a plugin and wer
 In browsers:
 ```js
 <head>
-  <script src="https://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-2.7.3.js"
+  <script src="https://cdn.mainnet.cash/indexeddb-storage/indexeddb-storage-2.7.4.js"
    integrity="sha384-Xd0tbDqx9xZwSoaAj9/YPO4/wKyIQRxCn2mdZN8qiEfXsIBXvsCpX/6bPUizJg/x"
    crossorigin="anonymous"></script>
 </head>
@@ -793,8 +793,8 @@ yarn add @mainnet-cash/contract
 To get started using CashScript Contracts on your site, include this tag in your `<head>` section:
 
 ```html
-<script src="https://cdn.mainnet.cash/contract/contract-2.7.3.js"
- integrity="sha384-wBCeUoUZqG2WL8ixbX2++JWm7aPv5yuEnAjAdkzs9FS1YZ0CLrKWa1G/jwScf9kP"
+<script src="https://cdn.mainnet.cash/contract/contract-2.7.4.js"
+ integrity="sha384-zXo74WsFS8sDNLxCFqURojBMSn+lFD/dWmLM+43wUlWBSkiGIEVJz52KxFhRmutN"
  crossorigin="anonymous"></script>
 ```
 
