@@ -42,7 +42,7 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 ```html
 <head>
   <script src="https://cdn.mainnet.cash/mainnet-.js"
-   integrity="sha384-Bm+9MXNz61ZrmDMx0oW0gWpBjyURmUnVV3WOe/baNcCJYXNSNKbI86OKDr1UF0gV"
+   integrity="sha384-vjtrS7fT/dIoD2KhfoeU3RAYmk8ILM6Us8GgPKc2kNJh48FuTSnSg2Hxojt05BAR"
    crossorigin="anonymous"></script>
 </head>
 <body>
@@ -794,7 +794,7 @@ To get started using CashScript Contracts on your site, include this tag in your
 
 ```html
 <script src="https://cdn.mainnet.cash/contract/contract-.js"
- integrity="sha384-htR+DWgTURIDM2qN8ktRwT/qcg11MxtnG1K2We5GefKeWHoITnNqySLX66vqDPJp"
+ integrity="sha384-5DicgjCjtAM+t91zY7ZE7w4KZTcs7yM7xxe3mMEconJtgRUZtFQEzdh0OIc8qQyo"
  crossorigin="anonymous"></script>
 ```
 
