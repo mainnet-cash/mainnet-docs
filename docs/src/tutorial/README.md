@@ -8,9 +8,64 @@ money to your customers.
 
 With this library you will be able to create advanced, non-custodial, in-browser wallets.
 
-<p style="font-size: 90%;">The mainnet library is currently in a <span style="background-color: #fffdbf; padding: 0 5px 0 5px;">beta stage</span>.
-Things may change randomly. There is no backward compatibility guarantee yet,
-even though we try not to break things too often.</p>
+## Version 3.0.0 Breaking Changes
+
+Version 3.0.0 introduces several breaking changes:
+
+### Satoshi values are now bigint
+All balance and amount values are now `bigint` instead of `number`. Use the new conversion utilities:
+
+```js
+import { toBch, toSat, toCurrency, convert } from 'mainnet-js';
+
+const balance = await wallet.getBalance();  // Returns bigint (satoshis)
+const balanceBch = toBch(balance);          // Convert to BCH (number)
+const balanceUsd = await toCurrency(balance, 'usd');  // Convert to fiat
+
+// Convert BCH to satoshis for sending
+const sendAmount = toSat(0.001);  // Returns 100000n
+```
+
+### Unit parameters removed
+Methods no longer accept unit parameters. All amounts must be in satoshis (bigint):
+
+```js
+// OLD (v2.x) - no longer works
+await wallet.send([{ cashaddr: addr, value: 1, unit: 'usd' }]);
+
+// NEW (v3.0.0)
+const sats = BigInt(Math.round(await convert(1, 'usd', 'sat')));
+await wallet.send([{ cashaddr: addr, value: sats }]);
+```
+
+### CashTokens interface changes
+Token interfaces were updated for compatibility with BCHN, CashScript, and libauth:
+
+- `tokenId` → `category`
+- Top-level `capability`, `commitment` → nested `nft: { capability, commitment }`
+
+```js
+// OLD (v2.x) - no longer works
+await wallet.tokenGenesis({
+  amount: 100n,
+  capability: NFTCapability.minting,
+  commitment: "abcd",
+});
+
+// NEW (v3.0.0)
+await wallet.tokenGenesis({
+  amount: 100n,
+  nft: {
+    capability: NFTCapability.minting,
+    commitment: "abcd",
+  },
+});
+```
+
+### Removed methods
+- `watchBalanceUsd` - Use `watchBalance` with manual currency conversion
+- `getAddressUtxos` - Use `wallet.provider.getUtxos(address)` instead
+- `contracts` sub-package removed
 
 <!-- Your stack: Browser + IndexedDB PHP Other -->
 
@@ -210,46 +265,204 @@ They are constructed from a cashaddress as follows:
 const wallet = await TestNetWallet.watchOnly('bchtest:qq1234567...');
 ```
 
+## HD Wallets
+
+::: tip New in v3.0.0
+HD Wallets provide hierarchical deterministic key derivation with automatic address management.
+:::
+
+HD Wallets automatically manage multiple addresses for deposits and change, following BIP44 standard. They support gap limit scanning, history tracking, and can be created from mnemonic seeds or extended keys.
+
+### Creating HD Wallets
+
+```js
+import { HDWallet, TestNetHDWallet, RegTestHDWallet } from 'mainnet-js';
+
+// Create a new random HD wallet
+const wallet = await HDWallet.newRandom();
+console.log(wallet.mnemonic);  // 12-word seed phrase
+
+// Create from existing seed phrase
+const wallet2 = await HDWallet.fromSeed(
+  "divide battle bulb improve hockey favorite charge save merit fatal frog cage"
+);
+
+// Create from extended private key
+const wallet3 = await HDWallet.fromXPriv("xprv...");
+
+// Create watch-only from extended public key
+const watchOnly = await HDWallet.fromXPub("xpub...");
+```
+
+### HD Wallet Addresses
+
+HD Wallets automatically derive and manage addresses:
+
+```js
+// Get next available deposit address (auto-increments)
+const depositAddr = wallet.getDepositAddress();
+
+// Get specific address by index
+const addr0 = wallet.getDepositAddress(0);
+const addr5 = wallet.getDepositAddress(5);
+
+// Token-aware addresses for CashTokens
+const tokenAddr = wallet.getTokenDepositAddress();
+
+// Change addresses (used internally for transaction change)
+const changeAddr = wallet.getChangeAddress();
+```
+
+### HD Wallet Balance and Sending
+
+HD Wallets aggregate balance across all derived addresses:
+
+```js
+// Get total balance across all addresses
+const balance = await wallet.getBalance();  // bigint in satoshis
+
+// Send funds (change goes to auto-derived change address)
+await wallet.send([{
+  cashaddr: recipient,
+  value: 50000n,
+}]);
+
+// Check indices after activity
+console.log(wallet.depositIndex);  // Next unused deposit address index
+console.log(wallet.changeIndex);   // Next unused change address index
+```
+
+### HD Wallet History
+
+Query transaction history across all wallet addresses:
+
+```js
+// Get formatted transaction history
+const history = await wallet.getHistory({
+  fromHeight: 0,      // Start block height (0 = genesis)
+  toHeight: -1,       // End block height (-1 = include mempool)
+  start: 0,           // Pagination offset
+  count: 20,          // Number of transactions
+});
+
+history.forEach(item => {
+  console.log(`${item.hash}: ${item.valueChange} sat`);
+  console.log(`Balance after: ${item.balance}`);
+});
+
+// Get raw transaction history
+const rawHistory = await wallet.getRawHistory();
+```
+
+### HD Wallet Watching
+
+Watch for activity across all wallet addresses:
+
+```js
+// Watch for any address status change
+const cancel = await wallet.watchStatus((status, address) => {
+  console.log(`${address} changed: ${status}`);
+});
+
+// Watch balance changes
+const cancelBalance = await wallet.watchBalance((balance) => {
+  console.log(`New balance: ${balance} satoshis`);
+});
+
+// Wait for specific balance
+await wallet.waitForBalance(100000n);
+
+// Watch for transactions
+const cancelTx = await wallet.watchTransactions((tx) => {
+  console.log(`New tx: ${tx.txid}`);
+});
+
+// Stop all watching
+await wallet.stop();
+```
+
+### HD Wallet Serialization
+
+```js
+// Serialize wallet for storage
+const walletId = wallet.toString();
+// "hd:mainnet:seed phrase here:m/44'/0'/0':0:0"
+
+// Restore from serialized form
+const restored = await HDWallet.fromId(walletId);
+```
+
+### Extended Address Scanning
+
+By default, HD wallets scan 20 addresses ahead (gap limit). To scan further:
+
+```js
+// Scan 30 more addresses beyond current gap
+await wallet.scanMoreAddresses(30);
+```
+
 ## Getting the balance
 
 To get the balance of the wallet you can use `getBalance` method:
 
 ```js
-await wallet.getBalance() // { bch: 0.20682058, sat: 20682058, usd: 91.04 }
+const balance = await wallet.getBalance();  // Returns bigint in satoshis, e.g. 20682058n
 ```
 
-If you want to receive balance as number denominated in a unit of your choice, you can call `getBalance` with an argument:
+Use conversion utilities to display in different units:
 
 ```js
-await wallet.getBalance('usd') // 91.04
-await wallet.getBalance('bch') // 0.20682058
-await wallet.getBalance('sat') // 20682058
-```
+import { toBch, toCurrency } from 'mainnet-js';
 
-You can ask for `usd`, `sat`, `bch` (or `satoshi`, `satoshis`, `sats` - just in case you forget the exact name).
+const balance = await wallet.getBalance();  // 20682058n (satoshis)
+const balanceBch = toBch(balance);          // 0.20682058 (number)
+const balanceUsd = await toCurrency(balance, 'usd');  // ~91.04 (number)
+```
 
 - 1 satoshi = 0.000 000 01 Bitcoin Cash
 - 1 Bitcoin Cash = 100,000,000 satoshis
 
-`usd` returns the amount at the current exchange rate, fetched from CoinGecko or Bitcoin.com.
+Exchange rates are fetched from Bitcoin.com or bitpay.com. You can decide to use your own exchange rate getter by setting
+
+```ts
+Config.GetExchangeRateFn = (symbol: string): Promise<number> {
+  ...
+}
+```
 
 ## Sending money
 
 Let's create another wallet and send some of our money there:
 
 ```js
+import { toSat, convert } from 'mainnet-js';
+
 const seller = await TestNetWallet.named('seller');
 
+// Send a specific amount in satoshis
 const txData = await wallet.send([
   {
     cashaddr: seller.getDepositAddress(),
-    value: 0.01,
-    unit: 'usd',
+    value: 10000n,  // 10,000 satoshis
   }
 ]);
 
-// or alternatively
-const txData = await wallet.send([seller.getDepositAddress(), 0.01, 'usd']);
+// Or convert from USD first
+const usdInSats = BigInt(Math.round(await convert(0.01, 'usd', 'sat')));
+const txData2 = await wallet.send([
+  {
+    cashaddr: seller.getDepositAddress(),
+    value: usdInSats,
+  }
+]);
+
+// Or use toSat for BCH amounts
+const txData3 = await wallet.send([
+  {
+    cashaddr: seller.getDepositAddress(),
+    value: toSat(0.0001),  // 0.0001 BCH = 10000n satoshis
+  }
+]);
 ```
 
 ... which returns an object containing the remaining balance and the transaction ID:
@@ -257,7 +470,7 @@ const txData = await wallet.send([seller.getDepositAddress(), 0.01, 'usd']);
 ```js
 {
   txId: "2fc2...af",
-  balance: {bch: 1.0, sat: 100000000, usd: 1000.00}
+  balance: 99990000n  // Balance in satoshis (bigint)
 }
 ```
 
@@ -278,7 +491,7 @@ There is also an `options` parameter that specifies how money is spent.
 * `queryBalance` is a boolean flag (defaulting to `true`) to include the wallet balance after the successful `send` operation to the returned result. If set to false, the balance will not be queried and returned, making the `send` call faster.
 * `awaitTransactionPropagation` is a boolean flag (defaulting to `true`) to wait for transaction to propagate through the network and be registered in the bitcoind and indexer. If set to false, the `send` call will be very fast, but the wallet UTXO state might be invalid for some 500ms.
 * `feePaidBy` Fee allocation strategy. Convenience option to subtract fees from outputs if change is not sufficient to cover transaction costs. Options are as follows:
-  
+
   - `change` - pay the fees from change or error
   - `firstOutput` - pay the fee from the first output or error
   - `lastOutput` - pay the fee from the last output or error
@@ -309,8 +522,11 @@ const txId = await wallet.submitTransaction(
 Let's print the balance of the seller's wallet:
 
 ```js
-console.log(await seller.getBalance('USD'));
-// 0.01
+import { toCurrency } from 'mainnet-js';
+
+const balance = await seller.getBalance();  // bigint in satoshis
+console.log(await toCurrency(balance, 'usd'));
+// ~0.01
 ```
 
 Great! You've just made your first transaction!
@@ -326,7 +542,7 @@ const txData = await seller.sendMax(wallet.getDepositAddress());
 ```js
 {
   txId: "2fc2...af",
-  balance: {bch: 0, sat: 0, usd: 0}
+  balance: 0n  // Balance in satoshis (bigint)
 }
 ```
 
@@ -429,31 +645,31 @@ If you are willing to ~~spy on~~ monitor transactions of an address you do not o
 
 ### Watching/Waiting for balance
 
-You can watch for wallet balance changes with `watchBalance` method (which also returns a cancellation function). The balance object sent to the callback has the same type as returned from `getBalance` method.
+You can watch for wallet balance changes with `watchBalance` method (which also returns a cancellation function). The balance is returned as a bigint in satoshis.
 
 ```js
+import { toBch } from 'mainnet-js';
+
 const cancelWatch = await wallet.watchBalance((balance) => {
-  console.log(balance);
+  console.log(`Balance: ${balance} satoshis`);
+  console.log(`Balance: ${toBch(balance)} BCH`);
   await cancelWatch();
 });
 ```
 
-You can watch for wallet balance changes which are also sensitive to BCH/USD rate changes. The callback will be fired even if there are no actual transactions happening. You can change the polling interval by setting `usdPriceRefreshInterval` parameter, which defaults to 30000 milliseconds.
+You can wait for a certain minimal balance (in satoshis) on the wallet using the `waitForBalance` function.
 
 ```js
-const cancelWatch = await wallet.watchBalanceUsd((balance) => {
-  console.log(balance);
-  await cancelWatch();
-}, 5000);
+import { toSat } from 'mainnet-js';
+
+// Wait for at least 100,000 satoshis (0.001 BCH)
+const balance = await wallet.waitForBalance(100000n);
+
+// Or use toSat for BCH amounts
+const balance2 = await wallet.waitForBalance(toSat(0.001));
 ```
 
-You can wait for a certain minimal balance on the wallet using the `waitForBalance` function.
-
-```js
-const balance = await wallet.waitForBalance(1.0, 'usd');
-```
-
-The `balance` variable contains the actual balance of the wallet.
+The `balance` variable contains the actual balance of the wallet in satoshis (bigint).
 
 ### Watching/Waiting for block
 
@@ -506,7 +722,7 @@ Sending funds and OP_RETURN messages can be mixed together, the output order wil
 ```js
 await wallet.send([
   OpReturnData.from("MEMO\x10LÖL😅"),
-  { cashaddr: otherWallet.cashaddr!, value: 546, unit: "sats" },
+  { cashaddr: otherWallet.cashaddr!, value: 546n },
 ]);
 ```
 
@@ -525,17 +741,25 @@ There are minimal, react and vue sample configurations for numerous web apps in 
 
 All token related methods are available from `Wallet` class directly. This means that you can send BCH and CashTokens in the same transaction.
 
-Furthermore, both fungible and non-fungible (NFT) tokens of the same category (tokenId) can share the same UTXO. Pure NFT just has its fungible token `amount` being 0n.
+Furthermore, both fungible and non-fungible (NFT) tokens of the same category can share the same UTXO. Pure NFT just has its fungible token `amount` being 0n.
 
-Each token UTXO may or may not contain the following attributes:
+Each token UTXO contains the following structure:
 
-*  `amount: bigint;` - fungible token amount. [Note: After genesis the total amount of fungible tokens can not be increased. Max amount is `9223372036854775807`]
-*  `tokenId: string;` - the category Id of the token, this is a 32 bytes hex encoded transaction hash which was spent in the token genesis process
-*  `commitment?: string;` - 0 to 40 bytes long hex encoded string representing the token commitment message. This can be a serial number of an NFT in the group or any other user defined data.
-*  `capability?: NFTCapability;` - Non-fungible token capability.
-    - `none`: token is immutable (can not change its commitment) and can not mint new NFTs
-    - `mutable`: token can be spent to create a singular new NFT token with different commitment and optionally `mutable` capability
-    - `minting`: token can be spent to create any amount of new NFT tokens with different commitment and any capability
+```ts
+interface TokenI {
+  amount: bigint;           // Fungible token amount (max: 9223372036854775807)
+  category: string;         // 32 bytes hex transaction hash from token genesis
+  nft?: {
+    capability: NFTCapability;  // none, mutable, or minting
+    commitment: string;         // 0-40 bytes hex encoded data
+  };
+}
+```
+
+NFT capabilities:
+- `none`: token is immutable (can not change its commitment) and can not mint new NFTs
+- `mutable`: token can be spent to create a singular new NFT token with different commitment and optionally `mutable` capability
+- `minting`: token can be spent to create any amount of new NFT tokens with different commitment and any capability
 
 Also token carrying utxos do have a BCH value which can not be lower than 798 satoshi for p2pkh token outputs (dust limit), otherwise these inputs would be unspendable. For simplicity mainnet allows to omit the BCH value for token UTXOs. If new token UTXOs are created the value for them will be set to 1000 satoshi. If a singular token UTXO is spent to a single new UTXO its BCH value will be carried over to the new one.
 
@@ -547,21 +771,25 @@ It is very easy to create new token category:
 
 ```js
 const genesisResponse = await wallet.tokenGenesis({
-      cashaddr: alice.cashaddr!,      // token UTXO recipient, if not specified will default to sender's address
-      amount: 5n,                      // fungible token amount
-      commitment: "abcd",             // NFT Commitment message
-      capability: NFTCapability.none, // NFT capability
-      value: 1000,                    // Satoshi value
-    });
-const tokenId = genesisResponse.tokenIds![0];
+  cashaddr: alice.cashaddr!,      // token UTXO recipient, if not specified will default to sender's address
+  amount: 5n,                     // fungible token amount
+  nft: {                          // NFT properties (optional)
+    capability: NFTCapability.none,
+    commitment: "abcd",
+  },
+  value: 1000n,                   // Satoshi value
+});
+const category = genesisResponse.categories![0];
 ```
 
 ### Looking up token information
 
-If you want to get the BCMR information about your token (given you have imported it), you can invoke `getTokenInfo` method.
+If you want to get the BCMR information about your token (given you have imported it), you can use the BCMR class.
 
 ```js
-const info: IdentitySnapshot | undefined = wallet.getTokenInfo(tokenId);
+import { BCMR } from '@mainnet-cash/bcmr';
+
+const info: IdentitySnapshot | undefined = BCMR.getTokenInfo(category);
 ```
 
 Please refer to the [BCMR specification](https://github.com/bitjson/chip-bcmr) to learn more about identity snapshots and how to get the detailed token information.
@@ -575,19 +803,23 @@ In the following example we mint 2 new NFTS:
 ```js
 // mint 2 NFTs, amount reducing
 const response = await wallet.tokenMint(
-  tokenId,
+  category,
   [
     new TokenMintRequest({
       cashaddr: wallet.cashaddr!,
-      commitment: "01",
-      capability: NFTCapability.none,
-      value: 1000,
+      nft: {
+        commitment: "01",
+        capability: NFTCapability.none,
+      },
+      value: 1000n,
     }),
     new TokenMintRequest({
       cashaddr: wallet.cashaddr!,
-      commitment: "02",
-      capability: NFTCapability.mutable,
-      value: 1000,
+      nft: {
+        commitment: "02",
+        capability: NFTCapability.mutable,
+      },
+      value: 1000n,
     }),
   ],
   true, // reduce FT amount
@@ -602,22 +834,25 @@ Sending tokens around is easy and can be combined with sending BCH! You can incl
 
 ```js
 const sendResponse = await wallet.send([
+  // Send fungible tokens
   new TokenSendRequest({
     cashaddr: alice.cashaddr!,
+    category: category,
     amount: 100n,
-    tokenId: tokenId,
-    value: 1500,
+    value: 1500n,
   }),
+  // Send NFT with specific capability and commitment
   new TokenSendRequest({
     cashaddr: bob.cashaddr!,
-    tokenId: tokenId2,
-    commitment: "abcd",
-    capability: NFTCapability.none,
+    category: category2,
+    nft: {
+      capability: NFTCapability.none,
+      commitment: "abcd",
+    },
   }),
   new SendRequest({
     cashaddr: charlie.cashaddr!,
-    value: 100000,
-    unit: "satoshis",
+    value: 100000n,
   }),
 ]);
 ```
@@ -627,13 +862,15 @@ const sendResponse = await wallet.send([
 To explicitly burn the CashTokens they must be sent to an OP_RETURN output. `tokenBurn` method does this:
 
 ```js
-// burn 1 FT
+// burn 1 FT with minting NFT
 const burnResponse = await wallet.tokenBurn(
   {
-    tokenId: tokenId,
+    category: category,
     amount: 1n,
-    capability: NFTCapability.minting,
-    commitment: "abcd",
+    nft: {
+      capability: NFTCapability.minting,
+      commitment: "abcd",
+    },
   },
   "burn", // optional OP_RETURN message
 );
@@ -652,26 +889,26 @@ const sendAndBurnResponse = await wallet.send([...], { checkTokenQuantities: fal
 If you want to get the information about CashToken UTXOs of an address, look up the locked satoshi values, etc., you can do the following call:
 
 ```js
-const tokenId = undefined;
-const utxos = wallet.getTokenUtxos(tokenId);
+const category = undefined;
+const utxos = await wallet.getTokenUtxos(category);
 ```
 
-If `tokenId` is undefined UTXOs of all token categories will be returned. If `tokenId` is set, only tokens of this category will be returned.
+If `category` is undefined UTXOs of all token categories will be returned. If `category` is set, only tokens of this category will be returned.
 
 ### Token balances
 
 You can get all fungible token balances of your wallet or a balance of a specific token with the following methods:
 
 ```js
-const tokenBalance = wallet.getTokenBalance(tokenId);
-const allBalances = wallet.getAllTokenBalances();
+const tokenBalance = await wallet.getTokenBalance(category);
+const allBalances = await wallet.getAllTokenBalances();
 ```
 
 To get the total amount of NFT tokens use the following methods:
 
 ```js
-const nftTokenBalance = wallet.getNftTokenBalance(tokenId);
-const allNftBalances = wallet.getAllNftTokenBalances();
+const nftTokenBalance = await wallet.getNftTokenBalance(category);
+const allNftBalances = await wallet.getAllNftTokenBalances();
 ```
 
 ### Watching/waiting for fungible token balance
@@ -687,18 +924,12 @@ const cancelFn = await wallet.watchTokenBalance(tokenId, (balance) => {
 You can wait for the wallet to reach a certain minimal fungible token balance:
 
 ```js
-const actualBalance = await wallet.waitForBalance(tokenId, 10);
+const actualBalance = await wallet.waitForTokenBalance(category, 10n);
 ```
 
 This will halt the program execution until the balance reaches the target value.
 
 ## BCMR - BitcoinCash Metadata Registries
-
-::: warning
-BCMR implementation in mainnet.cash is in alpha phase.
-
-BCMR CHIP might still be changed.
-:::
 
 We implement [BCMR](https://github.com/bitjson/chip-bcmr/tree/5b24b0ec93cf9316222ab2ea2e2ffe8a9f390b12) CHIP to support on-chain CashToken metadata resolution employing zeroth-descendant transaction chain (ZDTC), which authenticates and publishes all registry updates.
 
@@ -717,13 +948,13 @@ const authChain = await BCMR.addMetadataRegistryAuthChain({
 
 In this example we resolve the exact metadata registry stored in the transaction findable by its transaction hash `txHash`. If we'd wanted to resolve the latest version, we'd set `followToHead` to `true`.
 
-After adding the registry, we will have access to token info with either `wallet.getTokenInfo` or a static `BCMR.getTokenInfo`:
+After adding the registry, we will have access to token info with `BCMR.getTokenInfo`:
 
 ```js
-const info: IdentitySnapshot | undefined = BCMR.getTokenInfo(tokenId);
+const info: IdentitySnapshot | undefined = BCMR.getTokenInfo(category);
 ```
 
-Note, that token info resolution will prioritize the most recently added registries and return the info about first found token with matching `tokenId`.
+Note, that token info resolution will prioritize the most recently added registries and return the info about first found token with matching `category`.
 
 To get a copy of all tracked registries, use `getRegistries`, to purge the list use `resetRegistries`.
 
@@ -767,554 +998,6 @@ const txid = await wallet.getTestnetSatoshis();
 const sendResponse = await wallet.returnTestnetSatoshis();
 ```
 
-## Escrow contracts
-
-::: warning 
-Alpha release
-:::
-
-### Getting the mainnet-cash Contract package
-
-To keep the size of the packages small, both CashScript contract and Ethereum style functionality have been broken out into separate add-on packages (@mainnet-cash/contract). 
-
-#### Via npm / yarn
-
-If you are developing in node or for a webapp, import or require from `@mainnet-cash/contract` after installing the separate package using:
-
-```sh
-npm install @mainnet-cash/contract
-# or 
-yarn add @mainnet-cash/contract
-
-```
-
-#### &lt;script> tag in HTML
-
-To get started using CashScript Contracts on your site, include this tag in your `<head>` section:
-
-```html
-<script src="https://cdn.mainnet.cash/contract/contract-.js"
- integrity="sha384-2rHb3Ad0asUHmx7dJcWspyfebpOnYhpG0b7Zg5biAxTJAzlOGXSJJ855NlvK/FYl"
- crossorigin="anonymous"></script>
-```
-
-<!--
-you can generate the integrity sha like in the following example:
-echo sha384-`curl https://cdn.mainnet.cash/contract-2.2.5.js | openssl dgst -sha384 -binary | openssl base64 -A`
--->
-
-This will enable code required for Cashscript in the global scope of your browser.
-
-Note that the `integrity` part guarantees that the script haven't been tampered with. So if a hacker replaces it,
-the user's browser will not run the script. Or you can download the library and serve it locally.
-
-### Using the pre-defined contract
-
-Ok, let's now assume that you are building a service where you want to connect a buyer and a seller (a freelance marketplace 
-or a non-custodial exchange), but at the same time you don't want to hold anyone's money, 
-but only act as an arbiter in case something goes wrong. It's possible in Bitcoin Cash and it's called "an escrow contract".
-
-You'll need three addresses for this: `buyer`, `seller` and `arbiter`. 
-
-Note: The source for the contract is [here](https://github.com/mainnet-cash/mainnet-js/blob/c1c80889b8c211231326ab8537e20e85658239fa/src/contract/escrow/EscrowContract.ts#L123-L144). 
-
-1) Buyer sends the money to the contract and could then release the money to the seller 
-2) The seller could refund the buyer
-3) Arbiter can either complete the transaction to the seller or refund to the buyer, but cannot steal the money 
-
-```js
-let escrow = new EscrowContract({
-  arbiterAddr: arbiter.getDepositAddress(),
-  buyerAddr: buyer.getDepositAddress(),
-  sellerAddr: seller.getDepositAddress(),
-  amount: 5000n
-});
-```
-
-You can now send money to the contract:
-
-```js
-await buyer.send([ [ escrow.getAddress(), 8700n, "satoshis" ], ]);
-``` 
-
-Check the balance of the contract (in satoshis):
-
-```js
-await escrow.getBalance()
-// 8700
-```
-
-Note: Escrow contract is big (in bytes) and requires a big fee, so the minimum what you can send to it is about 3700 satoshis. 
-
-Now, we can execute the necessary functions:
-
-1) Buyer releases the funds
-```js
-await escrow.call(buyer.privateKeyWif, "spend");
-```
-
-2) Seller refunds
-```js
-await escrow.call(seller.privateKeyWif, "refund");
-```
-
-3) Arbiter releases the funds or refunds
-```js
-await escrow.call(arbiter.privateKeyWif, "spend");
-await escrow.call(arbiter.privateKeyWif, "refund");
-```
-
-### Saving the contract to the database
-
-The arbiter needs to save the contract somewhere (in a database or some other storage), so that when the time comes,
-he could execute the necessary functions:
-
-Save:
-
-```js
-const escrowContractId = escrow.toString();
-```
-
-Restore it later:
-
-```js
-const restoredEscrow = EscrowContract.fromId(escrowContractId);
-```
-
-The escrow object implements a CashScript contract from a stock template, but if the template doesn't suit your needs, it is also possible to use any contract written in [CashScript](https://cashscript.org/).  
-
-```solidity
-pragma cashscript ^0.7.0;
-contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int contractAmount, int contractNonce) {
-
-    function spend(pubkey signingPk, sig s, int amount, int nonce) {
-        require(hash160(signingPk) == arbiterPkh || hash160(signingPk) == buyerPkh);
-        require(checkSig(s, signingPk));
-        require(amount >= contractAmount);
-        require(nonce == contractNonce);
-        bytes25 lockingCode = new LockingBytecodeP2PKH(sellerPkh);
-        bool sendsToSeller = tx.outputs[0].lockingBytecode == lockingCode;
-        require(tx.outputs[0].value == amount);
-        require(sendsToSeller);
-    }
-
-    function refund(pubkey signingPk, sig s, int amount, int nonce) {
-        require(hash160(signingPk) == arbiterPkh||hash160(signingPk) == sellerPkh);
-        require(checkSig(s, signingPk));
-        require(amount >= contractAmount);
-        require(nonce == contractNonce);
-        bytes25 lockingCode = new LockingBytecodeP2PKH(buyerPkh);
-        bool sendsToSeller = tx.outputs[0].lockingBytecode == lockingCode;
-        require(tx.outputs[0].value == amount);
-        require(sendsToSeller);
-    }
-}
-```
-
-## Generic CashScript
-
-::: warning 
-Alpha release
-:::
-
-::: tip What is CashScript?
-
-*From CashScript.org:*
-
-[CashScript](https://cashscript.org/) is a high-level programming language for smart contracts on Bitcoin Cash. It offers a strong abstraction layer over Bitcoin Cash' native virtual machine, Bitcoin Script. Its syntax is based on Ethereum's smart contract language Solidity, but its functionality is very different since smart contracts on Bitcoin Cash differ greatly from smart contracts on Ethereum. For a detailed comparison of them, refer to the blog post [Smart Contracts on Ethereum, Bitcoin and Bitcoin Cash](https://kalis.me/smart-contracts-eth-btc-bch/). 
-
-
-:::
-
-In the `EscrowContract` example in the previous section, the contract source is hardcoded. But with a generic `Contract`, the full script is defined by the user. 
-
-`Contracts` are objects that simply wrap a CashScript Contract, with utilities to serialize and deserialize them. In addition, there are some functions on wallets to facilitate sending arguments to the contract. 
-
-For example, taking a simple pay with timeout example from the [CashScript playground](https://playground.cashscript.org/):
-
-
-```solidity
-pragma cashscript ^0.7.0;
-
-contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
-    // Require recipient's signature to match
-    function transfer(sig recipientSig) {
-        require(checkSig(recipientSig, recipient));
-    }
-
-    // Require timeout time to be reached and sender's signature to match
-    function timeout(sig senderSig) {
-        require(checkSig(senderSig, sender));
-        require(tx.time >= timeout);
-    }
-}
-```
-
-This can be loaded up by passing the script, constructor arguments and network to a new Contract. 
-
-::: tip Before you dive in, it might be a good time to consider using RegTest?
-
-The below code is for TestNet, but it's highly recommended to develop and test your contracts on `RegTest`. Besides the ability to give yourself free coins, it's also possible to mine blocks to test your contract functioning over different time conditions.
-
-:::
-
-```js
-
-const script = `contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {
-    // Require recipient's signature to match
-    function transfer(sig recipientSig) {
-        require(checkSig(recipientSig, recipient));
-    }
-
-    // Require timeout time to be reached and sender's signature to match
-    function timeout(sig senderSig) {
-        require(checkSig(senderSig, sender));
-        require(tx.time >= timeout);
-    }
-}`
-```
-
-```js
-const alice = await TestNetWallet.newRandom();
-
-```
-
-
-In the case that you only have Charlie's cashaddr, 
-it won't be possible to get the full public key,
-but a public key hash may be used in the contract instead
-```js
-const charlie = await TestNetWallet.watchOnly("bchtest:qqz52tne6ny78tltw82f0tufcum0752zg5tnwcf0v9")
-```
-In javascript, the contract can take a binary argument as a Uint8Array or 
-hexadecimal strings just like CashScript, but passing passing `true`
-here causes getPublicKey() to return hex, 
-(in case you wanted to paste into the data into CashScript playground.)
-the default is a Uint8Array.
-
-```js
-const alicePk = alice.getPublicKey(true);
-const charliePk = charlie.getPublicKey(true);
-```
-
-Next pass the script, arguments and network to create a new Contract.
-```js
-// Some block height very far in the past.
-const after = 215;
-
-let contract = new Contract(
-  script,
-  [alicePk, charliePk, after],
-  Network.TESTNET
-);
-
-```
-
-
-::: tip `Contract is not a function` got you down?
-
-See the note at the top of the [previous section](#getting-the-mainnet-cash-contract-package) about getting the @mainnet-cash/contract package.
-
-:::
-
-
-This will give you a contract object that can be serialized and deserialized just like a wallet:
-
-```js
-// serialized to a string
-let contractStr = contract.toString()
-//contract:testnet:TURSa05EV...nPT06TWpFMQ==:cHJhZ...gfQp9:61149027"
-
-// recreate the Contract object from a string
-let contractCopy = Contract.fromId(contractStr)
-```
-
-The deposit address is available with the same interface as a wallet.
-
-```js
-contract.getDepositAddress()
-//"bchtest:pzpt6y6ganwagvr6far4pe82yvtflx60zstdyhlzld"
-```
-
-The interface to list utxos is identical to wallets as well...
-
-```js
-await contract.getUtxos()
-// [
-//  {
-//   txid: "8806ef4f1185f268a5083fbd651d974b939d2c68afa2be28652c4ccce06703c4", 
-//   vout: 0, 
-//   satoshis: 1000, 
-//   height: 0
-//  }
-// ]
-```
-
-Once the contract is funded, contract functions may be called just like in CashScript:
-
-```js
-let transferFn = contract.getContractFunction("transfer");
-
-// the signature template for charlie is available on the wallet
-const sig = charlie.getSignatureTemplate();
-const charlieAddr = charlie.getDepositAddress()
-
-// The function may be called by passing the arguments to the function
-// specifying a `to` destination and a CashScript function method, i.e. send
-let txn = await transferFn(sig).to(charlieAddr, 7000n).send();  
-```
-
-Wallets have the following convenience methods for passing data to CashScript:
-
-| Wallet Method | Returns | CashScript Type | 
-| ----------- | ----------- | ----------- |  
-| `getSignatureTemplate()` | SignatureTemplate | `sig` |
-| `getPublicKeyCompressed()` | Hex String or Uint8Array | `pubkey` |
-| `getPublicKeyHash()` | Hex String or Uint8Array |`bytes20` |
-
-In Javascript, passing either hex or a Uint8Array to CashScript will work.
-
-In the case that a contractId is stored, or received from another party, a convenience method exists to list information contained in a contractId, the `info()` interface is available to return the parsed data.
-
-The return should be an object with the same contractId, deposit cashaddr, script source, input parameters and a contract nonce that is added for uniqueness.
-
-```js
-contract.info()
-// {
-//   "contractId": "contract:testnet:TURRellXWTNabVF5WmpVeVpUa3dNVFEzTldOa1pEUXhPRFZoWWpWa1ptVmlZamMyTXpNM09EQTVNV0psTVRrd1lXUXlOMkZrTXpRM1lUZGtPR1kwTmpOa1pqSXlaVE5sT0dKbFlUaGtaRGcwTldKaE1XUXlNR00xWmpCbFl6QTJNek13WmpNM01ETTFZbUpsTkdFME1UZzNPVEUzTVRCaVlUbGpNakUxWkRaa05RPT06TURSbE9EZGtOV1ZrTlRCbU16VXdZVFZtTjJFMk16aG1abVkyT0RFek5HTTNOekJsT1RGaVlUUTFNV0l4TXpSaVlqTTVOVEJqTUdVMk9ETTJNR0poWW1JNE0ySTJOMlF3TnpSaU16WTFOVFl4WVdVMU0ySmxaVEV6TXpBNFl6TTFPVEF6TnpOaU5qTm1aV1F6TVRKallXVTNNMlk0TXpWaE56SmlaR00xWldFek53PT06TWpFMQ==:Y29udHJhY3QgVHJhbnNmZXJXaXRoVGltZW91dChwdWJrZXkgc2VuZGVyLCBwdWJrZXkgcmVjaXBpZW50LCBpbnQgdGltZW91dCkgewogICAgLy8gUmVxdWlyZSByZWNpcGllbnQncyBzaWduYXR1cmUgdG8gbWF0Y2gKICAgIGZ1bmN0aW9uIHRyYW5zZmVyKHNpZyByZWNpcGllbnRTaWcpIHsKICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHJlY2lwaWVudFNpZywgcmVjaXBpZW50KSk7CiAgICB9CgogICAgLy8gUmVxdWlyZSB0aW1lb3V0IHRpbWUgdG8gYmUgcmVhY2hlZCBhbmQgc2VuZGVyJ3Mgc2lnbmF0dXJlIHRvIG1hdGNoCiAgICBmdW5jdGlvbiB0aW1lb3V0KHNpZyBzZW5kZXJTaWcpIHsKICAgICAgICByZXF1aXJlKGNoZWNrU2lnKHNlbmRlclNpZywgc2VuZGVyKSk7CiAgICAgICAgcmVxdWlyZSh0eC50aW1lID49IHRpbWVvdXQpOwogICAgfQp9:544951395",
-//   "cashaddr": "bchtest:ppv649rmxcd9fpwgk78pq0yek30krgwreva8unzm0x",
-//   "script": "contract TransferWithTimeout(pubkey sender, pubkey recipient, int timeout) {\n    // Require recipient's signature to match\n    function transfer(sig recipientSig) {\n        require(checkSig(recipientSig, recipient));\n    }\n\n    // Require timeout time to be reached and sender's signature to match\n    function timeout(sig senderSig) {\n        require(checkSig(senderSig, sender));\n        require(tx.time >= timeout);\n    }\n}",
-//   "parameters": [
-//     "043af7fd2f52e901475cdd4185ab5dfebb763378091be190ad27ad347a7d8f463df22e3e8bea8dd845ba1d20c5f0ec06330f37035bbe4a418791710ba9c215d6d5",
-//     "04e87d5ed50f350a5f7a638fff68134c770e91ba451b134bb3950c0e68360babb83b67d074b365561ae53bee13308c3590373b63fed312cae73f835a72bdc5ea37",
-//     "215"
-//   ],
-//   "nonce": 544951395
-// }
-```
-
-Combined with the `getPublicKeyHash()` method described above, another party could verify that the script of the contract matched an agreement and that the counter-party's public key hash was indeed a parameter to the contract.
-
-## Debugging Contracts
-
-For developing, testing, or debugging contracts, it's useful to run your script on a [local regtest "network"](/tutorial/#regtest-wallets). 
-
-In this section, we'll revisit the escrow contract and see ways to cause the contract not to release funds and how to debug why that is happening.
-
-### Before you begin
-
-1. Have docker-compose installed
-2. Have the [`meep`](https://github.com/gcash/meep) Bitcoin Cash debugger installed, and the go language if necessary.
-2. See the [regtest wallets](/tutorial/#regtest-wallets) section below.
-3. Checkout a copy of the mainnet-js repository.
-4. From the mainnet-js project root, run:
-
-```shell
-yarn regtest:up 
-```
-
-This should give you all the services used by mainnet-js in the background configured in regtest mode, which you may check with `docker ps`.  
-
-When you want to shut regtest down, use:
-
-```shell
-yarn regtest:down 
-```
-
-### Step 1, "Neglect the fees"
-
-Small transaction fees are currently used on Bitcoin Cash to make the cost of a large spam attack non-trivial to the attacker. There are other finite measures, such as coindays (or the age of coins being spent). However, for a the time being, Bitcoin Cash software largely agrees to use 1 sat/byte, because the mechanism was simple to implement across a lot of diverse and interconnected software.
-
-So a common way to break the escrow transaction flow is to neglect the fees, which we'll do below.
-
-Let's create our contract parties again. 
-
-You can do this by importing mainnet into nodejs, using a live coding tool or the console of web browser using `yarn reload` at localhost:8080.
-
-```js
-seller = await RegTestWallet.newRandom()
-buyer = await RegTestWallet.newRandom()
-arbiter = await RegTestWallet.newRandom()
-```
-
-Next we need the buyer to have some funds. Luckily we know an address on your regtest network with lots of bitcoin mined to it when docker starts.  
-
-```js
-
-miner = await RegTestWallet.fromWIF("cNfsPtqN2bMRS7vH5qd8tR8GMvgXyL5BjnGAKgZ8DYEiCrCCQcP6")
-await miner.send([
-  {
-    cashaddr: buyer.getDepositAddress(),
-    value: 100000,
-    unit: "satoshis",
-  },
-]);
-```
-
-Next, let's create a contract between our parties:
-
-```js
-escrow = new EscrowContract({
-  arbiterAddr: arbiter.getDepositAddress(),
-  buyerAddr: buyer.getDepositAddress(),
-  sellerAddr: seller.getDepositAddress(),
-  amount: 20000
-});
-```
-Next the buyer sends funds for the transaction to the contract address, and checks the balance:
-
-```js
-await buyer.send({cashaddr:escrow.getDepositAddress(), value: 20000, unit:'sat'})
-await escrow.getBalance()
-// 20000
-```
-
-Since the contract is funded for the full amount, let's try to release funds to the seller using the buyer's private key:
-
-```js
-await escrow.call(buyer.privateKeyWif, "spend");
-```
-
-But instead of sending the funds successfully, this returns an error:
-
-```
-Uncaught (in promise) Error: Error: The contract amount (20000) could not be submitted for a tx fee (836) with the available with contract balance (20000)
-```
-
-In the above case, we attempted to spend 20,000 sat using the unlocking script, from an address with only 20,000 sat, we neglected to include enough to cover the transaction fee of 836 sats. 
-
-If we send another input to the contract address...
-
-```js
-await buyer.send({cashaddr:escrow.getDepositAddress(), value: 836, unit:'sat'})
-await escrow.getBalance()
-/// 20836
-await escrow.call(buyer.privateKeyWif, "spend");
-```
-
-... we'll be greeted with another error: 
-
-```
-Uncaught (in promise) Error: Error: The contract amount (20000) could not be submitted for a tx fee (1596) with the available with contract balance (20836)
-```
-
-The fees went up to 1596 sats!
-
-This error occurred because funds are now being spent from two inputs (20,000 & 836), so the resulting transaction is larger and requires a larger fee. Although the fee we added would have been enough to spend the first output, it's not enough to spend two outputs.
-
-Since the unlocking script is included for each input, we can double the amount needed to spend from one unspent transaction output and should be able to spend the full amount from three inputs:
-
-```js
-await buyer.send({cashaddr:escrow.getDepositAddress(), value: 1656, unit:'sat'})
-await escrow.getBalance()
-/// 22492
-```
-
-If the buyer attempts to `spend` funds now, the transaction will succeed.
-
-```js
-await escrow.call(buyer.privateKeyWif, "spend");
-
-// ​Object { inputs: (3) […], locktime: 645, outputs: (1) […], version: 2, txid: "612ca1da16492503d9fea53106800073fa8b3f573d7663aed1ab92e41d38d979",
-// hex: "0200000003a5e92065f28ba406b0ac020b961caba285fcb438535775978524ebe5c9d1b92800000000fdcf020488bcc30802a84e41020424b6ede0258de98a4d77770a7282878634ba348e3ef520853cfc13c0987d979d6f5574e49ba04f65d74003ac43da837a5ce7edd111b17b3ecdce0a223b7941210384ddcc77b7177d8fe61b9a5b8c8ee3d1c225e525ac986d249e2c9b4a26920c8b4d7d01020000009e..."
-
-```
-
-### Step 2, Rejection by network rules.
-
-A library can handle some common errors around a static contract, but if you develop your own contract (or have issues with the builtin escrow contract), a transaction may be rejected by the network because the rules of the contract don't authorize funds to be spent.
-
-Let's do this with the same escrow contract from above and see how to figure out what happened.
-
-
-Let's fund the contract address, with enough fee to spend...
-
-```js
-await buyer.send({cashaddr:escrow.getDepositAddress(), value: 20837, unit:'sat'})
-await escrow.getBalance()
-// 20837
-```
-
-Now lets attempt to break the rules by `spend`ing to the seller's address, with the seller's key
-
-
-```js
-await escrow.call(seller.privateKeyWif, "spend");
-
-Uncaught (in promise) Error: Error: Transaction failed with reason: the transaction was rejected by network rules.
-
-mandatory-script-verify-flag-failed (Script failed an OP_VERIFY operation) (code 16)
-
-meep debug --tx=0200000001f0a7e4ace8584c254a12e65a1ff0b6b3b876160d102a8eec2456095ef7e6000700000000fdcf020488bcc30802214e410bcba486912488ef15eb1e9a1cac56768823ff750b9bec35106b75e698f53d69ca483acd26f9441f683aa4975078f73e11e803788255849fb9d6dbb87667a4204121025fc8b68ce77607a82169849b8ae03384948644b4c8d42655aa2a99803df56d474d7d010200000000d6d779b71176a783ff0d427e00ccc504cd3ee027dc4d8792392be2e562fdc718606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe198f0a7e4ace8584c254a12e65a1ff0b6b3b876160d102a8eec2456095ef7e6000700000000e00488bcc30802204e140048249a5b92081ed9899c8bc15767c7ad45b033149ec12aee1e1266036ae546b93620f1a7aebfc39614d20194262d3b448d55154b52ef69e13581d4af815579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff492b5e32f70d2c63e07cc0c5e08fcaecc34ec34237919d9d1675dbcf7f3065c9d700000041000000004ce00488bcc30802204e140048249a5b92081ed9899c8bc15767c7ad45b033149ec12aee1e1266036ae546b93620f1a7aebfc39614d20194262d3b448d55154b52ef69e13581d4af815579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a914d20194262d3b448d55154b52ef69e13581d4af8188acd7000000 --idx=0 --amt=20837 --pkscript=a914721245359aa9cb99428df5e449fd9e6a16270ee487
-    _sendMax webpack://mainnet-js/./src/contract/escrow/EscrowContract.ts?:245
-```
-
-In the above error output, we see the operation that failed was `OP_VERIFY` and we're provided with the `meep` debug command to step through this specific transaction.
-
-[`meep`](https://github.com/gcash/meep) is a Bitcoin Cash script debugger written in golang. After ensuring you have it installed, and it's callable on your computer, you may use the above supplied command to see where exactly in execution of the unlock script OP_VERIFY failed.
-
-![Meep](./assets/escrow_seller_spend_meep.png)
-
-Stepping through the Bitcoin Script in `meep`, we can see the translation of the CashScript contract to Bitcoin Script. The contract repeats the same pattern with the `spend` and `refund` blocks in an `if,else,endif` structure. And that the failure occurs on an `OP_VERIFY` in the first or `spend` block.
-
-We can also see in the `RedeemScript` section that the nonce (`88bcc308`), amount (`204e`), as well as the public key hashes for the arbiter (`0048...b033`), buyer and seller.  These are the arguments to our CashScript function, but in reversed order.  
-
-Walking through the contract with `meep`, we can see that there are two `OP_HASH160` operations performed and then the contract fails on `OP_VERIFY`.  Looking at the escrow contract, it should be clear that this corresponds to the highlighted line in the `spend` function, where the contract requires that either the `arbiterPkh` or `buyerPkh` match the `signingPkh` provided.  
-
-
-```solidity{5}
-pragma cashscript ^0.7.0;
-  contract escrow(bytes20 sellerPkh, bytes20 buyerPkh, bytes20 arbiterPkh, int contractAmount, int contractNonce) {
-
-      function spend(pubkey signingPk, sig s, int amount, int nonce) {
-          require(hash160(signingPk) == arbiterPkh || hash160(signingPk) == buyerPkh);
-          require(checkSig(s, signingPk));
-          require(amount >= contractAmount);
-          require(nonce == contractNonce);
-          bytes25 lockingCode = new LockingBytecodeP2PKH(sellerPkh);
-          bool sendsToSeller = tx.outputs[0].lockingBytecode == lockingCode;
-          require(tx.outputs[0].value == amount);
-          require(sendsToSeller);
-      }
-
-      function refund(pubkey signingPk, sig s, int amount, int nonce) {
-          require(hash160(signingPk) == arbiterPkh||hash160(signingPk) == sellerPkh);
-          require(checkSig(s, signingPk));
-          require(amount >= contractAmount);
-          require(nonce == contractNonce);
-          bytes25 lockingCode = new LockingBytecodeP2PKH(buyerPkh);
-          bool sendsToSeller = tx.outputs[0].lockingBytecode == lockingCode;
-          require(tx.outputs[0].value == amount);
-          require(sendsToSeller);
-      }
-}
-```
-
-The above process can be repeated to trace back which particular step the contract was rejected on, and what the state of the stack was when that rejection occurred.
-
-To examine the execution of a transaction that would succeed, we can call a the escrow function with getHexOnly set to true:
-
-```js
-await escrow.call(buyer.privateKeyWif, "spend", undefined, true);
-```
-
-This will return the hex of the transaction with the buyer spending the funds.
-
-```json
-{
-  "hex": "020000000191eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000fdcf020437dd393402214e41863b47e9de111d43b48c4dc4f7d87fa8c07daab8cf3ee45753a1eba31d71933c2088f1716c8f9b1b0f3f123137c656d55bf5721af754dd418b063d3fb267c3f4412103a7ca01e2f5eaaa30e36d2d6687a88dae3cb4531ec6573f2793bcf37d1cb200e34d7d0102000000af4e505b95af3b69f119865b3e1f81bad1ba191e4adc2c61bd5fa450359eda9618606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe19891eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000e00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff947dfa2869621f5af52e85b6c88641f864c9e36791808a8db94b6491f0dc443f8502000041000000004ce00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a9141136f7ac42b3d65345906b2228d5644f0f1c7c3b88ac85020000"
-}
-```
-
-This can be passed to `meep` to see how the Bitcoin Script would be executed.
-
-```shell
-meep debug --tx=020000000191eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000fdcf020437dd393402214e41863b47e9de111d43b48c4dc4f7d87fa8c07daab8cf3ee45753a1eba31d71933c2088f1716c8f9b1b0f3f123137c656d55bf5721af754dd418b063d3fb267c3f4412103a7ca01e2f5eaaa30e36d2d6687a88dae3cb4531ec6573f2793bcf37d1cb200e34d7d0102000000af4e505b95af3b69f119865b3e1f81bad1ba191e4adc2c61bd5fa450359eda9618606b350cd8bf565266bc352f0caddcf01e8fa789dd8a15386327cf8cabe19891eb6277d54c659a5683822667a2e7cc0b23140e993af8c6e999348e15b3e4cc00000000e00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa87686551000000000000feffffff947dfa2869621f5af52e85b6c88641f864c9e36791808a8db94b6491f0dc443f8502000041000000004ce00437dd393402204e149592c19950bf410418469916583e3b99ec74ab0314b7cada9cde2ace5cc17dca136fc2ba7c9d58d1de141136f7ac42b3d65345906b2228d5644f0f1c7c3b5579009c635679820128947f7701207f755879a9547a875879a9547a879b69577a577a6e7c828c7f75597aa87bbbad5579537aa269557a537a9d537a5880041976a9147e7b7e0288ac7eaa877767557a519d5579820128947f7701207f755779a9547a875779a9537a879b69567a567a6e7c828c7f75587aa87bbbad5479537aa269547a537a9d7b5880041976a9147e7b7e0288ac7eaa8768feffffff01214e0000000000001976a9141136f7ac42b3d65345906b2228d5644f0f1c7c3b88ac85020000 --idx=0 --amt=20837 --pkscript=a91430392b5580c38e409fec5810045d59a62531ef2f87
-```
-
-Passing the hex with appropriate arguments will show the execution stack for your Bitcoin Script at each stage, using the above command, it should finish without error.
-
-
 ## Utilities
 
 ### Decoding transactions
@@ -1347,7 +1030,7 @@ wallet.derivationPath
 // "m/44'/0'/0'/0/0"
 ```
 
-If you wanted to check different xPubKey paths for funds, 
+If you wanted to check different xPubKey paths for funds,
 
 ```js
 await wallet.getXPubKeys()
@@ -1508,12 +1191,12 @@ francisWallet = await Wallet.fromWIF(
 francisWallet.cashaddr
 // "bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7eatdkqt05lt3nw"
 
-signature = (await francisWallet.sign(message)).signature;
+signature = francisWallet.sign(message).signature;
 // H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y=
 
-// or 
+// or
 
-sigResult = await francisWallet.sign(message);
+sigResult = francisWallet.sign(message);
 ```
 <!-- cSpell:enable -->
 
@@ -1567,7 +1250,7 @@ francisPublic = await Wallet.watchOnly("bitcoincash:qqehccy89v7ftlfgr9v0zvhjzyy7
 message = "Chancellor on brink of second bailout for banks"
 sig = "H/9jMOnj4MFbH3d7t4yCQ9i7DgZU/VZ278w3+ySv2F4yIsdqjsc5ng3kmN8OZAThgyfCZOQxZCWza9V5XzlVY0Y="
 
-verifyResult = await francisPublic.verify(message, sig);
+verifyResult = francisPublic.verify(message, sig);
 ```
 
 where `verifyResult` is
