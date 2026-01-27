@@ -1,4 +1,4 @@
-FROM node:14.21.3
+FROM node:24-bullseye
 
 WORKDIR /app/docs
 COPY docs/package.json .
