@@ -65,6 +65,9 @@ await wallet.tokenGenesis({
 ### Removed methods
 - `watchBalanceUsd` - Use `watchBalance` with manual currency conversion
 - `getAddressUtxos` - Use `wallet.provider.getUtxos(address)` instead
+- `watchAddress` - Use `watchTransactionHashes` instead
+- `watchAddressTransactions` - Use `watchTransactions` instead
+- `watchAddressTokenTransactions` - Use `watchTokenTransactions` instead
 - `contracts` sub-package removed
 
 <!-- Your stack: Browser + IndexedDB PHP Other -->
@@ -156,7 +159,8 @@ const wallet = await Wallet.fromSeed('.....');
 ```
 
 ::: tip
-Seed phrase wallets use the derivation path `m/44'/0'/0'/0/0` by default (Bitcoin.com wallet compatibility)
+Seed phrase wallets use the derivation path `m/44'/0'/0'/0/0` by default (Bitcoin.com wallet compatibility).
+Both 12-word and 24-word BIP39 seed phrases are supported.
 :::
 
 Optionally, a [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) derivation path may be added as a second argument.
@@ -169,6 +173,12 @@ If you want to create a wallet from a WIF (private key), use this call:
 
 ```js
 const wallet = await Wallet.fromWIF('.....');
+```
+
+You can also create a wallet from a raw private key (hex string or Uint8Array):
+
+```js
+const wallet = await Wallet.fromPrivateKey('deadbeef...');
 ```
 
 ::: danger Keep the private key and the seed phrase secret
@@ -608,18 +618,33 @@ document.querySelector('#deposit').src = qrAddress(wallet.getDepositAddress()).s
 
 ### Watching/Waiting for transaction
 
-You can watch for incoming wallet transaction with `watchAddress` and `watchAddressTransactions` methods with the difference that the former will monitor transaction hashes and the latter will receive the decoded transactions in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get). Both methods return an async function which when evaluated will cancel watching.
+You can watch for incoming wallet transactions with `watchTransactionHashes` and `watchTransactions` methods. The former monitors transaction hashes and the latter receives decoded transactions in verbose format as per [specification](https://electrum-cash-protocol.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-get). Both methods return a cancel function.
 
 ```js
-await wallet.watchAddress((txHash) => {
+const cancelHashes = await wallet.watchTransactionHashes((txHash) => {
   console.log(txHash);
 });
 
-const cancelWatch = await wallet.watchAddressTransactions((tx) => {
-  if (tx.hash === someHash) {
+const cancelWatch = await wallet.watchTransactions((tx) => {
+  console.log(tx.txid);
+  if (tx.txid === someHash) {
     await cancelWatch();
   }
 });
+```
+
+To watch specifically for CashToken transactions:
+
+```js
+const cancelTokenWatch = await wallet.watchTokenTransactions((tx) => {
+  console.log(`Token tx: ${tx.txid}`);
+});
+```
+
+You can stop all active subscriptions on a wallet at once:
+
+```js
+await wallet.stop();
 ```
 
 You can also wait for a wallet transaction and halt the program execution until it arrives:
