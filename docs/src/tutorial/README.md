@@ -100,7 +100,7 @@ To get started using Bitcoin Cash on your site, include these tags in your `<hea
 ```html
 <head>
   <script src="https://cdn.mainnet.cash/mainnet-.js"
-   integrity="sha384-4yhn7NbhfgJ9EYI7OXOCV4g9wZ1VBK7e8b6o6mGzIiPZo/BukBBzH17YqHLozP/B"
+   integrity="sha384-Vtf1tbTzcAZ0qI5UKA8b+YPGOty2opnA2uqnP3ZC5KpxrlNRL681NW2lyUuoKfV+"
    crossorigin="anonymous"></script>
 </head>
 <body>
